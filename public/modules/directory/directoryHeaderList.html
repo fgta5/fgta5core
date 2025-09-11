@@ -1,0 +1,25 @@
+<div class="search-container">
+	<div id="directoryHeaderList-pnl_search" class="search-parameters">
+		<input id="directoryHeaderList-txt_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext">
+	</div>
+	<button id="directoryHeaderList-btn_gridload">Load</button>
+</div>
+
+<table id="directoryHeaderList-tbl" fgta5-component="Gridview">
+	<thead>
+		<tr data-header key="directory_id">
+			<th data-name="directory_id" binding="directory_id" >ID</th>
+			<th data-name="directory_name" binding="directory_name" >Name</th>
+		</tr>
+	</thead>
+</table>
+
+
+
+<div class="footer-buttons-container">
+	<div></div>
+	<div>
+		<button id="directoryHeaderList-btn_new" data-action="directoryHeader-new" data-sectionsource="directoryHeaderList-section">New</button>
+	</div>
+	<div></div>
+</div>

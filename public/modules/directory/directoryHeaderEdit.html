@@ -1,0 +1,109 @@
+<form id="directoryHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="directoryHeaderEdit-obj_directory_id">
+
+	<!-- Textbox: directory_id-->	
+	<div id="directoryHeaderEdit-obj_directory_id-container" class="input-field" field="directoryHeaderEdit-obj_directory_id">
+		<label for="directoryHeaderEdit-obj_directory_id">ID</label>
+		<input id="directoryHeaderEdit-obj_directory_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
+			binding="directory_id"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: directory_name-->	
+	<div id="directoryHeaderEdit-obj_directory_name-container" class="input-field" field="directoryHeaderEdit-obj_directory_name">
+		<label for="directoryHeaderEdit-obj_directory_name">Name</label>
+		<input id="directoryHeaderEdit-obj_directory_name"  fgta5-component="Textbox" placeholder="nama directory" autocomplete="off" spellcheck="false" 
+			binding="directory_name"
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Textbox: directory_descr-->	
+	<div id="directoryHeaderEdit-obj_directory_descr-container" class="input-field" field="directoryHeaderEdit-obj_directory_descr">
+		<label for="directoryHeaderEdit-obj_directory_descr">Descr</label>
+		<input id="directoryHeaderEdit-obj_directory_descr"  fgta5-component="Textbox" placeholder="deskripsi" autocomplete="off" spellcheck="false" 
+			binding="directory_descr"
+			autocomplete="off" spellcheck="false" 
+			maxlength="255" 
+		>
+	</div>
+
+
+	<!-- Textbox: directory_icon-->	
+	<div id="directoryHeaderEdit-obj_directory_icon-container" class="input-field" field="directoryHeaderEdit-obj_directory_icon">
+		<label for="directoryHeaderEdit-obj_directory_icon">Icon</label>
+		<input id="directoryHeaderEdit-obj_directory_icon"  fgta5-component="Textbox" placeholder="icon" autocomplete="off" spellcheck="false" 
+			binding="directory_icon"
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Combobox: directory_parent-->	
+	<div id="directoryHeaderEdit-obj_directory_parent-container" class="input-field" field="directoryHeaderEdit-obj_directory_parent">
+		<label for="directoryHeaderEdit-obj_directory_parent">Parent</label>
+		<input id="directoryHeaderEdit-obj_directory_parent"  fgta5-component="Combobox" placeholder="parent" autocomplete="off" spellcheck="false" 
+			binding="directory_parent"
+			data-display="directory_parentname" 
+		>
+	</div>
+
+
+	<!-- Textbox: directory_path-->	
+	<div id="directoryHeaderEdit-obj_directory_path-container" class="input-field" field="directoryHeaderEdit-obj_directory_path">
+		<label for="directoryHeaderEdit-obj_directory_path">Path</label>
+		<input id="directoryHeaderEdit-obj_directory_path"  fgta5-component="Textbox" placeholder="path" autocomplete="off" spellcheck="false" 
+			binding="directory_path"
+			autocomplete="off" spellcheck="false" 
+			maxlength="255" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Textbox: directory_pathid-->	
+	<div id="directoryHeaderEdit-obj_directory_pathid-container" class="input-field" field="directoryHeaderEdit-obj_directory_pathid">
+		<label for="directoryHeaderEdit-obj_directory_pathid">Path Id</label>
+		<input id="directoryHeaderEdit-obj_directory_pathid"  fgta5-component="Textbox" placeholder="pathid" autocomplete="off" spellcheck="false" 
+			binding="directory_pathid"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: directory_level-->	
+	<div id="directoryHeaderEdit-obj_directory_level-container" class="input-field" field="directoryHeaderEdit-obj_directory_level">
+		<label for="directoryHeaderEdit-obj_directory_level">Level</label>
+		<input id="directoryHeaderEdit-obj_directory_level"  fgta5-component="Numberbox" placeholder="level" autocomplete="off" spellcheck="false" 
+			binding="directory_level"
+			value="0" 
+			maxlength="4" 
+			disabled 
+		>
+	</div>
+	
+</form>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="directoryHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="directoryHeaderEdit-btn_save">Save</button>
+		<button id="directoryHeaderEdit-btn_edit">Edit</button>
+		<button id="directoryHeaderEdit-btn_new" data-action="directoryHeader-new">New</button>
+		<button id="directoryHeaderEdit-btn_reset">Reset</button>
+		<button id="directoryHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="directoryHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

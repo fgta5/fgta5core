@@ -6,7 +6,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node .",
-    "clear": "kill -9 $(lsof -t -i :3000)"
+    "clear": "kill -9 $(lsof -t -i :3001)"
   },
   "repository": {
     "type": "git",

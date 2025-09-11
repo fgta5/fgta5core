@@ -1,0 +1,122 @@
+<form id="programHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="programHeaderEdit-obj_program_id">
+
+	<!-- Textbox: program_id-->	
+	<div id="programHeaderEdit-obj_program_id-container" class="input-field" field="programHeaderEdit-obj_program_id">
+		<label for="programHeaderEdit-obj_program_id">ID</label>
+		<input id="programHeaderEdit-obj_program_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
+			binding="program_id"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_name-->	
+	<div id="programHeaderEdit-obj_program_name-container" class="input-field" field="programHeaderEdit-obj_program_name">
+		<label for="programHeaderEdit-obj_program_name">Name</label>
+		<input id="programHeaderEdit-obj_program_name"  fgta5-component="Textbox" placeholder="Name" autocomplete="off" spellcheck="false" 
+			binding="program_name"
+			character-case="lowercase" 
+			required 
+			invalid-message-required="nama program harus diisi" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_title-->	
+	<div id="programHeaderEdit-obj_program_title-container" class="input-field" field="programHeaderEdit-obj_program_title">
+		<label for="programHeaderEdit-obj_program_title">Title</label>
+		<input id="programHeaderEdit-obj_program_title"  fgta5-component="Textbox" placeholder="title" autocomplete="off" spellcheck="false" 
+			binding="program_title"
+			required 
+			invalid-message-required="title program harus diisi" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Combobox: apps_id-->	
+	<div id="programHeaderEdit-obj_apps_id-container" class="input-field" field="programHeaderEdit-obj_apps_id">
+		<label for="programHeaderEdit-obj_apps_id">Application</label>
+		<input id="programHeaderEdit-obj_apps_id"  fgta5-component="Combobox" placeholder="application" autocomplete="off" spellcheck="false" 
+			binding="apps_id"
+			required 
+			invalid-message-required="applikasi harus diisi" 
+			data-display="apps_name" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_descr-->	
+	<div id="programHeaderEdit-obj_program_descr-container" class="input-field" field="programHeaderEdit-obj_program_descr">
+		<label for="programHeaderEdit-obj_program_descr">Descr</label>
+		<input id="programHeaderEdit-obj_program_descr"  fgta5-component="Textbox" placeholder="description" autocomplete="off" spellcheck="false" 
+			binding="program_descr"
+			autocomplete="off" spellcheck="false" 
+			maxlength="255" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_icon-->	
+	<div id="programHeaderEdit-obj_program_icon-container" class="input-field" field="programHeaderEdit-obj_program_icon">
+		<label for="programHeaderEdit-obj_program_icon">Icon</label>
+		<input id="programHeaderEdit-obj_program_icon"  fgta5-component="Textbox" placeholder="icon" autocomplete="off" spellcheck="false" 
+			binding="program_icon"
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_parameter-->	
+	<div id="programHeaderEdit-obj_program_parameter-container" class="input-field" field="programHeaderEdit-obj_program_parameter">
+		<label for="programHeaderEdit-obj_program_parameter">Parameter</label>
+		<input id="programHeaderEdit-obj_program_parameter"  fgta5-component="Textbox" placeholder="url parameter" autocomplete="off" spellcheck="false" 
+			binding="program_parameter"
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Checkbox: program_isdisabled-->	
+	<div id="programHeaderEdit-obj_program_isdisabled-container" class="input-field" field="programHeaderEdit-obj_program_isdisabled">
+		<label for="programHeaderEdit-obj_program_isdisabled">Disabled</label>
+		<input id="programHeaderEdit-obj_program_isdisabled"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
+			binding="program_isdisabled"
+			type="checkbox" 
+		>
+	</div>
+
+
+	<!-- Combobox: directory_id-->	
+	<div id="programHeaderEdit-obj_directory_id-container" class="input-field" field="programHeaderEdit-obj_directory_id">
+		<label for="programHeaderEdit-obj_directory_id">Directory</label>
+		<input id="programHeaderEdit-obj_directory_id"  fgta5-component="Combobox" placeholder="directory" autocomplete="off" spellcheck="false" 
+			binding="directory_id"
+			data-display="directory_name" 
+		>
+	</div>
+	
+</form>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="programHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="programHeaderEdit-btn_save">Save</button>
+		<button id="programHeaderEdit-btn_edit">Edit</button>
+		<button id="programHeaderEdit-btn_new" data-action="programHeader-new">New</button>
+		<button id="programHeaderEdit-btn_reset">Reset</button>
+		<button id="programHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="programHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

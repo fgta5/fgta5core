@@ -1,0 +1,29 @@
+#appsHeaderEdit-obj_apps_name-container,
+#appsHeaderEdit-obj_apps_descr-container {
+	flex-basis: 100%;
+}
+
+
+
+@media screen and (max-width: 500px) {
+	#appsHeaderEdit-obj_apps_url-container,
+	#appsHeaderEdit-obj_apps_directory-container {
+		flex-basis: 100%;
+	}	
+}
+
+@media screen and (min-width: 501px) {
+	#appsHeaderEdit-obj_apps_url-container,
+	#appsHeaderEdit-obj_apps_directory-container {
+		flex-basis: 40%;
+	}
+}
+
+
+
+
+#appsHeaderEdit-obj_apps_name-container .fgta5-entry-container,
+#appsHeaderEdit-obj_apps_url-container .fgta5-entry-container,
+#appsHeaderEdit-obj_apps_directory-container .fgta5-entry-container {
+	max-width: 500px;
+}

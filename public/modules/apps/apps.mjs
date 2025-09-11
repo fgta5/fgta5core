@@ -1,7 +1,7 @@
-import Context from './sitetype-context.mjs'  
-import * as sitetypeHeaderList from './sitetypeHeaderList.mjs' 
-import * as sitetypeHeaderEdit from './sitetypeHeaderEdit.mjs' 
-import * as Extender from './sitetype-ext.mjs'
+import Context from './apps-context.mjs'  
+import * as appsHeaderList from './appsHeaderList.mjs' 
+import * as appsHeaderEdit from './appsHeaderEdit.mjs' 
+import * as Extender from './apps-ext.mjs'
 
 const app = Context.app
 const Crsl = Context.Crsl
@@ -15,7 +15,7 @@ export default class extends Module {
 	async main(args={}) {
 		
 		console.log('initializing module...')
-		app.setTitle('Site Type')
+		app.setTitle('Application')
 		app.showFooter(true)
 		
 		args.autoLoadGridData = true
@@ -26,8 +26,8 @@ export default class extends Module {
 		// jangan import lagi module-module ini di dalam mjs tersebut
 		// karena akan terjadi cyclic redudancy pada saat di rollup
 		self.Modules = { 
-			sitetypeHeaderList, 
-			sitetypeHeaderEdit, 
+			appsHeaderList, 
+			appsHeaderEdit, 
 		}
 
 		try {
@@ -46,8 +46,8 @@ export default class extends Module {
 			} 
 
 			await Promise.all([ 
-				sitetypeHeaderList.init(self, args), 
-				sitetypeHeaderEdit.init(self, args), 
+				appsHeaderList.init(self, args), 
+				appsHeaderEdit.init(self, args), 
 				Extender.init(self, args)
 			])
 
@@ -84,7 +84,7 @@ async function render(self) {
 			}
 		})
 
-		// sitetype-ext.mjs, export function extendPage(self) {} 
+		// apps-ext.mjs, export function extendPage(self) {} 
 		if (typeof Extender.extendPage === 'function') {
 			Extender.extendPage(self)
 		} else {

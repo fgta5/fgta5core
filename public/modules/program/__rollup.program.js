@@ -1,18 +1,18 @@
 import terser from '@rollup/plugin-terser';
 
 const currentdate = (new Date()).toISOString().split('T')[0]
-const banner = `sitetype
+const banner = `program
 *
 * build at ${currentdate}
 `
 
 // untuk eksekusi npx
-// npx rollup -c ./public/modules/sitetype/__rollup-sitetype.js
+// npx rollup -c ./public/modules/program/__rollup-program.js
 
 export default {
-	input: "public/modules/sitetype/sitetype.mjs", // File utama yang menjadi entry point
+	input: "public/modules/program/program.mjs", // File utama yang menjadi entry point
 	output: {
-		file: `public/modules/sitetype/sitetype.min.mjs`, // Lokasi output file hasil bundle
+		file: `public/modules/program/program.min.mjs`, // Lokasi output file hasil bundle
 		format: "esm", // Format modul ECMAScript
 		banner: `/*! ${banner}*/`,
 		manualChunks: (id) => {

@@ -1,21 +1,21 @@
-import Context from './sitetype-context.mjs'
-import * as Extender from './sitetype-ext.mjs'
+import Context from './apps-context.mjs'
+import * as Extender from './apps-ext.mjs'
 
 
 const Crsl =  Context.Crsl
-const CurrentSectionId = Context.Sections.sitetypeHeaderList
+const CurrentSectionId = Context.Sections.appsHeaderList
 const CurrentSection = Crsl.Items[CurrentSectionId]
 const CurrentState = {}
 
-const tbl =  new $fgta5.Gridview('sitetypeHeaderList-tbl')
-const pnl_search = document.getElementById('sitetypeHeaderList-pnl_search')
-const btn_gridload = new $fgta5.ActionButton('sitetypeHeaderList-btn_gridload') 
+const tbl =  new $fgta5.Gridview('appsHeaderList-tbl')
+const pnl_search = document.getElementById('appsHeaderList-pnl_search')
+const btn_gridload = new $fgta5.ActionButton('appsHeaderList-btn_gridload') 
 
 export const Section = CurrentSection
 export const SearchParams = {}
 
 export async function init(self, args) {
-	console.log('initializing sitetypeHeaderList ...')
+	console.log('initializing appsHeaderList ...')
 
 	// add event listener
 	tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
@@ -43,7 +43,7 @@ export async function init(self, args) {
 			SearchParams[binding] =  new $fgta5[componentname](id)
 		}
 
-		// sitetypeHeaderList-ext.mjs, export function initSearchParams(self, SearchParams) {} 
+		// appsHeaderList-ext.mjs, export function initSearchParams(self, SearchParams) {} 
 		if (typeof Extender.initSearchParams === 'function') {
 			Extender.initSearchParams(self, SearchParams)
 		} else {
@@ -63,7 +63,7 @@ export async function init(self, args) {
 }
 
 export async function render(self) {
-	console.log('sitetypeHeaderList render')
+	console.log('appsHeaderList render')
 }
 
 
@@ -119,13 +119,13 @@ async function openRow(self, tr) {
 	const keyvalue = tr.getAttribute('keyvalue')
 	const key = tr.getAttribute('key')
 
-	const sitetypeHeaderEdit = self.Modules.sitetypeHeaderEdit
+	const appsHeaderEdit = self.Modules.appsHeaderEdit
 
 	try {
 		setCurrentRow(self, tr)
 		CurrentState.SelectedRow.keyValue = keyvalue
 		CurrentState.SelectedRow.key = key
-		await sitetypeHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
+		await appsHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
@@ -178,8 +178,8 @@ async function tbl_cellclick(self, evt) {
 async function tbl_celldblclick(self, evt) {
 	const tr = evt.detail.tr
 
-	const sitetypeHeaderEdit = self.Modules.sitetypeHeaderEdit
-	sitetypeHeaderEdit.Section.show()
+	const appsHeaderEdit = self.Modules.appsHeaderEdit
+	appsHeaderEdit.Section.show()
 
 	await openRow(self, tr)
 }
@@ -191,7 +191,7 @@ async function btn_gridload_click(self, evt) {
 
 
 async function tbl_loadData(self, params={}) {
-	console.log('loading sitetypeHeader data')
+	console.log('loading appsHeader data')
 	console.log(params)
 
 	const { criteria={}, limit=0, offset=0, sort={} } = params

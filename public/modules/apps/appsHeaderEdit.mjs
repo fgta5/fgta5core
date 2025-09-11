@@ -1,38 +1,41 @@
-import Context from './sitetype-context.mjs'
-import * as Extender from './sitetype-ext.mjs'
+import Context from './apps-context.mjs'
+import * as Extender from './apps-ext.mjs'
 
 
 const CurrentState = {}
 const Crsl =  Context.Crsl
-const CurrentSectionId = Context.Sections.sitetypeHeaderEdit
+const CurrentSectionId = Context.Sections.appsHeaderEdit
 const CurrentSection = Crsl.Items[CurrentSectionId]
 const Source = Context.Source
 
 
-const TitleWhenNew = 'New Site Type'
-const TitleWhenView = 'View Site Type'
-const TitleWhenEdit = 'Edit Site Type'
+const TitleWhenNew = 'New Application'
+const TitleWhenView = 'View Application'
+const TitleWhenEdit = 'Edit Application'
 const EditModeText = 'Edit'
 const LockModeText = 'Lock'
 
-const btn_edit = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_edit')
-const btn_save = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_save')
-const btn_new = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_new', 'sitetypeHeader-new')
-const btn_del = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_delete')
-const btn_reset = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_reset')
-const btn_prev = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_prev')
-const btn_next = new $fgta5.ActionButton('sitetypeHeaderEdit-btn_next')
+const btn_edit = new $fgta5.ActionButton('appsHeaderEdit-btn_edit')
+const btn_save = new $fgta5.ActionButton('appsHeaderEdit-btn_save')
+const btn_new = new $fgta5.ActionButton('appsHeaderEdit-btn_new', 'appsHeader-new')
+const btn_del = new $fgta5.ActionButton('appsHeaderEdit-btn_delete')
+const btn_reset = new $fgta5.ActionButton('appsHeaderEdit-btn_reset')
+const btn_prev = new $fgta5.ActionButton('appsHeaderEdit-btn_prev')
+const btn_next = new $fgta5.ActionButton('appsHeaderEdit-btn_next')
 
-const frm = new $fgta5.Form('sitetypeHeaderEdit-frm');
-const obj_sitetype_id = frm.Inputs['sitetypeHeaderEdit-obj_sitetype_id']
-const obj_sitetype_name = frm.Inputs['sitetypeHeaderEdit-obj_sitetype_name']
-const obj_sitetype_descr = frm.Inputs['sitetypeHeaderEdit-obj_sitetype_descr']	
+const frm = new $fgta5.Form('appsHeaderEdit-frm');
+const obj_apps_id = frm.Inputs['appsHeaderEdit-obj_apps_id']
+const obj_apps_isdisabled = frm.Inputs['appsHeaderEdit-obj_apps_isdisabled']
+const obj_apps_name = frm.Inputs['appsHeaderEdit-obj_apps_name']
+const obj_apps_descr = frm.Inputs['appsHeaderEdit-obj_apps_descr']
+const obj_apps_url = frm.Inputs['appsHeaderEdit-obj_apps_url']
+const obj_apps_directory = frm.Inputs['appsHeaderEdit-obj_apps_directory']	
 
 
 export const Section = CurrentSection
 
 export async function init(self, args) {
-	console.log('initializing sitetypeHeaderEdit ...')
+	console.log('initializing appsHeaderEdit ...')
 	
 
 	CurrentSection.addEventListener($fgta5.Section.EVT_BACKBUTTONCLICK, async (evt)=>{
@@ -60,7 +63,7 @@ export async function init(self, args) {
 
 
 export async function render(self) {
-	console.log('sitetypeHeaderEdit render')
+	console.log('appsHeaderEdit render')
 }
 
 
@@ -236,8 +239,8 @@ async function btn_new_click(self, evt) {
 	console.log('btn_new_click')
 	const sourceSection = evt.target.getAttribute('data-sectionsource') 
 
-	const sitetypeHeaderList = self.Modules.sitetypeHeaderList
-	const listsecid = sitetypeHeaderList.Section.Id
+	const appsHeaderList = self.Modules.appsHeaderList
+	const listsecid = appsHeaderList.Section.Id
 	const fromListSection = sourceSection===listsecid
 	if (fromListSection) {
 		// klik new dari list (tidak perlu cek ada perubahan data)
@@ -286,7 +289,7 @@ async function btn_new_click(self, evt) {
 		await $fgta5.MessageBox.error(err.message)
 		if (fromListSection) {
 			// jika saat tombol baru dipilih saat di list, tampilan kembalikan ke list
-			self.Modules.sitetypeHeaderList.Section.show()
+			self.Modules.appsHeaderList.Section.show()
 		}
 	}
 }
@@ -366,10 +369,10 @@ async function btn_save_click(self, evt) {
 
 			// buat baris baru di grid
 			console.log('tamabah baris baru di grid')
-			self.Modules.sitetypeHeaderList.addNewRow(self, data)
+			self.Modules.appsHeaderList.addNewRow(self, data)
 		} else {
 			console.log('update data baris yang dibuka')
-			self.Modules.sitetypeHeaderList.updateCurrentRow(self, data)
+			self.Modules.appsHeaderList.updateCurrentRow(self, data)
 		}
 
 	} catch (err) {
@@ -404,10 +407,10 @@ async function btn_del_click(self, evt) {
 		const result = await deleteData(self, idValue)
 		
 		// hapus current row yang dipilih di list
-		self.Modules.sitetypeHeaderList.removeCurrentRow(self)
+		self.Modules.appsHeaderList.removeCurrentRow(self)
 		
 		// kembali ke list
-		self.Modules.sitetypeHeaderList.Section.show()
+		self.Modules.appsHeaderList.Section.show()
 
 
 		// lock kembali form
@@ -449,12 +452,12 @@ async function btn_reset_click(self, evt) {
 
 async function btn_prev_click(self, evt) {
 	console.log('btn_prev_click')
-	self.Modules.sitetypeHeaderList.selectPreviousRow(self)
+	self.Modules.appsHeaderList.selectPreviousRow(self)
 }
 
 async function btn_next_click(self, evt) {
 	console.log('btn_next_click')
-	self.Modules.sitetypeHeaderList.selectNextRow(self)
+	self.Modules.appsHeaderList.selectNextRow(self)
 }
 
 
