@@ -20,10 +20,16 @@
 				"name": "Chrome",
 				"request": "launch",
 				"type": "chrome",
-				"url": "http://core-dev.transfashion.id",
+				"url": "https://core-dev.transfashion.id",
 				"webRoot": "${workspaceFolder}",
-				"userDataDir": "${workspaceFolder}/.vscode/chrome-profile"
+				"windows": {
+					"userDataDir": "C:/Users/agung/.vscode/chrome-profile-core"
+				},
+				"linux": {
+					"userDataDir": "/home/agung/.vscode/chrome-profile-core"
+				}
 			}				
 		]
+
 	}
 }

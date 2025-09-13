@@ -189,7 +189,7 @@ ALTER TABLE core."directory" DROP CONSTRAINT fk$core$directory$directory_parent;
 ALTER TABLE core."directory"
 	ADD CONSTRAINT fk$core$directory$directory_parent
 	FOREIGN KEY (directory_parent)
-	REFERENCES core."directory"(directory_id)
+	REFERENCES core."directory"(directory_id);
 	
 
 

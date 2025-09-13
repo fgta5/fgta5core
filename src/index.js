@@ -3,7 +3,10 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import * as path from 'node:path';
 import { createWebApplication } from '@agung_dhewe/webapps'
+import { createRouter } from './router.js'
 import db from '@agung_dhewe/webapps/src/db.js'
+
+
 
 
 dotenv.config();
@@ -50,13 +53,3 @@ async function main() {
 	})
 }
 
-
-function createRouter() {
-	const router = express.Router()
-
-	// router.get('/', (req, res)=>{
-	// 	res.status(200).send('ini index custom')
-	// })
-
-	return router
-}

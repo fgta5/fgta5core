@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>authentication</title>
+	</head>
+	<body>
+		redirect to to lgin page<br>
+		click <a id="redirectlink" href="/login">here</a> if page not redirected.
+	</body>
+	<script>
+		// ambil parameter untuk direct modul open
+		// https://core-dev.transfashion.id/?nexturl=https://ent-dev.transfashion.id/sitetype&id=STO
+
+		const urlorigin = window.location.origin
+		const queryString = window.location.search
+		const params = new URLSearchParams(queryString)
+		const nexturl = params.get('nexturl')
+		const id = params.get('id')
+
+		const qs = []
+
+		if (nexturl!=null) {
+			qs.push(`nexturl=${nexturl}`)
+		}
+
+		if (id!=null) {
+			qs.push(`id=${id}`)
+		}
+
+		const nextQueryString = qs.join('&')
+		const redirectTo = `/login?${nextQueryString}`
+
+		const el = document.getElementById('redirectlink')
+		el.setAttribute('href', redirectTo)
+
+		location.href = redirectTo
+
+	</script>
+</html>	
