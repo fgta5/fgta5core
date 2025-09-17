@@ -1,0 +1,82 @@
+<form id="groupHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="groupHeaderEdit-obj_group_id">
+
+	<!-- Textbox: group_id-->	
+	<div id="groupHeaderEdit-obj_group_id-container" class="input-field" field="groupHeaderEdit-obj_group_id">
+		<label for="groupHeaderEdit-obj_group_id">ID</label>
+		<input id="groupHeaderEdit-obj_group_id"  fgta5-component="Textbox" placeholder="ID Group" autocomplete="off" spellcheck="false" 
+			binding="group_id"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: group_name-->	
+	<div id="groupHeaderEdit-obj_group_name-container" class="input-field css nama" field="groupHeaderEdit-obj_group_name">
+		<label for="groupHeaderEdit-obj_group_name">Name</label>
+		<input id="groupHeaderEdit-obj_group_name"  fgta5-component="Textbox" placeholder="Nama Group" autocomplete="off" spellcheck="false" 
+			binding="group_name"
+			style="color: blue" 
+			character-case="uppercase" 
+			required 
+			invalid-message-required="Nama harus diisi" 
+			description="nama group" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+			minlength="2" 
+			invalid-message-minlength="Nama minimum diisi 2 character" 
+		>
+	</div>
+
+
+	<!-- Textbox: group_descr-->	
+	<div id="groupHeaderEdit-obj_group_descr-container" class="input-field" field="groupHeaderEdit-obj_group_descr">
+		<label for="groupHeaderEdit-obj_group_descr">Descr</label>
+		<input id="groupHeaderEdit-obj_group_descr"  fgta5-component="Textbox" placeholder="Deskripsi" autocomplete="off" spellcheck="false" 
+			binding="group_descr"
+			description="jelaskan secara singkat tentang fungsi group" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Combobox: grouptype_id-->	
+	<div id="groupHeaderEdit-obj_grouptype_id-container" class="input-field" field="groupHeaderEdit-obj_grouptype_id">
+		<label for="groupHeaderEdit-obj_grouptype_id">Type</label>
+		<input id="groupHeaderEdit-obj_grouptype_id"  fgta5-component="Combobox" placeholder="Group Type" autocomplete="off" spellcheck="false" 
+			binding="grouptype_id"
+			required 
+			invalid-message-required="Tipe Group harus diisi" 
+			data-display="grouptype_name" 
+		>
+	</div>
+
+
+	<!-- Checkbox: group_isdisabled-->	
+	<div id="groupHeaderEdit-obj_group_isdisabled-container" class="input-field" field="groupHeaderEdit-obj_group_isdisabled">
+		<label for="groupHeaderEdit-obj_group_isdisabled">Disabled</label>
+		<input id="groupHeaderEdit-obj_group_isdisabled"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
+			binding="group_isdisabled"
+			type="checkbox" 
+		>
+	</div>
+	
+</form>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="groupHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="groupHeaderEdit-btn_save">Save</button>
+		<button id="groupHeaderEdit-btn_edit">Edit</button>
+		<button id="groupHeaderEdit-btn_new" data-action="groupHeader-new">New</button>
+		<button id="groupHeaderEdit-btn_reset">Reset</button>
+		<button id="groupHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="groupHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

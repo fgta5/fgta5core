@@ -6,11 +6,11 @@ import sqlUtil from '@agung_dhewe/pgsqlc'
 import context from '@agung_dhewe/webapps/src/context.js'
 
 
-import * as Extender from './extenders/directory.apiext.js'
+import * as Extender from './extenders/group.apiext.js'
 
-const moduleName = 'directory'
+const moduleName = 'group'
 const headerSectionName = 'header'
-const headerTableName = 'core.directory'
+const headerTableName = 'core.group'
 
 // api: account
 export default class extends Api {
@@ -23,19 +23,19 @@ export default class extends Api {
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
-	async init(body) { return await directory_init(this, body) }
+	async init(body) { return await group_init(this, body) }
 
 	// header
-	async headerList(body) { return await directory_headerList(this, body) }
-	async headerOpen(body) { return await directory_headerOpen(this, body) }
-	async headerUpdate(body) { return await directory_headerUpdate(this, body)}
-	async headerCreate(body) { return await directory_headerCreate(this, body)}
-	async headerDelete(body) { return await directory_headerDelete(this, body) }
+	async headerList(body) { return await group_headerList(this, body) }
+	async headerOpen(body) { return await group_headerOpen(this, body) }
+	async headerUpdate(body) { return await group_headerUpdate(this, body)}
+	async headerCreate(body) { return await group_headerCreate(this, body)}
+	async headerDelete(body) { return await group_headerDelete(this, body) }
 
 }
 
 
-async function directory_init(self, body) {
+async function group_init(self, body) {
 	const req = self.req
 
 	// set sid untuk session ini, diperlukan ini agar session aktif
@@ -69,10 +69,10 @@ async function directory_init(self, body) {
 }
 
 
-async function directory_headerList(self, body) {
+async function group_headerList(self, body) {
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		searchtext: `directory_id=try_cast_int(\${searchtext}, 0) OR directory_name ILIKE '%' || \${searchtext} || '%'`,
+		searchtext: `group_id=try_cast_int(\${searchtext}, 0) OR group_name ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
@@ -103,10 +103,10 @@ async function directory_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// lookup: directory_parentname dari field directory_name pada table core.directory dimana (core.directory.directory_id = core.directory.directory_parent)
+			// lookup: grouptype_name dari field grouptype_name pada table core.grouptype dimana (core.grouptype.grouptype_id = core.group.grouptype_id)
 			{
-				const { directory_name } = await sqlUtil.lookupdb(db, 'core.directory', 'directory_id', row.directory_parent)
-				row.directory_parentname = directory_name
+				const { grouptype_name } = await sqlUtil.lookupdb(db, 'core.grouptype', 'grouptype_id', row.grouptype_id)
+				row.grouptype_name = grouptype_name
 			}
 			
 
@@ -136,11 +136,11 @@ async function directory_headerList(self, body) {
 	}
 }
 
-async function directory_headerOpen(self, body) {
+async function group_headerOpen(self, body) {
 	try {
 		const { id } = body 
-		const criteria = { directory_id: id }
-		const searchMap = { directory_id: `directory_id = \${directory_id}`}
+		const criteria = { group_id: id }
+		const searchMap = { group_id: `group_id = \${group_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
 			tablename: headerTableName, 
@@ -156,10 +156,10 @@ async function directory_headerOpen(self, body) {
 			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
-		// lookup: directory_parentname dari field directory_name pada table core.directory dimana (core.directory.directory_id = core.directory.directory_parent)
+		// lookup: grouptype_name dari field grouptype_name pada table core.grouptype dimana (core.grouptype.grouptype_id = core.group.grouptype_id)
 		{
-			const { directory_name } = await sqlUtil.lookupdb(db, 'core.directory', 'directory_id', data.directory_parent)
-			data.directory_parentname = directory_name
+			const { grouptype_name } = await sqlUtil.lookupdb(db, 'core.grouptype', 'grouptype_id', data.grouptype_id)
+			data.grouptype_name = grouptype_name
 		}
 		
 
@@ -177,7 +177,7 @@ async function directory_headerOpen(self, body) {
 }
 
 
-async function directory_headerCreate(self, body) {
+async function group_headerCreate(self, body) {
 	const { source, data } = body
 
 	try {
@@ -187,11 +187,11 @@ async function directory_headerCreate(self, body) {
 		data._createdate = (new Date()).toISOString()
 
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['directory_id'])
+		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['group_id'])
 		const result = await cmd.execute(data)
 		
 		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.directory_id}
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.group_id}
 		await self.log(logdata)
 		
 		return result
@@ -200,7 +200,7 @@ async function directory_headerCreate(self, body) {
 	}
 }
 
-async function directory_headerUpdate(self, body) {
+async function group_headerUpdate(self, body) {
 	const { source, data } = body
 
 	try {
@@ -209,11 +209,11 @@ async function directory_headerUpdate(self, body) {
 		data._modifyby = 1
 		data._modifydate = (new Date()).toISOString()
 		
-		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['directory_id'])
+		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['group_id'])
 		const result = await cmd.execute(data)
 		
 		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.directory_id} 
+		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.group_id} 
 		await self.log(logdata)
 
 		return result
@@ -223,13 +223,13 @@ async function directory_headerUpdate(self, body) {
 }
 
 
-async function directory_headerDelete(self, body) {
+async function group_headerDelete(self, body) {
 
 	try {
 		const { source, id } = body 
-		const dataToRemove = {directory_id: id}
+		const dataToRemove = {group_id: id}
 
-		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['directory_id'])
+		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['group_id'])
 		const result = await cmd.execute(dataToRemove)
 	
 		// record log

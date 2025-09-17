@@ -36,7 +36,6 @@ export default class extends Api {
 
 
 async function program_init(self, body) {
-	console.log('init generator')
 	const req = self.req
 
 	// set sid untuk session ini, diperlukan ini agar session aktif
