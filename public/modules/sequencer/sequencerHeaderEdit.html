@@ -1,0 +1,135 @@
+<form id="sequencerHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="sequencerHeaderEdit-obj_sequencer_id">
+
+	<!-- Textbox: sequencer_id-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_id-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_id">
+		<label for="sequencerHeaderEdit-obj_sequencer_id">ID</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
+			binding="sequencer_id"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: sequencer_year-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_year-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_year">
+		<label for="sequencerHeaderEdit-obj_sequencer_year">Year</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_year"  fgta5-component="Numberbox" placeholder="document year" autocomplete="off" spellcheck="false" 
+			binding="sequencer_year"
+			value="0" 
+			maxlength="9" 
+			min="2025" 
+			max="2050" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: sequencer_month-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_month-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_month">
+		<label for="sequencerHeaderEdit-obj_sequencer_month">Month</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_month"  fgta5-component="Numberbox" placeholder="month" autocomplete="off" spellcheck="false" 
+			binding="sequencer_month"
+			value="0" 
+			maxlength="9" 
+			min="1" 
+			max="12" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: sequencer_seqnum-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_seqnum-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_seqnum">
+		<label for="sequencerHeaderEdit-obj_sequencer_seqnum">SeqNum</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_seqnum"  fgta5-component="Numberbox" placeholder="document seqnum" autocomplete="off" spellcheck="false" 
+			binding="sequencer_seqnum"
+			value="0" 
+			maxlength="9" 
+			min="1" 
+			max="99" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: sequencer_block-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_block-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_block">
+		<label for="sequencerHeaderEdit-obj_sequencer_block">Block</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_block"  fgta5-component="Numberbox" placeholder="block" autocomplete="off" spellcheck="false" 
+			binding="sequencer_block"
+			value="0" 
+			maxlength="9" 
+			min="1" 
+			max="999" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: sequencer_cluster-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_cluster-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_cluster">
+		<label for="sequencerHeaderEdit-obj_sequencer_cluster">Cluster</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_cluster"  fgta5-component="Numberbox" placeholder="cluster" autocomplete="off" spellcheck="false" 
+			binding="sequencer_cluster"
+			value="0" 
+			maxlength="9" 
+			min="1" 
+			max="99" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Numberbox: sequencer_number-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_number-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_number">
+		<label for="sequencerHeaderEdit-obj_sequencer_number">Number</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_number"  fgta5-component="Numberbox" placeholder="number" autocomplete="off" spellcheck="false" 
+			binding="sequencer_number"
+			value="0" 
+			maxlength="9" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Datepicker: sequencer_lastdate-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_lastdate-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_lastdate">
+		<label for="sequencerHeaderEdit-obj_sequencer_lastdate">lastdate</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_lastdate"  fgta5-component="Datepicker" placeholder="lastdate" autocomplete="off" spellcheck="false" 
+			binding="sequencer_lastdate"
+			value="now()" 
+			disabled 
+		>
+	</div>
+
+
+	<!-- Textbox: sequencer_remark-->	
+	<div id="sequencerHeaderEdit-obj_sequencer_remark-container" class="input-field" field="sequencerHeaderEdit-obj_sequencer_remark">
+		<label for="sequencerHeaderEdit-obj_sequencer_remark">Remark</label>
+		<input id="sequencerHeaderEdit-obj_sequencer_remark"  fgta5-component="Textbox" placeholder="remark" autocomplete="off" spellcheck="false" 
+			binding="sequencer_remark"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+	
+</form>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="sequencerHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="sequencerHeaderEdit-btn_save">Save</button>
+		<button id="sequencerHeaderEdit-btn_edit">Edit</button>
+		<button id="sequencerHeaderEdit-btn_new" data-action="sequencerHeader-new">New</button>
+		<button id="sequencerHeaderEdit-btn_reset">Reset</button>
+		<button id="sequencerHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="sequencerHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

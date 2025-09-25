@@ -1,0 +1,31 @@
+<div class="search-container">
+	<div id="sequencerHeaderList-pnl_search" class="search-parameters">
+		<input id="sequencerHeaderList-txt_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext">
+	</div>
+	<button id="sequencerHeaderList-btn_gridload">Load</button>
+</div>
+
+<table id="sequencerHeaderList-tbl" fgta5-component="Gridview">
+	<thead>
+		<tr data-header key="sequencer_id">
+			<th data-name="sequencer_id" binding="sequencer_id" >ID</th>
+			<th data-name="sequencer_year" binding="sequencer_year" >Year</th>
+			<th data-name="sequencer_month" binding="sequencer_month" >Month</th>
+			<th data-name="sequencer_seqnum" binding="sequencer_seqnum" >SeqNum</th>
+			<th data-name="sequencer_block" binding="sequencer_block" >Block</th>
+			<th data-name="sequencer_cluster" binding="sequencer_cluster" >Cluster</th>
+			<th data-name="sequencer_number" binding="sequencer_number" >Number</th>
+			<th data-name="sequencer_lastdate" binding="sequencer_lastdate" >lastdate</th>
+		</tr>
+	</thead>
+</table>
+
+
+
+<div class="footer-buttons-container">
+	<div></div>
+	<div>
+		<button id="sequencerHeaderList-btn_new" data-action="sequencerHeader-new" data-sectionsource="sequencerHeaderList-section">New</button>
+	</div>
+	<div></div>
+</div>
