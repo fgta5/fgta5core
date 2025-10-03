@@ -237,6 +237,10 @@ async function  frm_locked(self, evt) {
 	// trigger lock event di group
 	self.Modules.userGroupList.headerLocked(self)
 	self.Modules.userGroupEdit.headerLocked(self)
+	
+	// trigger lock event di favourite
+	self.Modules.userFavouriteList.headerLocked(self)
+	self.Modules.userFavouriteEdit.headerLocked(self)
 		
 
 }
@@ -273,6 +277,10 @@ async function  frm_unlocked(self, evt) {
 	// trigger unlock event di group
 	self.Modules.userGroupList.headerUnlocked(self)
 	self.Modules.userGroupEdit.headerUnlocked(self)	
+	
+	// trigger unlock event di favourite
+	self.Modules.userFavouriteList.headerUnlocked(self)
+	self.Modules.userFavouriteEdit.headerUnlocked(self)	
 		
 }
 

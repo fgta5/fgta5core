@@ -7,6 +7,8 @@ import * as userPropList from './userPropList.mjs'
 import * as userPropEdit from './userPropEdit.mjs' 
 import * as userGroupList from './userGroupList.mjs' 
 import * as userGroupEdit from './userGroupEdit.mjs' 
+import * as userFavouriteList from './userFavouriteList.mjs' 
+import * as userFavouriteEdit from './userFavouriteEdit.mjs' 
 import * as Extender from './user-ext.mjs'
 
 const app = Context.app
@@ -40,6 +42,8 @@ export default class extends Module {
 			userPropEdit, 
 			userGroupList, 
 			userGroupEdit, 
+			userFavouriteList, 
+			userFavouriteEdit, 
 		}
 
 		try {
@@ -66,6 +70,8 @@ export default class extends Module {
 				userPropEdit.init(self, args), 
 				userGroupList.init(self, args), 
 				userGroupEdit.init(self, args), 
+				userFavouriteList.init(self, args), 
+				userFavouriteEdit.init(self, args), 
 				Extender.init(self, args)
 			])
 

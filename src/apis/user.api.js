@@ -15,7 +15,8 @@ const headerSectionName = 'header'
 const headerTableName = 'core.user' 
 const loginTableName = 'core.userlogin'  
 const propTableName = 'core.userprop'  
-const groupTableName = 'core.usergroup'  	
+const groupTableName = 'core.usergroup'  
+const favouriteTableName = 'core.userfavouriteprogram'  	
 
 // api: account
 export default class extends Api {
@@ -61,6 +62,14 @@ export default class extends Api {
 	async groupCreate(body) { return await user_groupCreate(this, body) }
 	async groupDelete(body) { return await user_groupDelete(this, body) }
 	async groupDeleteRows(body) { return await user_groupDeleteRows(this, body) }
+	
+	// favourite	
+	async favouriteList(body) { return await user_favouriteList(this, body) }
+	async favouriteOpen(body) { return await user_favouriteOpen(this, body) }
+	async favouriteUpdate(body) { return await user_favouriteUpdate(this, body)}
+	async favouriteCreate(body) { return await user_favouriteCreate(this, body) }
+	async favouriteDelete(body) { return await user_favouriteDelete(this, body) }
+	async favouriteDeleteRows(body) { return await user_favouriteDeleteRows(this, body) }
 			
 }	
 
@@ -433,6 +442,32 @@ async function user_headerDelete(self, body) {
 
 					user_log(self, body, startTime, groupTableName, rowgroup.usergroup_id, 'DELETE', {rowdata: deletedRow})
 					user_log(self, body, startTime, headerTableName, rowgroup.user_id, 'DELETE ROW GROUP', {usergroup_id: rowgroup.usergroup_id, tablename: groupTableName}, `removed: ${rowgroup.usergroup_id}`)
+
+
+				}	
+			}
+
+			// hapus data favourite
+			{
+				const sql = `select * from ${favouriteTableName} where user_id=\${user_id}`
+				const rows = await tx.any(sql, dataToRemove)
+				for (let rowfavourite of rows) {
+					// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
+					if (typeof Extender.favouriteDeleting === 'function') {
+						await Extender.favouriteDeleting(self, tx, rowfavourite, logMetadata)
+					}
+
+					const param = {userfavouriteprogram_id: rowfavourite.userfavouriteprogram_id}
+					const cmd = sqlUtil.createDeleteCommand(favouriteTableName, ['userfavouriteprogram_id'])
+					const deletedRow = await cmd.execute(param)
+
+					// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
+					if (typeof Extender.favouriteDeleted === 'function') {
+						await Extender.favouriteDeleted(self, tx, deletedRow, logMetadata)
+					}					
+
+					user_log(self, body, startTime, favouriteTableName, rowfavourite.userfavouriteprogram_id, 'DELETE', {rowdata: deletedRow})
+					user_log(self, body, startTime, headerTableName, rowfavourite.user_id, 'DELETE ROW FAVOURITE', {userfavouriteprogram_id: rowfavourite.userfavouriteprogram_id, tablename: favouriteTableName}, `removed: ${rowfavourite.userfavouriteprogram_id}`)
 
 
 				}	
@@ -1324,6 +1359,303 @@ async function user_groupDeleteRows(self, body) {
 
 				user_log(self, body, startTime, groupTableName, rowgroup.usergroup_id, 'DELETE', {rowdata: deletedRow})
 				user_log(self, body, startTime, headerTableName, rowgroup.user_id, 'DELETE ROW GROUP', {usergroup_id: rowgroup.usergroup_id, tablename: groupTableName}, `removed: ${rowgroup.usergroup_id}`)
+			}
+		})
+
+		const res = {
+			deleted: true,
+			message: ''
+		}
+		return res
+	} catch (err) {
+		throw err
+	}	
+}
+
+
+// favourite	
+
+async function user_favouriteList(self, body) {
+	const tablename = favouriteTableName
+	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
+	const searchMap = {
+		user_id: `user_id=try_cast_bigint(\${user_id}, 0)`,
+	};
+
+
+	try {
+	
+		// hilangkan criteria '' atau null
+		for (var cname in criteria) {
+			if (criteria[cname]==='' || criteria[cname]===null) {
+				delete criteria[cname]
+			}
+		}
+
+		// apabila ada keperluan untuk recompose criteria
+		if (typeof Extender.userListCriteria === 'function') {
+			await Extender.userListCriteria(self, db, searchMap, criteria, sort, columns)
+		}
+
+		var max_rows = limit==0 ? 10 : limit
+		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
+		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
+		const rows = await db.any(sql, queryParams);
+
+		
+		var i = 0
+		const data = []
+		for (var row of rows) {
+			i++
+			if (i>max_rows) { break }
+
+			// lookup: program_name dari field program_name pada table core.program dimana (core.program.program_id = core.user.program_id)
+			{
+				const { program_name } = await sqlUtil.lookupdb(db, 'core.program', 'program_id', row.program_id)
+				row.program_name = program_name
+			}
+			
+
+			// pasang extender di sini
+			if (typeof Extender.detilListRow === 'function') {
+				await Extender.detilListRow(row)
+			}
+
+			data.push(row)
+		}
+
+		var nextoffset = null
+		if (rows.length>max_rows) {
+			nextoffset = offset+max_rows
+		}
+
+		return {
+			criteria: criteria,
+			limit:  max_rows,
+			nextoffset: nextoffset,
+			data: data
+		}
+
+	} catch (err) {
+		throw err
+	}
+}
+
+async function user_favouriteOpen(self, body) {
+	const tablename = favouriteTableName
+
+	try {
+		const { id } = body 
+		const criteria = { userfavouriteprogram_id: id }
+		const searchMap = { userfavouriteprogram_id: `userfavouriteprogram_id = \${userfavouriteprogram_id}`}
+		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
+		const sql = sqlUtil.createSqlSelect({
+			tablename, 
+			columns:[], 
+			whereClause, 
+			sort:{}, 
+			limit:0, 
+			offset:0, 
+			queryParams
+		})
+		const data = await db.one(sql, queryParams);
+		if (data==null) { 
+			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
+		}	
+
+
+		// lookup: program_name dari field program_name pada table core.program dimana (core.program.program_id = core.user.program_id)
+		{
+			const { program_name } = await sqlUtil.lookupdb(db, 'core.program', 'program_id', data.program_id)
+			data.program_name = program_name
+		}
+		
+
+		// lookup data createby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._createby)
+			data._createby = user_fullname ?? ''
+		}
+
+		// lookup data modifyby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._modifyby)
+			data._modifyby = user_fullname ?? ''
+		}	
+
+		return data
+	} catch (err) {
+		throw err
+	}
+}
+
+async function user_favouriteCreate(self, body) {
+	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = favouriteTableName
+
+	try {
+
+		data._createby = user_id
+		data._createdate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const sequencer = createSequencerLine(tx, {})
+			const id = await sequencer.increment('USR')
+			data.userfavouriteprogram_id = id
+
+			// apabila ada keperluan pengolahan data SEBELUM disimpan
+			if (typeof Extender.favouriteCreating === 'function') {
+				await Extender.favouriteCreating(self, tx, data)
+			}
+
+			const cmd = sqlUtil.createInsertCommand(tablename, data)
+			const ret = await cmd.execute(data)
+
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.favouriteCreated === 'function') {
+				await Extender.favouriteCreated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			user_log(self, body, startTime, tablename, ret.userfavouriteprogram_id, 'CREATE', logMetadata)
+
+			return ret
+		})
+
+		return result
+	} catch (err) {
+		throw err
+	}
+}
+
+async function user_favouriteUpdate(self, body) {
+	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = favouriteTableName
+
+	try {
+
+		data._modifyby = user_id
+		data._modifydate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+
+			// apabila ada keperluan pengolahan data SEBELUM disimpan
+			if (typeof Extender.favouriteUpdating === 'function') {
+				await Extender.favouriteUpdating(self, tx, data)
+			}			
+			
+			const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['userfavouriteprogram_id'])
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.favouriteUpdated === 'function') {
+				await Extender.favouriteUpdated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			user_log(self, body, startTime, tablename, data.userfavouriteprogram_id, 'UPDATE', logMetadata)
+
+			return ret
+		})
+	
+		return result
+	} catch (err) {
+		throw err
+	}
+}
+
+async function user_favouriteDelete(self, body) {
+	const { source, id } = body 
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = favouriteTableName
+
+	try {
+
+		const deletedRow = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const dataToRemove = {userfavouriteprogram_id: id}
+			const sql = `select * from ${favouriteTableName} where userfavouriteprogram_id=\${userfavouriteprogram_id}`
+			const rowfavourite = await tx.oneOrNone(sql, dataToRemove)
+
+
+			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
+			if (typeof Extender.favouriteDeleting === 'function') {
+				await Extender.favouriteDeleting(self, tx, rowfavourite, logMetadata)
+			}
+
+			const param = {userfavouriteprogram_id: rowfavourite.userfavouriteprogram_id}
+			const cmd = sqlUtil.createDeleteCommand(favouriteTableName, ['userfavouriteprogram_id'])
+			const deletedRow = await cmd.execute(param)
+
+			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
+			if (typeof Extender.favouriteDeleted === 'function') {
+				await Extender.favouriteDeleted(self, tx, deletedRow, logMetadata)
+			}					
+
+			user_log(self, body, startTime, favouriteTableName, rowfavourite.userfavouriteprogram_id, 'DELETE', {rowdata: deletedRow})
+			user_log(self, body, startTime, headerTableName, rowfavourite.user_id, 'DELETE ROW FAVOURITE', {userfavouriteprogram_id: rowfavourite.userfavouriteprogram_id, tablename: favouriteTableName}, `removed: ${rowfavourite.userfavouriteprogram_id}`)
+
+			return deletedRow
+		})
+	
+
+		return deletedRow
+	} catch (err) {
+		throw err
+	}
+}
+
+async function user_favouriteDeleteRows(self, body) {
+	const { data } = body 
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = favouriteTableName
+
+
+	try {
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			for (let id of data) {
+				const dataToRemove = {userfavouriteprogram_id: id}
+				const sql = `select * from ${favouriteTableName} where userfavouriteprogram_id=\${userfavouriteprogram_id}`
+				const rowfavourite = await tx.oneOrNone(sql, dataToRemove)
+
+				// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
+				if (typeof Extender.favouriteDeleting === 'function') {
+					await Extender.favouriteDeleting(self, tx, rowfavourite, logMetadata)
+				}
+
+				const param = {userfavouriteprogram_id: rowfavourite.userfavouriteprogram_id}
+				const cmd = sqlUtil.createDeleteCommand(favouriteTableName, ['userfavouriteprogram_id'])
+				const deletedRow = await cmd.execute(param)
+
+				// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
+				if (typeof Extender.favouriteDeleted === 'function') {
+					await Extender.favouriteDeleted(self, tx, deletedRow, logMetadata)
+				}					
+
+				user_log(self, body, startTime, favouriteTableName, rowfavourite.userfavouriteprogram_id, 'DELETE', {rowdata: deletedRow})
+				user_log(self, body, startTime, headerTableName, rowfavourite.user_id, 'DELETE ROW FAVOURITE', {userfavouriteprogram_id: rowfavourite.userfavouriteprogram_id, tablename: favouriteTableName}, `removed: ${rowfavourite.userfavouriteprogram_id}`)
 			}
 		})
 

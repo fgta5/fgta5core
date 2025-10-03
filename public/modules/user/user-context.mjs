@@ -16,5 +16,7 @@ export default {
 		userPropEdit: 'userPropEdit-section', 
 		userGroupList: 'userGroupList-section', 
 		userGroupEdit: 'userGroupEdit-section', 
+		userFavouriteList: 'userFavouriteList-section', 
+		userFavouriteEdit: 'userFavouriteEdit-section', 
 	}
 }

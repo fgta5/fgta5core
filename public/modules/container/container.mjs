@@ -43,6 +43,21 @@ async function main(self, args) {
 			appmgr_logout(self, evt)
 		})
 
+		appmgr.addEventListener('addtofavourite', evt=>{
+			appmgr_addtofavourite(self, evt)
+		})
+
+		appmgr.addEventListener('removefavourite', evt=>{
+			appmgr_removefavourite(self, evt)
+		})
+
+		appmgr.addEventListener('openprofile', evt=>{
+			appmgr_openprofile(self, evt)
+		})
+
+		appmgr.addEventListener('openpreference', evt=>{
+			appmgr_openpreference(self, evt)
+		})
 
 	} catch (err) {
 		throw err
@@ -52,8 +67,7 @@ async function main(self, args) {
 async function appmgr_logout(self, evt) {
 	let mask = $fgta5.Modal.createMask()
 	try {
-		const apiLogout = new $fgta5.ApiEndpoint('login/do-logout')
-		const result = await apiLogout.execute({})
+		const result = await Module.apiCall(`login/do-logout`, {})
 		if (result) {
 			sessionStorage.removeItem('nextmodule');
 			sessionStorage.removeItem('login_nexturl');
@@ -66,5 +80,67 @@ async function appmgr_logout(self, evt) {
 	} finally {
 		mask.close()
 		mask = null
+	}
+}
+
+async function appmgr_addtofavourite(self, evt) {
+	try {
+		const program_id = evt.detail.modulename
+		const param = { program_id }
+		const result = await Module.apiCall(`/container/add-to-favourite`, param)
+	} catch (err) {
+		console.log(err)
+		$fgta5.MessageBox.error(err.message)
+	}
+
+}
+
+async function appmgr_removefavourite(self, evt) {
+	try {
+		const program_id = evt.detail.modulename
+		const param = { program_id }
+		const result = await Module.apiCall(`/container/remove-from-favourite`, param)
+	} catch (err) {
+		console.log(err)
+		$fgta5.MessageBox.error(err.message)
+	}
+}
+
+async function appmgr_openprofile(self, evt) {
+	try {
+		// buka program profile
+		const type = 'program' 
+		const name = 'profile'
+		const title = 'Profile'
+		const url = 'profile'
+		appmgr.openModule({
+			type, 
+			name, 
+			title, 
+			url 
+		})
+	} catch (err) {
+		console.log(err)
+		$fgta5.MessageBox.error(err.message)
+	}
+}
+
+async function appmgr_openpreference(self, evt) {
+	try {
+		// buka program profile
+		const type = 'program' 
+		const name = 'preference'
+		const title = 'Preference'
+		const url = 'preference'
+		appmgr.openModule({
+			type, 
+			name, 
+			title, 
+			url 
+		})
+
+	} catch (err) {
+		console.log(err)
+		$fgta5.MessageBox.error(err.message)
 	}
 }

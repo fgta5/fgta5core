@@ -1,7 +1,7 @@
 <form id="userHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="userHeaderEdit-obj_user_id">
 
 	<!-- Textbox: user_id-->	
-	<div id="userHeaderEdit-obj_user_id-container" class="input-field" field="userHeaderEdit-obj_user_id">
+	<div id="userHeaderEdit-obj_user_id-container" class="input-field hidden" field="userHeaderEdit-obj_user_id">
 		<label for="userHeaderEdit-obj_user_id">ID</label>
 		<input id="userHeaderEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
@@ -17,6 +17,7 @@
 		<input id="userHeaderEdit-obj_user_name"  fgta5-component="Textbox" placeholder="username" autocomplete="off" spellcheck="false" 
 			binding="user_name"
 			character-case="lowercase" 
+			required 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 		>
@@ -64,7 +65,8 @@
 		<input id="userHeaderEdit-obj_user_password"  fgta5-component="Textbox" placeholder="password" autocomplete="off" spellcheck="false" 
 			binding="user_password"
 			autocomplete="off" spellcheck="false" 
-			maxlength="30" 
+			maxlength="255" 
+			disabled 
 		>
 	</div>
 
@@ -96,6 +98,10 @@
 		</div>
 		<div class="panel-detil-row">
 			<div data-label><a href="javascript:void(0)" data-target-section="userGroupList" data-current-section="userHeaderEdit">Group</a></div>
+			<div data-info>&nbsp</div>
+		</div>
+		<div class="panel-detil-row">
+			<div data-label><a href="javascript:void(0)" data-target-section="userFavouriteList" data-current-section="userHeaderEdit">Favourite</a></div>
 			<div data-info>&nbsp</div>
 		</div>
 

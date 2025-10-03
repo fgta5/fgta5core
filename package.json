@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/agungdhewe/fgta5core#readme",
   "dependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "bcrypt": "^6.0.0",
     "connect-redis": "^9.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

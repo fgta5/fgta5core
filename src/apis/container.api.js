@@ -3,50 +3,23 @@ import pgp from 'pg-promise';
 import db from '@agung_dhewe/webapps/src/db.js'
 import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
+import { createSequencerLine } from '@agung_dhewe/webapps/src/sequencerline.js' 
 
 const moduleName = 'container'
-
-
-// dummy program
-const programs = {
-	appgen: {type:'program', name:'generator', title:'Generator', url:'appgen'},
-	account: {type:'program', name:'account', title:'Account', icon:'images/iconprograms/mcfly.png'},
-	departement: {type:'program', name:'departement', title:'Departemen', icon: 'images/iconprograms/mcfly.png'},
-	lokasi: {type:'program', name:'lokasi', title:'Lokasi', icon: 'images/iconprograms/medicine.png'},
-	periode: {type:'program', name:'periode', title:'Periode', icon: 'images/iconprograms/mountain.png'},
-	jurnal: {type:'program', name:'jurnal', title:'Jurnal Umum', icon: 'images/iconprograms/packman.png', disabled:true},
-	payment: {type:'program', name:'payment', title:'Pembayaran', icon: 'images/iconprograms/photo.png'},
-	hutang: {type:'program', name:'hutang', title:'Hutang', icon: 'images/iconprograms/pin.png'},
-	user: {type:'program', name:'user', title:'User', icon: 'images/iconprograms/pizza.png'},
-	group: {type:'program', name:'group', title:'Group', icon: 'images/iconprograms/speakers.png'},
-	crud01: {type:'program', name:'crud01', title:'Simple CRUD', icon: 'images/iconprograms/speakers.png', url:'http://localhost:3000/user'},
-}
-
 
 // api: account
 export default class extends Api {
 	constructor(req, res, next) {
 		super(req, res, next);
 		Api.cekLogin(req)
-
-		// set context dengan data session saat ini
-		// this.context = {
-		// 	userId: req.session.user.userId,
-		// 	userName: req.session.user.userName,
-		// 	userFullname: req.session.user.userFullname,
-		// 	sid: req.sessionID,
-		// 	notifierId: Api.generateNotifierId(moduleName, req.sessionID),
-		// 	notifierSocket: req.app.locals.appConfig.notifierSocket,
-		// 	notifierServer: req.app.locals.appConfig.notifierServer,
-		// }
-
-		
 	}
 
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
 	async init(body) { return await container_init(this, body) }	
+	async addToFavourite(body)  { return await container_addToFavourite(this, body) }	
+	async removeFromFavourite(body)  { return await container_removeFromFavourite(this, body) }	
 }
 
 
@@ -67,7 +40,7 @@ async function container_init(self, body) {
 			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
 			notifierSocket: req.app.locals.appConfig.notifierSocket,			
 			programs: await getAllProgram(self,  req.session.user.userId),
-			favourites: getUserFavourites(self,  req.session.user.userId)
+			favourites: await getUserFavourites(self,  req.session.user.userId)
 		}
 	} catch (err) {
 		throw err
@@ -75,11 +48,17 @@ async function container_init(self, body) {
 }
 
 
-function getUserFavourites() {
-	try {
-		
+async function getUserFavourites(self, user_id) {
 
-		return []
+	const data = []
+	try {
+		const sql = 'select program_id from core.userfavouriteprogram where user_id=${user_id}'
+		const param = { user_id }
+		const rows = await db.any(sql, param)
+		for (var row of rows) {
+			data.push(row.program_id)
+		}
+		return data
 	} catch (err) {
 		throw err
 	}
@@ -107,14 +86,16 @@ function composeMenuProgram(rows, parent=null) {
 				type: 'program', 
 				name: row.id,
 				title: row.title,
-				icon: row.icon,
+				icon: row.icon=='' ? null : row.icon,
 				url: row.url
 			})
 		} else {
+			console.log(row)
 			// directory
 			programs.push({
 				title: row.title,
-				icon: '',
+				icon: row.icon=='' ? null : row.icon,
+				border: (row.icon=='' || row.icon==null) ? false : true,
 				items: composeMenuProgram(rows, row.id)
 			})
 		}
@@ -123,45 +104,58 @@ function composeMenuProgram(rows, parent=null) {
 }
 
 
-	// return [
-	// 	programs.appgen,
+async function container_addToFavourite(self, body) {
+	const { program_id } = body
+	const req = self.req
+	const user_id = req.session.user.userId
 
-	// 	{
-	// 		title: 'Accounting',
-	// 		border: false,
-	// 		items: [
-	// 			{
-	// 				icon: 'images/icon-food.svg',
-	// 				title: 'Master data',
-	// 				items: [
-	// 					programs.account,
-	// 					programs.departement,
-	// 					programs.lokasi,
-	// 					programs.periode
-	// 				]
-	// 			},
-	// 			{
-	// 				title: 'Transaksi',
-	// 				border: false,
-	// 				items: [
-	// 					programs.jurnal,
-	// 					programs.payment,
-	// 					programs.hutang
+	console.log(program_id)
 
+	try {
 
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
 
-	// 				]
-	// 			}
-	// 		]
-	// 	},
-	// 	{
-	// 		title: 'Administrator',
-	// 		border: false,
-	// 		items: [
-	// 			programs.user,
-	// 			programs.group,
-	// 		]
-	// 	},
-		
-	// 	programs.crud01,
-	// ]
+			// cek apakah user sudah ada program favourite ini
+			const sql = 'select program_id from core.userfavouriteprogram where user_id=${user_id} and program_id=${program_id}'
+			const param = { user_id, program_id }
+			const row = await tx.oneOrNone(sql, param)
+
+			if (row==null) {
+				// belum ada, tambahkan ke user favourite
+				const sequencer = createSequencerLine(tx, {})
+				const userfavouriteprogram_id = await sequencer.increment('CNT')
+				const data = {
+					userfavouriteprogram_id,
+					program_id,
+					user_id,
+					_createby: user_id,
+					_createdate: (new Date()).toISOString()
+				}
+
+				const cmd = sqlUtil.createInsertCommand('core.userfavouriteprogram', data)
+				const ret = await cmd.execute(data)
+			}
+		})
+
+	} catch (err) {
+		throw err
+	}	
+}
+
+async function container_removeFromFavourite(self, body) {
+	const { program_id } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+
+	try {
+		// hapus dari favourite
+		const sql = 'delete from core.userfavouriteprogram where user_id=${user_id} and program_id=${program_id}'
+		const param = { user_id, program_id }
+		await db.none(sql, param)
+
+	} catch (err) {
+		throw err
+	}
+}
+
