@@ -3,14 +3,15 @@ import pgp from 'pg-promise';
 import db from '@agung_dhewe/webapps/src/db.js'
 import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
-import context from '@agung_dhewe/webapps/src/context.js'
-
+import context from '@agung_dhewe/webapps/src/context.js'  
+import logger from '@agung_dhewe/webapps/src/logger.js'
+import { createSequencerLine } from '@agung_dhewe/webapps/src/sequencerline.js' 
 
 import * as Extender from './extenders/program.apiext.js'
 
 const moduleName = 'program'
 const headerSectionName = 'header'
-const headerTableName = 'core.program'
+const headerTableName = 'core.program' 	
 
 // api: account
 export default class extends Api {
@@ -31,10 +32,11 @@ export default class extends Api {
 	async headerUpdate(body) { return await program_headerUpdate(this, body)}
 	async headerCreate(body) { return await program_headerCreate(this, body)}
 	async headerDelete(body) { return await program_headerDelete(this, body) }
+	
+			
+}	
 
-}
-
-
+// init module
 async function program_init(self, body) {
 	const req = self.req
 
@@ -69,10 +71,30 @@ async function program_init(self, body) {
 }
 
 
+// data logging
+async function program_log(self, body, startTime, tablename, id, action, data={}, remark='') {
+	const { source } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const user_name = req.session.user.userFullname
+	const ipaddress = req.ip
+	const metadata = JSON.stringify({...{source:source}, ...data})
+	const endTime = process.hrtime.bigint();
+	const executionTimeMs = Number((endTime - startTime) / 1_000_000n); // hasil dalam ms tanpa desimal
+	
+	const logdata = {id, user_id, user_name, moduleName, action, tablename, executionTimeMs, remark, metadata, ipaddress}
+	const ret = await logger.log(logdata)
+	return ret
+}
+
+
+
+
 async function program_headerList(self, body) {
+	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		searchtext: `program_id=try_cast_int(\${searchtext}, 0) OR program_name ILIKE '%' || \${searchtext} || '%'`,
+		searchtext: `program_name ILIKE '%' || \${searchtext} || '%' OR program_title ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
@@ -90,10 +112,14 @@ async function program_headerList(self, body) {
 			}
 		}
 
+		// apabila ada keperluan untuk recompose criteria
+		if (typeof Extender.headerListCriteria === 'function') {
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+		}
 
 		var max_rows = limit==0 ? 10 : limit
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
-		const sql = sqlUtil.createSqlSelect({tablename:headerTableName, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
+		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
 		const rows = await db.any(sql, queryParams);
 
 		
@@ -108,17 +134,15 @@ async function program_headerList(self, body) {
 				const { apps_name } = await sqlUtil.lookupdb(db, 'core.apps', 'apps_id', row.apps_id)
 				row.apps_name = apps_name
 			}
-			// lookup: directory_name dari field directory_name pada table core.directory dimana (core.directory.directory_id = core.program.directory_id)
+			// lookup: programgroup_name dari field programgroup_name pada table core.programgroup dimana (core.programgroup.programgroup_id = core.program.programgroup_id)
 			{
-				const { directory_name } = await sqlUtil.lookupdb(db, 'core.directory', 'directory_id', row.directory_id)
-				row.directory_name = directory_name
+				const { programgroup_name } = await sqlUtil.lookupdb(db, 'core.programgroup', 'programgroup_id', row.programgroup_id)
+				row.programgroup_name = programgroup_name
 			}
 			
-
-
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(row)
+				await Extender.headerListRow(self, row)
 			}
 
 			data.push(row)
@@ -142,13 +166,15 @@ async function program_headerList(self, body) {
 }
 
 async function program_headerOpen(self, body) {
+	const tablename = headerTableName
+
 	try {
 		const { id } = body 
 		const criteria = { program_id: id }
 		const searchMap = { program_id: `program_id = \${program_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
-			tablename: headerTableName, 
+			tablename: tablename, 
 			columns:[], 
 			whereClause, 
 			sort:{}, 
@@ -158,7 +184,7 @@ async function program_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
+			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
 		// lookup: apps_name dari field apps_name pada table core.apps dimana (core.apps.apps_id = core.program.apps_id)
@@ -166,18 +192,28 @@ async function program_headerOpen(self, body) {
 			const { apps_name } = await sqlUtil.lookupdb(db, 'core.apps', 'apps_id', data.apps_id)
 			data.apps_name = apps_name
 		}
-		// lookup: directory_name dari field directory_name pada table core.directory dimana (core.directory.directory_id = core.program.directory_id)
+		// lookup: programgroup_name dari field programgroup_name pada table core.programgroup dimana (core.programgroup.programgroup_id = core.program.programgroup_id)
 		{
-			const { directory_name } = await sqlUtil.lookupdb(db, 'core.directory', 'directory_id', data.directory_id)
-			data.directory_name = directory_name
+			const { programgroup_name } = await sqlUtil.lookupdb(db, 'core.programgroup', 'programgroup_id', data.programgroup_id)
+			data.programgroup_name = programgroup_name
 		}
 		
 
+		// lookup data createby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._createby)
+			data._createby = user_fullname ?? ''
+		}
 
-
+		// lookup data modifyby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._modifyby)
+			data._modifyby = user_fullname ?? ''
+		}
+		
 		// pasang extender untuk olah data
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(data)
+			await Extender.headerOpen(self, data)
 		}
 
 		return data
@@ -189,21 +225,58 @@ async function program_headerOpen(self, body) {
 
 async function program_headerCreate(self, body) {
 	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = headerTableName
 
 	try {
-		sqlUtil.connect(db)
 
-		data._createby = 1
+		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
 
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['program_id'])
-		const result = await cmd.execute(data)
-		
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.program_id}
-		await self.log(logdata)
-		
+			
+			// buat short sequencer	
+			const sequencer = createSequencerLine(tx, {})
+
+			if (typeof Extender.sequencerSetup === 'function') {
+				// jika ada keperluan menambahkan code block/cluster di sequencer
+				// dapat diimplementasikan di exterder sequencerSetup 
+				await Extender.sequencerSetup(self, tx, sequencer, data)
+			}
+
+			// generate short id untuk CNT reset pertahun
+			const id = await sequencer.yearlyshort('CNT')
+			data.program_id = id
+
+			const seqdata = {}
+				
+
+			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
+			if (typeof Extender.headerCreating === 'function') {
+				await Extender.headerCreating(self, tx, data, seqdata)
+			}
+
+
+			const cmd = sqlUtil.createInsertCommand(tablename, data)
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.headerCreated === 'function') {
+				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			program_log(self, body, startTime, tablename, ret.program_id, 'CREATE', logMetadata)
+
+			return ret
+		})
+
 		return result
 	} catch (err) {
 		throw err
@@ -212,19 +285,42 @@ async function program_headerCreate(self, body) {
 
 async function program_headerUpdate(self, body) {
 	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = headerTableName
 
 	try {
-		sqlUtil.connect(db)
 
-		data._modifyby = 1
+		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+
+			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
+			if (typeof Extender.headerUpdating === 'function') {
+				await Extender.headerUpdating(self, tx, data)
+			}
+
+			// eksekusi update
+			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['program_id'])
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.headerUpdated === 'function') {
+				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
+			}			
+
+			// record log
+			program_log(self, body, startTime, tablename, data.program_id, 'UPDATE')
+
+			return ret
+		})
 		
-		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['program_id'])
-		const result = await cmd.execute(data)
-		
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.program_id} 
-		await self.log(logdata)
 
 		return result
 	} catch (err) {
@@ -234,20 +330,49 @@ async function program_headerUpdate(self, body) {
 
 
 async function program_headerDelete(self, body) {
+	const { source, id } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = headerTableName
 
 	try {
-		const { source, id } = body 
-		const dataToRemove = {program_id: id}
 
-		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['program_id'])
-		const result = await cmd.execute(dataToRemove)
+		const deletedRow = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const dataToRemove = {program_id: id}
+
+			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
+			if (typeof Extender.headerDeleting === 'function') {
+				await Extender.headerDeleting(self, tx, dataToRemove)
+			}
+
+			
+
+			// hapus data header
+			const cmd = sqlUtil.createDeleteCommand(tablename, ['program_id'])
+			const deletedRow = await cmd.execute(dataToRemove)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
+			if (typeof Extender.headerDeleted === 'function') {
+				await Extender.headerDeleted(self, tx, ret, logMetadata)
+			}
+
+			// record log
+			program_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
+
+			return deletedRow
+		})
 	
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'DELETE', id}
-		await self.log(logdata)
 
-		return result
+		return deletedRow
 	} catch (err) {
 		throw err
 	}
 }
+
+
+	

@@ -20,8 +20,21 @@ export async function init(self, args) {
 	// add event listener
 	tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
 	tbl.addEventListener('sorting', async evt=>{ tbl_sorting(self, evt) })
-	tbl.addEventListener('cellclick', async evt=>{ tbl_cellclick(self, evt) })
-	tbl.addEventListener('celldblclick', async evt=>{ tbl_celldblclick(self, evt) })
+
+
+	// tambahkan event lain di extender: rowrender, rowremoving
+	// dapatkan parameternya di evt.detail
+	const fn_addTableEvents_name = 'headerList_addTableEvents'
+	const fn_addTableEvents = Extender[fn_addTableEvents_name]
+	if (typeof fn_addTableEvents === 'function') {
+		fn_addTableEvents(self, tbl)
+	}
+
+	if (Module.isMobileDevice()) {
+		tbl.addEventListener('cellclick', async evt=>{ tbl_cellclick(self, evt) })
+	} else {
+		tbl.addEventListener('celldblclick', async evt=>{ tbl_cellclick(self, evt) })
+	}
 
 	btn_gridload.addEventListener('click', async evt=>{ btn_gridload_click(self, evt) })
 	
@@ -44,8 +57,10 @@ export async function init(self, args) {
 		}
 
 		// groupHeaderList-ext.mjs, export function initSearchParams(self, SearchParams) {} 
-		if (typeof Extender.initSearchParams === 'function') {
-			Extender.initSearchParams(self, SearchParams)
+		const fn_initSearchParams_name = 'headerList_initSearchParams'
+		const fn_initSearchParams = Extender[fn_initSearchParams_name]
+		if (typeof fn_initSearchParams === 'function') {
+			fn_initSearchParams(self, SearchParams)
 		} else {
 			console.warn(`'initSearchParams' tidak diimplementasikan di extender`)
 		}
@@ -62,11 +77,6 @@ export async function init(self, args) {
 
 }
 
-export async function render(self) {
-	console.log('groupHeaderList render')
-}
-
-
 export async function loadData(self) {
 	await tbl.clear()
 	tbl_loadData(self)
@@ -76,9 +86,7 @@ export function getCurrentRow(self) {
 	return CurrentState.SelectedRow
 }
 
-function setCurrentRow(self, tr) {
-	CurrentState.SelectedRow = tr
-}
+
 
 export function addNewRow(self, data) {
 	const tr = tbl.addRow(data)
@@ -115,11 +123,33 @@ export function selectPreviousRow(self) {
 }
 
 
+export function setPagingButton(self,  editModule) {
+	const tr = CurrentState.SelectedRow
+	
+	if (tr.previousElementSibling) {
+		editModule.disablePrevButton(self, false)
+	} else {
+		editModule.disablePrevButton(self, true)
+	}
+
+	if (tr.nextElementSibling) {
+		editModule.disableNextButton(self, false)
+	} else {
+		editModule.disableNextButton(self, true)
+	}
+
+}
+
+function setCurrentRow(self, tr) {
+	CurrentState.SelectedRow = tr
+}
+
 async function openRow(self, tr) {
 	const keyvalue = tr.getAttribute('keyvalue')
 	const key = tr.getAttribute('key')
 
 	const groupHeaderEdit = self.Modules.groupHeaderEdit
+	groupHeaderEdit.clearForm(self, 'loading...')
 
 	try {
 		setCurrentRow(self, tr)
@@ -133,6 +163,10 @@ async function openRow(self, tr) {
 		setCurrentRow(self, null)
 		CurrentSection.show() // kembalikan ke list kalau error saat buka data
 	}
+
+
+	// matikan atau nyalakan button prev/next sesuai kondisi
+	setPagingButton(self, groupHeaderEdit)
 }
 
 async function listRows(self, criteria, offset,limit, sort) {
@@ -162,33 +196,23 @@ async function tbl_nextdata(self, evt) {
 	tbl.scrollToFooter()
 }
 
-async function tbl_sorting(self, evt) {
+function tbl_sorting(self, evt) {
 	tbl.clear()
 	const sort = evt.detail.sort
 	const criteria = evt.detail.Criteria
 	tbl_loadData(self, {criteria, sort})
 }
 
-async function tbl_cellclick(self, evt) {
-	if (Module.isMobileDevice()) {
-		await tbl_celldblclick(self, evt)
-	}
-}
-
-async function tbl_celldblclick(self, evt) {
+function tbl_cellclick(self, evt) {
 	const tr = evt.detail.tr
 
 	const groupHeaderEdit = self.Modules.groupHeaderEdit
-	groupHeaderEdit.Section.show()
+	groupHeaderEdit.Section.show({}, (evt)=>{
+		openRow(self, tr)
+	})
 
-	await openRow(self, tr)
+	
 }
-
-async function btn_gridload_click(self, evt) {
-	setCurrentRow(self, null)
-	loadData(self)
-}
-
 
 async function tbl_loadData(self, params={}) {
 	console.log('loading groupHeader data')
@@ -231,4 +255,9 @@ async function tbl_loadData(self, params={}) {
 		mask = null
 	}
 	
+}
+
+function btn_gridload_click(self, evt) {
+	setCurrentRow(self, null)
+	loadData(self)
 }

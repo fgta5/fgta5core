@@ -5,7 +5,7 @@
   "type": "module",
   "main": "./src/index.js",
   "scripts": {
-    "start": "node .",
+    "server": "node .",
     "clear": "kill -9 $(lsof -t -i :3001)"
   },
   "repository": {

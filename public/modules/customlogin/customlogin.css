@@ -1,9 +1,30 @@
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center; /* horizontal */
+  align-items: center;     /* vertical */
+}
+
+
+
 .loginbox {
-	margin: 10px
+	margin: 10px;
+	width: 200px;
+	height: 300px;
+}
+
+.loginbox h1 {
+	text-align: center;
+}
+
+.loginbox div {
+	text-align: center;
 }
 
 .loginbox input {
 	margin-bottom: 5px;
+	width: 100%;
 }
 
 .loginbox button {

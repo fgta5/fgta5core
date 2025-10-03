@@ -56,6 +56,7 @@ async function container_init(self, body) {
 
 	const req = self.req
 	req.session.sid = req.sessionID
+
 	try {
 		return {
 			title: 'Application',
@@ -65,8 +66,8 @@ async function container_init(self, body) {
 			sid: req.session.sid,
 			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
 			notifierSocket: req.app.locals.appConfig.notifierSocket,			
-			programs: await getAllProgram(),
-			favourites: getUserFavourites()
+			programs: await getAllProgram(self,  req.session.user.userId),
+			favourites: getUserFavourites(self,  req.session.user.userId)
 		}
 	} catch (err) {
 		throw err
@@ -84,50 +85,42 @@ function getUserFavourites() {
 	}
 }
 
-async function getAllProgram() {
+async function getAllProgram(self, user_id) {
 	try {
-		const programs = []
-		const sql = "select directory_id, directory_name, directory_icon from core.directory"
-		const result = await db.any(sql)
-		for (let row of result) {
-			const dir = {
-				title: row.directory_name,
-				border: false,
-				items: []
-			}	
-
-			const sql = `
-				select 
-				A.program_id, A.program_name, A.program_title, A.program_icon,  A.program_parameter,
-				B.apps_url
-				from 
-				core.program A inner join core.apps B on B.apps_id = A.apps_id 
-				where 
-				A.directory_id  = \${directory_id}		
-			`
-
-			const params = {directory_id: row.directory_id}
-			const items = await db.any(sql, params)
-			for (let item of items) {
-				dir.items.push({
- 					type:'program', 
-					name: item.program_name, 
-					title: item.program_title, 
-					icon: `${item.apps_url}/${item.program_icon}`, //item.program_icon, 
-					url: `${item.apps_url}/${item.program_name}`
-				})
-			}
-			programs.push(dir)
-		}
-
+		const sql = 'select * from core.get_user_programs (${user_id})'	
+		const rows = await db.any(sql, {user_id})
+		const programs = composeMenuProgram(rows)
 		return programs
 	} catch (err) {
 		throw err
 	}
-	
 }
 
 
+function composeMenuProgram(rows, parent=null) {
+	const programs = []
+	const rowLevel = rows.filter(row => row.parent==parent)
+	for (let row of rowLevel) {
+		if (row.type==='program') {
+			// program
+			programs.push({
+				type: 'program', 
+				name: row.id,
+				title: row.title,
+				icon: row.icon,
+				url: row.url
+			})
+		} else {
+			// directory
+			programs.push({
+				title: row.title,
+				icon: '',
+				items: composeMenuProgram(rows, row.id)
+			})
+		}
+	}
+	return programs
+}
 
 
 	// return [

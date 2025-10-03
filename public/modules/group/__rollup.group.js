@@ -7,7 +7,7 @@ const banner = `group
 `
 
 // untuk eksekusi npx
-// npx rollup -c ./public/modules/group/__rollup-group.js
+// npx rollup -c ./public/modules/group/__rollup.group.js
 
 export default {
 	input: "public/modules/group/group.mjs", // File utama yang menjadi entry point
@@ -15,13 +15,13 @@ export default {
 		file: `public/modules/group/group.min.mjs`, // Lokasi output file hasil bundle
 		format: "esm", // Format modul ECMAScript
 		banner: `/*! ${banner}*/`,
-		manualChunks: (id) => {
-			console.log('Chunking:', id);
-			if (id.includes('module.mjs')) return null;
-		}
+		// manualChunks: (id) => {
+		// 	console.log('Chunking:', id);
+		// 	if (id.includes('module.mjs')  || id.includes('-ext.mjs') || id.includes('public/libs/webmodule')) return null;
+		// }
 	},
 	external: (id) => {
- 		return id.includes('module.mjs') || id === '$fgta5';
+ 		return id.includes('module.mjs') || id === '$fgta5' || id.includes('public/libs/webmodule');
 	},
 	
 	preserveEntrySignatures: 'strict',

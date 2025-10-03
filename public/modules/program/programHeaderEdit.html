@@ -11,20 +11,6 @@
 	</div>
 
 
-	<!-- Textbox: program_name-->	
-	<div id="programHeaderEdit-obj_program_name-container" class="input-field" field="programHeaderEdit-obj_program_name">
-		<label for="programHeaderEdit-obj_program_name">Name</label>
-		<input id="programHeaderEdit-obj_program_name"  fgta5-component="Textbox" placeholder="Name" autocomplete="off" spellcheck="false" 
-			binding="program_name"
-			character-case="lowercase" 
-			required 
-			invalid-message-required="nama program harus diisi" 
-			autocomplete="off" spellcheck="false" 
-			maxlength="90" 
-		>
-	</div>
-
-
 	<!-- Textbox: program_title-->	
 	<div id="programHeaderEdit-obj_program_title-container" class="input-field" field="programHeaderEdit-obj_program_title">
 		<label for="programHeaderEdit-obj_program_title">Title</label>
@@ -46,6 +32,42 @@
 			required 
 			invalid-message-required="applikasi harus diisi" 
 			data-display="apps_name" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_name-->	
+	<div id="programHeaderEdit-obj_program_name-container" class="input-field" field="programHeaderEdit-obj_program_name">
+		<label for="programHeaderEdit-obj_program_name">Name</label>
+		<input id="programHeaderEdit-obj_program_name"  fgta5-component="Textbox" placeholder="Name" autocomplete="off" spellcheck="false" 
+			binding="program_name"
+			character-case="lowercase" 
+			required 
+			invalid-message-required="nama program harus diisi" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Textbox: program_variance-->	
+	<div id="programHeaderEdit-obj_program_variance-container" class="input-field" field="programHeaderEdit-obj_program_variance">
+		<label for="programHeaderEdit-obj_program_variance">Variance</label>
+		<input id="programHeaderEdit-obj_program_variance"  fgta5-component="Textbox" placeholder="variance" autocomplete="off" spellcheck="false" 
+			binding="program_variance"
+			character-case="lowercase" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Combobox: programgroup_id-->	
+	<div id="programHeaderEdit-obj_programgroup_id-container" class="input-field" field="programHeaderEdit-obj_programgroup_id">
+		<label for="programHeaderEdit-obj_programgroup_id">Group</label>
+		<input id="programHeaderEdit-obj_programgroup_id"  fgta5-component="Combobox" placeholder="program group" autocomplete="off" spellcheck="false" 
+			binding="programgroup_id"
+			data-display="programgroup_name" 
 		>
 	</div>
 
@@ -72,17 +94,6 @@
 	</div>
 
 
-	<!-- Textbox: program_parameter-->	
-	<div id="programHeaderEdit-obj_program_parameter-container" class="input-field" field="programHeaderEdit-obj_program_parameter">
-		<label for="programHeaderEdit-obj_program_parameter">Parameter</label>
-		<input id="programHeaderEdit-obj_program_parameter"  fgta5-component="Textbox" placeholder="url parameter" autocomplete="off" spellcheck="false" 
-			binding="program_parameter"
-			autocomplete="off" spellcheck="false" 
-			maxlength="90" 
-		>
-	</div>
-
-
 	<!-- Checkbox: program_isdisabled-->	
 	<div id="programHeaderEdit-obj_program_isdisabled-container" class="input-field" field="programHeaderEdit-obj_program_isdisabled">
 		<label for="programHeaderEdit-obj_program_isdisabled">Disabled</label>
@@ -91,18 +102,28 @@
 			type="checkbox" 
 		>
 	</div>
-
-
-	<!-- Combobox: directory_id-->	
-	<div id="programHeaderEdit-obj_directory_id-container" class="input-field" field="programHeaderEdit-obj_directory_id">
-		<label for="programHeaderEdit-obj_directory_id">Directory</label>
-		<input id="programHeaderEdit-obj_directory_id"  fgta5-component="Combobox" placeholder="directory" autocomplete="off" spellcheck="false" 
-			binding="directory_id"
-			data-display="directory_name" 
-		>
-	</div>
 	
 </form>
+
+
+<div id="panel-detil-selector" class="panel-detil hidden">
+	<div panel-title>
+		Information Detil
+	</div>
+	<div panel-content>
+
+		<div id="panel-detil-additionalinfo">
+			<!-- tambahkan additional info disini -->
+		</div>
+	</div>
+</div>
+ 
+
+<div class="panel-recordbar" data-view="nodetil">
+	<div><a id="programHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
+	<div><a id="programHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
+	<div><a id="programHeader-btn_about" href="javascript:void(0)">About</a></div>
+</div>
 
 
 <div class="footer-buttons-container hidden">

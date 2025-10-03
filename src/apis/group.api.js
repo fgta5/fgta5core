@@ -3,14 +3,16 @@ import pgp from 'pg-promise';
 import db from '@agung_dhewe/webapps/src/db.js'
 import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
-import context from '@agung_dhewe/webapps/src/context.js'
-
+import context from '@agung_dhewe/webapps/src/context.js'  
+import logger from '@agung_dhewe/webapps/src/logger.js'
+import { createSequencerLine } from '@agung_dhewe/webapps/src/sequencerline.js' 
 
 import * as Extender from './extenders/group.apiext.js'
 
 const moduleName = 'group'
 const headerSectionName = 'header'
-const headerTableName = 'core.group'
+const headerTableName = 'core.group' 
+const programTableName = 'core.groupprogram'  	
 
 // api: account
 export default class extends Api {
@@ -31,10 +33,19 @@ export default class extends Api {
 	async headerUpdate(body) { return await group_headerUpdate(this, body)}
 	async headerCreate(body) { return await group_headerCreate(this, body)}
 	async headerDelete(body) { return await group_headerDelete(this, body) }
+	
+	
+	// program	
+	async programList(body) { return await group_programList(this, body) }
+	async programOpen(body) { return await group_programOpen(this, body) }
+	async programUpdate(body) { return await group_programUpdate(this, body)}
+	async programCreate(body) { return await group_programCreate(this, body) }
+	async programDelete(body) { return await group_programDelete(this, body) }
+	async programDeleteRows(body) { return await group_programDeleteRows(this, body) }
+			
+}	
 
-}
-
-
+// init module
 async function group_init(self, body) {
 	const req = self.req
 
@@ -69,10 +80,30 @@ async function group_init(self, body) {
 }
 
 
+// data logging
+async function group_log(self, body, startTime, tablename, id, action, data={}, remark='') {
+	const { source } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const user_name = req.session.user.userFullname
+	const ipaddress = req.ip
+	const metadata = JSON.stringify({...{source:source}, ...data})
+	const endTime = process.hrtime.bigint();
+	const executionTimeMs = Number((endTime - startTime) / 1_000_000n); // hasil dalam ms tanpa desimal
+	
+	const logdata = {id, user_id, user_name, moduleName, action, tablename, executionTimeMs, remark, metadata, ipaddress}
+	const ret = await logger.log(logdata)
+	return ret
+}
+
+
+
+
 async function group_headerList(self, body) {
+	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		searchtext: `group_id=try_cast_int(\${searchtext}, 0) OR group_name ILIKE '%' || \${searchtext} || '%'`,
+		searchtext: `group_name ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
@@ -90,10 +121,14 @@ async function group_headerList(self, body) {
 			}
 		}
 
+		// apabila ada keperluan untuk recompose criteria
+		if (typeof Extender.headerListCriteria === 'function') {
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+		}
 
 		var max_rows = limit==0 ? 10 : limit
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
-		const sql = sqlUtil.createSqlSelect({tablename:headerTableName, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
+		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
 		const rows = await db.any(sql, queryParams);
 
 		
@@ -103,17 +138,10 @@ async function group_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
-			// lookup: grouptype_name dari field grouptype_name pada table core.grouptype dimana (core.grouptype.grouptype_id = core.group.grouptype_id)
-			{
-				const { grouptype_name } = await sqlUtil.lookupdb(db, 'core.grouptype', 'grouptype_id', row.grouptype_id)
-				row.grouptype_name = grouptype_name
-			}
 			
-
-
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(row)
+				await Extender.headerListRow(self, row)
 			}
 
 			data.push(row)
@@ -137,13 +165,15 @@ async function group_headerList(self, body) {
 }
 
 async function group_headerOpen(self, body) {
+	const tablename = headerTableName
+
 	try {
 		const { id } = body 
 		const criteria = { group_id: id }
 		const searchMap = { group_id: `group_id = \${group_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
-			tablename: headerTableName, 
+			tablename: tablename, 
 			columns:[], 
 			whereClause, 
 			sort:{}, 
@@ -153,21 +183,26 @@ async function group_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
+			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
-		// lookup: grouptype_name dari field grouptype_name pada table core.grouptype dimana (core.grouptype.grouptype_id = core.group.grouptype_id)
-		{
-			const { grouptype_name } = await sqlUtil.lookupdb(db, 'core.grouptype', 'grouptype_id', data.grouptype_id)
-			data.grouptype_name = grouptype_name
-		}
 		
 
+		// lookup data createby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._createby)
+			data._createby = user_fullname ?? ''
+		}
 
-
+		// lookup data modifyby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._modifyby)
+			data._modifyby = user_fullname ?? ''
+		}
+		
 		// pasang extender untuk olah data
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(data)
+			await Extender.headerOpen(self, data)
 		}
 
 		return data
@@ -179,21 +214,58 @@ async function group_headerOpen(self, body) {
 
 async function group_headerCreate(self, body) {
 	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = headerTableName
 
 	try {
-		sqlUtil.connect(db)
 
-		data._createby = 1
+		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
 
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data, ['group_id'])
-		const result = await cmd.execute(data)
-		
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.group_id}
-		await self.log(logdata)
-		
+			
+			// buat short sequencer	
+			const sequencer = createSequencerLine(tx, {})
+
+			if (typeof Extender.sequencerSetup === 'function') {
+				// jika ada keperluan menambahkan code block/cluster di sequencer
+				// dapat diimplementasikan di exterder sequencerSetup 
+				await Extender.sequencerSetup(self, tx, sequencer, data)
+			}
+
+			// generate short id untuk CNT reset pertahun
+			const id = await sequencer.yearlyshort('CNT')
+			data.group_id = id
+
+			const seqdata = {}
+				
+
+			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
+			if (typeof Extender.headerCreating === 'function') {
+				await Extender.headerCreating(self, tx, data, seqdata)
+			}
+
+
+			const cmd = sqlUtil.createInsertCommand(tablename, data)
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.headerCreated === 'function') {
+				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			group_log(self, body, startTime, tablename, ret.group_id, 'CREATE', logMetadata)
+
+			return ret
+		})
+
 		return result
 	} catch (err) {
 		throw err
@@ -202,19 +274,42 @@ async function group_headerCreate(self, body) {
 
 async function group_headerUpdate(self, body) {
 	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = headerTableName
 
 	try {
-		sqlUtil.connect(db)
 
-		data._modifyby = 1
+		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+
+			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
+			if (typeof Extender.headerUpdating === 'function') {
+				await Extender.headerUpdating(self, tx, data)
+			}
+
+			// eksekusi update
+			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['group_id'])
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.headerUpdated === 'function') {
+				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
+			}			
+
+			// record log
+			group_log(self, body, startTime, tablename, data.group_id, 'UPDATE')
+
+			return ret
+		})
 		
-		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['group_id'])
-		const result = await cmd.execute(data)
-		
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.group_id} 
-		await self.log(logdata)
 
 		return result
 	} catch (err) {
@@ -224,20 +319,374 @@ async function group_headerUpdate(self, body) {
 
 
 async function group_headerDelete(self, body) {
+	const { source, id } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = headerTableName
 
 	try {
-		const { source, id } = body 
-		const dataToRemove = {group_id: id}
 
-		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['group_id'])
-		const result = await cmd.execute(dataToRemove)
+		const deletedRow = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const dataToRemove = {group_id: id}
+
+			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
+			if (typeof Extender.headerDeleting === 'function') {
+				await Extender.headerDeleting(self, tx, dataToRemove)
+			}
+
+			
+			// hapus data program
+			{
+				const sql = `select * from ${programTableName} where group_id=\${group_id}`
+				const rows = await tx.any(sql, dataToRemove)
+				for (let rowprogram of rows) {
+					// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
+					if (typeof Extender.programDeleting === 'function') {
+						await Extender.programDeleting(self, tx, rowprogram, logMetadata)
+					}
+
+					const param = {groupprogram_id: rowprogram.groupprogram_id}
+					const cmd = sqlUtil.createDeleteCommand(programTableName, ['groupprogram_id'])
+					const deletedRow = await cmd.execute(param)
+
+					// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
+					if (typeof Extender.programDeleted === 'function') {
+						await Extender.programDeleted(self, tx, deletedRow, logMetadata)
+					}					
+
+					group_log(self, body, startTime, programTableName, rowprogram.groupprogram_id, 'DELETE', {rowdata: deletedRow})
+					group_log(self, body, startTime, headerTableName, rowprogram.group_id, 'DELETE ROW PROGRAM', {groupprogram_id: rowprogram.groupprogram_id, tablename: programTableName}, `removed: ${rowprogram.groupprogram_id}`)
+
+
+				}	
+			}
+
+			
+			
+
+			// hapus data header
+			const cmd = sqlUtil.createDeleteCommand(tablename, ['group_id'])
+			const deletedRow = await cmd.execute(dataToRemove)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
+			if (typeof Extender.headerDeleted === 'function') {
+				await Extender.headerDeleted(self, tx, ret, logMetadata)
+			}
+
+			// record log
+			group_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
+
+			return deletedRow
+		})
 	
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'DELETE', id}
-		await self.log(logdata)
+
+		return deletedRow
+	} catch (err) {
+		throw err
+	}
+}
+
+
+
+// program	
+
+async function group_programList(self, body) {
+	const tablename = programTableName
+	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
+	const searchMap = {
+		group_id: `group_id=try_cast_bigint(\${group_id}, 0)`,
+	};
+
+
+	try {
+	
+		// hilangkan criteria '' atau null
+		for (var cname in criteria) {
+			if (criteria[cname]==='' || criteria[cname]===null) {
+				delete criteria[cname]
+			}
+		}
+
+		// apabila ada keperluan untuk recompose criteria
+		if (typeof Extender.groupListCriteria === 'function') {
+			await Extender.groupListCriteria(self, db, searchMap, criteria, sort, columns)
+		}
+
+		var max_rows = limit==0 ? 10 : limit
+		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
+		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
+		const rows = await db.any(sql, queryParams);
+
+		
+		var i = 0
+		const data = []
+		for (var row of rows) {
+			i++
+			if (i>max_rows) { break }
+
+			// lookup: program_name dari field program_name pada table core.program dimana (core.program.program_id = core.group.program_id)
+			{
+				const { program_name } = await sqlUtil.lookupdb(db, 'core.program', 'program_id', row.program_id)
+				row.program_name = program_name
+			}
+			
+
+			// pasang extender di sini
+			if (typeof Extender.detilListRow === 'function') {
+				await Extender.detilListRow(row)
+			}
+
+			data.push(row)
+		}
+
+		var nextoffset = null
+		if (rows.length>max_rows) {
+			nextoffset = offset+max_rows
+		}
+
+		return {
+			criteria: criteria,
+			limit:  max_rows,
+			nextoffset: nextoffset,
+			data: data
+		}
+
+	} catch (err) {
+		throw err
+	}
+}
+
+async function group_programOpen(self, body) {
+	const tablename = programTableName
+
+	try {
+		const { id } = body 
+		const criteria = { groupprogram_id: id }
+		const searchMap = { groupprogram_id: `groupprogram_id = \${groupprogram_id}`}
+		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
+		const sql = sqlUtil.createSqlSelect({
+			tablename, 
+			columns:[], 
+			whereClause, 
+			sort:{}, 
+			limit:0, 
+			offset:0, 
+			queryParams
+		})
+		const data = await db.one(sql, queryParams);
+		if (data==null) { 
+			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
+		}	
+
+
+		// lookup: program_name dari field program_name pada table core.program dimana (core.program.program_id = core.group.program_id)
+		{
+			const { program_name } = await sqlUtil.lookupdb(db, 'core.program', 'program_id', data.program_id)
+			data.program_name = program_name
+		}
+		
+
+		// lookup data createby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._createby)
+			data._createby = user_fullname ?? ''
+		}
+
+		// lookup data modifyby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._modifyby)
+			data._modifyby = user_fullname ?? ''
+		}	
+
+		return data
+	} catch (err) {
+		throw err
+	}
+}
+
+async function group_programCreate(self, body) {
+	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = programTableName
+
+	try {
+
+		data._createby = user_id
+		data._createdate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const sequencer = createSequencerLine(tx, {})
+			const id = await sequencer.increment('CNT')
+			data.groupprogram_id = id
+
+			// apabila ada keperluan pengolahan data SEBELUM disimpan
+			if (typeof Extender.programCreating === 'function') {
+				await Extender.programCreating(self, tx, data)
+			}
+
+			const cmd = sqlUtil.createInsertCommand(tablename, data)
+			const ret = await cmd.execute(data)
+
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.programCreated === 'function') {
+				await Extender.programCreated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			group_log(self, body, startTime, tablename, ret.groupprogram_id, 'CREATE', logMetadata)
+
+			return ret
+		})
 
 		return result
 	} catch (err) {
 		throw err
 	}
 }
+
+async function group_programUpdate(self, body) {
+	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = programTableName
+
+	try {
+
+		data._modifyby = user_id
+		data._modifydate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+
+			// apabila ada keperluan pengolahan data SEBELUM disimpan
+			if (typeof Extender.programUpdating === 'function') {
+				await Extender.programUpdating(self, tx, data)
+			}			
+			
+			const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['groupprogram_id'])
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.programUpdated === 'function') {
+				await Extender.programUpdated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			group_log(self, body, startTime, tablename, data.groupprogram_id, 'UPDATE', logMetadata)
+
+			return ret
+		})
+	
+		return result
+	} catch (err) {
+		throw err
+	}
+}
+
+async function group_programDelete(self, body) {
+	const { source, id } = body 
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = programTableName
+
+	try {
+
+		const deletedRow = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const dataToRemove = {groupprogram_id: id}
+			const sql = `select * from ${programTableName} where groupprogram_id=\${groupprogram_id}`
+			const rowprogram = await tx.oneOrNone(sql, dataToRemove)
+
+
+			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
+			if (typeof Extender.programDeleting === 'function') {
+				await Extender.programDeleting(self, tx, rowprogram, logMetadata)
+			}
+
+			const param = {groupprogram_id: rowprogram.groupprogram_id}
+			const cmd = sqlUtil.createDeleteCommand(programTableName, ['groupprogram_id'])
+			const deletedRow = await cmd.execute(param)
+
+			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
+			if (typeof Extender.programDeleted === 'function') {
+				await Extender.programDeleted(self, tx, deletedRow, logMetadata)
+			}					
+
+			group_log(self, body, startTime, programTableName, rowprogram.groupprogram_id, 'DELETE', {rowdata: deletedRow})
+			group_log(self, body, startTime, headerTableName, rowprogram.group_id, 'DELETE ROW PROGRAM', {groupprogram_id: rowprogram.groupprogram_id, tablename: programTableName}, `removed: ${rowprogram.groupprogram_id}`)
+
+			return deletedRow
+		})
+	
+
+		return deletedRow
+	} catch (err) {
+		throw err
+	}
+}
+
+async function group_programDeleteRows(self, body) {
+	const { data } = body 
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = programTableName
+
+
+	try {
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			for (let id of data) {
+				const dataToRemove = {groupprogram_id: id}
+				const sql = `select * from ${programTableName} where groupprogram_id=\${groupprogram_id}`
+				const rowprogram = await tx.oneOrNone(sql, dataToRemove)
+
+				// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
+				if (typeof Extender.programDeleting === 'function') {
+					await Extender.programDeleting(self, tx, rowprogram, logMetadata)
+				}
+
+				const param = {groupprogram_id: rowprogram.groupprogram_id}
+				const cmd = sqlUtil.createDeleteCommand(programTableName, ['groupprogram_id'])
+				const deletedRow = await cmd.execute(param)
+
+				// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
+				if (typeof Extender.programDeleted === 'function') {
+					await Extender.programDeleted(self, tx, deletedRow, logMetadata)
+				}					
+
+				group_log(self, body, startTime, programTableName, rowprogram.groupprogram_id, 'DELETE', {rowdata: deletedRow})
+				group_log(self, body, startTime, headerTableName, rowprogram.group_id, 'DELETE ROW PROGRAM', {groupprogram_id: rowprogram.groupprogram_id, tablename: programTableName}, `removed: ${rowprogram.groupprogram_id}`)
+			}
+		})
+
+		const res = {
+			deleted: true,
+			message: ''
+		}
+		return res
+	} catch (err) {
+		throw err
+	}	
+}
+
+	

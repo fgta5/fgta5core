@@ -1,6 +1,6 @@
 import Context from './setting-context.mjs'
 import * as Extender from './setting-ext.mjs'
-
+import * as pageHelper from '/public/libs/webmodule/pagehelper.mjs'
 
 const CurrentState = {}
 const Crsl =  Context.Crsl
@@ -23,10 +23,18 @@ const btn_reset = new $fgta5.ActionButton('settingHeaderEdit-btn_reset')
 const btn_prev = new $fgta5.ActionButton('settingHeaderEdit-btn_prev')
 const btn_next = new $fgta5.ActionButton('settingHeaderEdit-btn_next')
 
+const btn_recordstatus = document.getElementById('settingHeader-btn_recordstatus')
+const btn_logs = document.getElementById('settingHeader-btn_logs')
+const btn_about = document.getElementById('settingHeader-btn_about')
+
 const frm = new $fgta5.Form('settingHeaderEdit-frm');
 const obj_setting_id = frm.Inputs['settingHeaderEdit-obj_setting_id']
 const obj_setting_value = frm.Inputs['settingHeaderEdit-obj_setting_value']
 const obj_setting_descr = frm.Inputs['settingHeaderEdit-obj_setting_descr']	
+const obj_createby = document.getElementById('fRecord-section-createby')
+const obj_createdate = document.getElementById('fRecord-section-createdate')
+const obj_modifyby = document.getElementById('fRecord-section-modifyby')
+const obj_modifydate = document.getElementById('fRecord-section-modifydate')
 
 
 export const Section = CurrentSection
@@ -52,17 +60,14 @@ export async function init(self, args) {
 	btn_next.addEventListener('click', (evt)=>{ btn_next_click(self, evt)})
 
 
-	// addEventListener
+	btn_recordstatus.addEventListener('click', evt=>{ btn_recordstatus_click(self, evt) })	
+	btn_logs.addEventListener('click', evt=>{ btn_logs_click(self, evt) })	
+	btn_about.addEventListener('click', evt=>{ btn_about_click(self, evt) })
+
+
 		
 	
 }
-
-
-
-export async function render(self) {
-	console.log('settingHeaderEdit render')
-}
-
 
 export async function openSelectedData(self, params) {
 	console.log('openSelectedData')
@@ -72,6 +77,15 @@ export async function openSelectedData(self, params) {
 		const id = params.keyvalue
 		const data = await openData(self, id)
 
+		CurrentState.currentOpenedId = id
+
+		const fn_name = 'settingHeaderEdit_isEditDisabled'
+		const fn_settingHeaderEdit_isEditDisabled = Extender[fn_name]
+		if (typeof fn_settingHeaderEdit_isEditDisabled === 'function') {
+			const editDisabled = fn_settingHeaderEdit_isEditDisabled(self, data)
+			CurrentState.editDisabled = editDisabled
+		}
+
 		// disable primary key
 		setPrimaryKeyState(self, {disabled:true})
 
@@ -79,6 +93,7 @@ export async function openSelectedData(self, params) {
 		frm.acceptChanges()
 		frm.lock()
 	} catch (err) {
+		CurrentState.currentOpenedId = null
 		throw err
 	} finally {
 		mask.close()
@@ -86,6 +101,21 @@ export async function openSelectedData(self, params) {
 	}
 }
 
+export function getHeaderForm() {
+	return frm
+}
+
+export function clearForm(self, text) {
+	frm.clear(text)
+}
+
+export function disableNextButton(self, disabled=true) {
+	btn_next.disabled = disabled
+}
+
+export function disablePrevButton(self, disabled=true) {
+	btn_prev.disabled = disabled
+}
 
 async function newData(self, datainit) {
 	try {
@@ -98,14 +128,11 @@ async function newData(self, datainit) {
 }
 
 async function openData(self, id) {
-	CurrentState.currentOpenedId = id
-
 	const url = `/${Context.moduleName}/header-open`
 	try {
 		const result = await Module.apiCall(url, { id }) 
 		return result 
 	} catch (err) {
-		CurrentState.currentOpenedId = null
 		throw err	
 	} 	
 }
@@ -161,7 +188,9 @@ async function backToList(self, evt) {
 
 	if (goback) {
 		frm.lock()
-		evt.detail.fn_ShowNextSection()
+		const listId =  Context.Sections.settingHeaderList
+		const listSection = Crsl.Items[listId]
+		listSection.show({direction: 1})
 	}
 }
 
@@ -179,6 +208,13 @@ async function  frm_locked(self, evt) {
 	btn_reset.disabled = true
 	btn_prev.disabled = false
 	btn_next.disabled = false
+
+	if (CurrentState.editDisabled) {
+		// jika karena suatu kondisi data mengharuskan data tidak boleh diedit
+		btn_edit.disabled = true
+	}
+
+		
 
 }
 
@@ -201,10 +237,9 @@ async function  frm_unlocked(self, evt) {
 	btn_reset.disabled = false
 	btn_prev.disabled = true
 	btn_next.disabled = true
+
+		
 }
-
-
-
 
 async function setPrimaryKeyState(self, opt) {
 	const obj_pk = frm.getPrimaryInput()
@@ -270,9 +305,11 @@ async function btn_new_click(self, evt) {
 
 
 		// jika perlu modifikasi data initial,
-		// atau dialog untuk opsi data baru, dapat dibuat di Extender.newData
-		if (typeof Extender.newData === 'function') {
-			await Extender.newData(self, datainit)
+		// atau dialog untuk opsi data baru, dapat dibuat di Extender
+		const fn_name = 'settingHeaderEdit_newData'
+		const fn_settingHeaderEdit_newData = Extender[fn_name]
+		if (typeof fn_settingHeaderEdit_newData === 'function') {
+			await fn_settingHeaderEdit_newData(self, datainit)
 		}
 
 		// buat data baru
@@ -327,6 +364,7 @@ async function btn_save_click(self, evt) {
 		dataToSave = frm.getData()		
 	}
 
+	let mask = $fgta5.Modal.createMask()
 	try {
 		let result
 
@@ -344,6 +382,8 @@ async function btn_save_click(self, evt) {
 		console.log(`get data id ${idValue}`)
 		const data = await openData(self, idValue)
 		console.log('data', data)
+
+		CurrentState.currentOpenedId = idValue
 
 		if (frm.AutoID) {
 			console.log('update field ID di form')
@@ -378,7 +418,10 @@ async function btn_save_click(self, evt) {
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
-	} 
+	} finally {
+		mask.close()
+		mask = null
+	}
 }
 
 async function btn_del_click(self, evt) {
@@ -403,6 +446,7 @@ async function btn_del_click(self, evt) {
 	}
 
 	console.log('delete data')
+	let mask = $fgta5.Modal.createMask()
 	try {
 		const result = await deleteData(self, idValue)
 		
@@ -419,6 +463,9 @@ async function btn_del_click(self, evt) {
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
+	} finally {
+		mask.close()
+		mask = null
 	}
 
 }
@@ -461,3 +508,90 @@ async function btn_next_click(self, evt) {
 }
 
 
+
+
+async function btn_recordstatus_click(self, evt) {
+	console.log('btn_recordstatus_click')
+	const params = {
+		Context,
+		sectionReturn: CurrentSection
+	}
+	
+	pageHelper.openSection(self, 'fRecord-section', params, async ()=>{
+
+		let mask = $fgta5.Modal.createMask()
+		try {
+			// ambil data
+			const pk = frm.getPrimaryInput()
+			const id = pk.value
+			const data = await openData(self, id)
+
+			obj_createby.innerHTML = data._createby
+			obj_createdate.innerHTML = data._createdate
+			obj_modifyby.innerHTML = data._modifyby
+			obj_modifydate.innerHTML = data._modifydate
+
+			if (typeof Extender.settingHeaderEdit_addRecordInfo === 'function') {
+				await Extender.settingHeaderEdit_addRecordInfo(data)
+			}
+
+		} catch (err) {
+			console.error(err)
+			$fgta5.MessageBox.error(err.message)
+		} finally {
+			mask.close()
+			mask = null
+		}
+	})
+
+}
+
+async function btn_logs_click(self, evt) {
+	const params = {
+		Context,
+		sectionReturn: CurrentSection
+	}
+
+	pageHelper.openSection(self, 'fLogs-section', params, async ()=>{
+		// get log data
+		const pk = frm.getPrimaryInput()
+		const id = pk.value
+
+
+		let mask = $fgta5.Modal.createMask()
+		try {
+
+			const url = `${Context.appsUrls.core.url}/logs/list`
+			const criteria = {
+				module: Context.moduleName,
+				table: 'core.setting',
+				id: id
+			}
+
+			const result = await Module.apiCall(url, {  
+				criteria
+			}) 
+
+			const sc = document.getElementById('fLogs-section')
+			const tbody = sc.querySelector('tbody')
+			pageHelper.renderLog(tbody, result.data)
+		} catch (err) {
+			console.error(err)
+			$fgta5.MessageBox.error(err.message)
+		} finally {
+			mask.close()
+			mask = null
+		}
+
+	})
+}
+
+async function btn_about_click(self, evt) {
+	const params = {
+		Context,
+		sectionReturn: CurrentSection
+	}
+	pageHelper.openSection(self, 'fAbout-section', params, async ()=>{
+
+	})
+}

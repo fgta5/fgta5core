@@ -1,9 +1,9 @@
 <form id="groupHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="groupHeaderEdit-obj_group_id">
 
 	<!-- Textbox: group_id-->	
-	<div id="groupHeaderEdit-obj_group_id-container" class="input-field" field="groupHeaderEdit-obj_group_id">
+	<div id="groupHeaderEdit-obj_group_id-container" class="input-field hidden" field="groupHeaderEdit-obj_group_id">
 		<label for="groupHeaderEdit-obj_group_id">ID</label>
-		<input id="groupHeaderEdit-obj_group_id"  fgta5-component="Textbox" placeholder="ID Group" autocomplete="off" spellcheck="false" 
+		<input id="groupHeaderEdit-obj_group_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="group_id"
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
@@ -12,19 +12,13 @@
 
 
 	<!-- Textbox: group_name-->	
-	<div id="groupHeaderEdit-obj_group_name-container" class="input-field css nama" field="groupHeaderEdit-obj_group_name">
-		<label for="groupHeaderEdit-obj_group_name">Name</label>
-		<input id="groupHeaderEdit-obj_group_name"  fgta5-component="Textbox" placeholder="Nama Group" autocomplete="off" spellcheck="false" 
+	<div id="groupHeaderEdit-obj_group_name-container" class="input-field" field="groupHeaderEdit-obj_group_name">
+		<label for="groupHeaderEdit-obj_group_name">Group</label>
+		<input id="groupHeaderEdit-obj_group_name"  fgta5-component="Textbox" placeholder="nama group" autocomplete="off" spellcheck="false" 
 			binding="group_name"
-			style="color: blue" 
-			character-case="uppercase" 
-			required 
-			invalid-message-required="Nama harus diisi" 
-			description="nama group" 
+			character-case="lowercase" 
 			autocomplete="off" spellcheck="false" 
-			maxlength="90" 
-			minlength="2" 
-			invalid-message-minlength="Nama minimum diisi 2 character" 
+			maxlength="30" 
 		>
 	</div>
 
@@ -32,23 +26,10 @@
 	<!-- Textbox: group_descr-->	
 	<div id="groupHeaderEdit-obj_group_descr-container" class="input-field" field="groupHeaderEdit-obj_group_descr">
 		<label for="groupHeaderEdit-obj_group_descr">Descr</label>
-		<input id="groupHeaderEdit-obj_group_descr"  fgta5-component="Textbox" placeholder="Deskripsi" autocomplete="off" spellcheck="false" 
+		<input id="groupHeaderEdit-obj_group_descr"  fgta5-component="Textbox" placeholder="Descr" autocomplete="off" spellcheck="false" 
 			binding="group_descr"
-			description="jelaskan secara singkat tentang fungsi group" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
-		>
-	</div>
-
-
-	<!-- Combobox: grouptype_id-->	
-	<div id="groupHeaderEdit-obj_grouptype_id-container" class="input-field" field="groupHeaderEdit-obj_grouptype_id">
-		<label for="groupHeaderEdit-obj_grouptype_id">Type</label>
-		<input id="groupHeaderEdit-obj_grouptype_id"  fgta5-component="Combobox" placeholder="Group Type" autocomplete="off" spellcheck="false" 
-			binding="grouptype_id"
-			required 
-			invalid-message-required="Tipe Group harus diisi" 
-			data-display="grouptype_name" 
 		>
 	</div>
 
@@ -63,6 +44,30 @@
 	</div>
 	
 </form>
+
+
+<div id="panel-detil-selector" class="panel-detil ">
+	<div panel-title>
+		Information Detil
+	</div>
+	<div panel-content>
+		<div class="panel-detil-row">
+			<div data-label><a href="javascript:void(0)" data-target-section="groupProgramList" data-current-section="groupHeaderEdit">Programs</a></div>
+			<div data-info>&nbsp</div>
+		</div>
+
+		<div id="panel-detil-additionalinfo">
+			<!-- tambahkan additional info disini -->
+		</div>
+	</div>
+</div>
+ 
+
+<div class="panel-recordbar" >
+	<div><a id="groupHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
+	<div><a id="groupHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
+	<div><a id="groupHeader-btn_about" href="javascript:void(0)">About</a></div>
+</div>
 
 
 <div class="footer-buttons-container hidden">

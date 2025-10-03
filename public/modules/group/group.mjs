@@ -1,6 +1,8 @@
 import Context from './group-context.mjs'  
 import * as groupHeaderList from './groupHeaderList.mjs' 
 import * as groupHeaderEdit from './groupHeaderEdit.mjs' 
+import * as groupProgramList from './groupProgramList.mjs' 
+import * as groupProgramEdit from './groupProgramEdit.mjs' 
 import * as Extender from './group-ext.mjs'
 
 const app = Context.app
@@ -28,6 +30,8 @@ export default class extends Module {
 		self.Modules = { 
 			groupHeaderList, 
 			groupHeaderEdit, 
+			groupProgramList, 
+			groupProgramEdit, 
 		}
 
 		try {
@@ -48,11 +52,14 @@ export default class extends Module {
 			await Promise.all([ 
 				groupHeaderList.init(self, args), 
 				groupHeaderEdit.init(self, args), 
+				groupProgramList.init(self, args), 
+				groupProgramEdit.init(self, args), 
 				Extender.init(self, args)
 			])
 
 			// render dan setup halaman
 			await render(self)
+
 
 		} catch (err) {
 			throw err
@@ -66,6 +73,7 @@ async function render(self) {
 		const footerButtonsContainer =  document.getElementsByClassName('footer-buttons-container')
 		Module.renderFooterButtons(footerButtonsContainer)
 	
+		// Set listener untuk section carousel
 		Crsl.addEventListener($fgta5.SectionCarousell.EVT_SECTIONSHOWING, (evt)=>{
 			var sectionId = evt.detail.commingSection.Id
 			for (let cont of footerButtonsContainer) {
@@ -83,10 +91,50 @@ async function render(self) {
 				}
 			}
 		})
+		
+		Crsl.Items['fRecord-section'].addEventListener($fgta5.Section.EVT_BACKBUTTONCLICK, async (evt)=>{
+			evt.detail.fn_ShowNextSection()
+		})
 
+		Crsl.Items['fLogs-section'].addEventListener($fgta5.Section.EVT_BACKBUTTONCLICK, async (evt)=>{
+			evt.detail.fn_ShowNextSection()
+		})
+
+		Crsl.Items['fAbout-section'].addEventListener($fgta5.Section.EVT_BACKBUTTONCLICK, async (evt)=>{
+			evt.detail.fn_ShowNextSection()
+		})
+		
+
+		// Set panel detil saat hover di detil item
+		const detilpanel = document.getElementById('panel-detil-selector')
+		detilpanel.querySelectorAll('.panel-detil-row a').forEach(link => {
+			link.addEventListener('mouseenter', () => {
+				link.closest('.panel-detil-row').classList.add('panel-detil-row-highligted');
+			});
+
+			link.addEventListener('mouseleave', () => {
+				link.closest('.panel-detil-row').classList.remove('panel-detil-row-highligted');
+			});
+
+
+			const sectionTargetName = link.getAttribute('data-target-section')
+			const sectionCurrentName = link.getAttribute('data-current-section')
+			
+			link.addEventListener('click', (evt)=>{
+				openDetilSection(self, sectionTargetName, sectionCurrentName)
+			})
+
+			// jika ada event-event yang khusus untuk mobile device
+			// if (Module.isMobileDevice()) {
+			// }
+		});
+
+		
 		// group-ext.mjs, export function extendPage(self) {} 
-		if (typeof Extender.extendPage === 'function') {
-			Extender.extendPage(self)
+		const fn_name = 'extendPage'
+		const fn_extendPage = Extender[fn_name]
+		if (typeof fn_extendPage === 'function') {
+			fn_extendPage(self)
 		} else {
 			console.warn(`'extendPage' tidak diimplementasikan di extender`)
 		}
@@ -94,4 +142,24 @@ async function render(self) {
 	} catch (err) {
 		throw err
 	}
+}
+
+
+function openDetilSection(self, sectionTargetName, sectionCurrentName) {
+	const sectionCurrentId = Context.Sections[sectionCurrentName]
+	const sectionCurrent =   Crsl.Items[sectionCurrentId]
+
+	const sectionId = Context.Sections[sectionTargetName]
+	const section = Crsl.Items[sectionId]
+
+	section.setSectionReturn(sectionCurrent)
+	section.show({}, ()=>{
+		const moduleTarget = self.Modules[sectionTargetName]
+		const moduleHeaderEdit = self.Modules[sectionCurrentName]
+		moduleTarget.openList(self, {
+			moduleHeaderEdit
+		})
+	})
+
+
 }

@@ -1,0 +1,73 @@
+<form id="roleHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="roleHeaderEdit-obj_role_id">
+
+	<!-- Textbox: role_id-->	
+	<div id="roleHeaderEdit-obj_role_id-container" class="input-field hidden" field="roleHeaderEdit-obj_role_id">
+		<label for="roleHeaderEdit-obj_role_id">ID</label>
+		<input id="roleHeaderEdit-obj_role_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
+			binding="role_id"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: role_name-->	
+	<div id="roleHeaderEdit-obj_role_name-container" class="input-field" field="roleHeaderEdit-obj_role_name">
+		<label for="roleHeaderEdit-obj_role_name">Role</label>
+		<input id="roleHeaderEdit-obj_role_name"  fgta5-component="Textbox" placeholder="nama role" autocomplete="off" spellcheck="false" 
+			binding="role_name"
+			character-case="uppercase" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: role_descr-->	
+	<div id="roleHeaderEdit-obj_role_descr-container" class="input-field" field="roleHeaderEdit-obj_role_descr">
+		<label for="roleHeaderEdit-obj_role_descr">Descr</label>
+		<input id="roleHeaderEdit-obj_role_descr"  fgta5-component="Textbox" placeholder="deskripsi" autocomplete="off" spellcheck="false" 
+			binding="role_descr"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+	
+</form>
+
+
+<div id="panel-detil-selector" class="panel-detil hidden">
+	<div panel-title>
+		Information Detil
+	</div>
+	<div panel-content>
+
+		<div id="panel-detil-additionalinfo">
+			<!-- tambahkan additional info disini -->
+		</div>
+	</div>
+</div>
+ 
+
+<div class="panel-recordbar" data-view="nodetil">
+	<div><a id="roleHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
+	<div><a id="roleHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
+	<div><a id="roleHeader-btn_about" href="javascript:void(0)">About</a></div>
+</div>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="roleHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="roleHeaderEdit-btn_save">Save</button>
+		<button id="roleHeaderEdit-btn_edit">Edit</button>
+		<button id="roleHeaderEdit-btn_new" data-action="roleHeader-new">New</button>
+		<button id="roleHeaderEdit-btn_reset">Reset</button>
+		<button id="roleHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="roleHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>

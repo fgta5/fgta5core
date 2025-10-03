@@ -3,14 +3,14 @@ import pgp from 'pg-promise';
 import db from '@agung_dhewe/webapps/src/db.js'
 import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
-import context from '@agung_dhewe/webapps/src/context.js'
-
+import context from '@agung_dhewe/webapps/src/context.js'  
+import logger from '@agung_dhewe/webapps/src/logger.js'
 
 import * as Extender from './extenders/doc.apiext.js'
 
 const moduleName = 'doc'
 const headerSectionName = 'header'
-const headerTableName = 'core.doc'
+const headerTableName = 'core.doc' 	
 
 // api: account
 export default class extends Api {
@@ -31,10 +31,11 @@ export default class extends Api {
 	async headerUpdate(body) { return await doc_headerUpdate(this, body)}
 	async headerCreate(body) { return await doc_headerCreate(this, body)}
 	async headerDelete(body) { return await doc_headerDelete(this, body) }
+	
+			
+}	
 
-}
-
-
+// init module
 async function doc_init(self, body) {
 	const req = self.req
 
@@ -69,7 +70,27 @@ async function doc_init(self, body) {
 }
 
 
+// data logging
+async function doc_log(self, body, startTime, tablename, id, action, data={}, remark='') {
+	const { source } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const user_name = req.session.user.userFullname
+	const ipaddress = req.ip
+	const metadata = JSON.stringify({...{source:source}, ...data})
+	const endTime = process.hrtime.bigint();
+	const executionTimeMs = Number((endTime - startTime) / 1_000_000n); // hasil dalam ms tanpa desimal
+	
+	const logdata = {id, user_id, user_name, moduleName, action, tablename, executionTimeMs, remark, metadata, ipaddress}
+	const ret = await logger.log(logdata)
+	return ret
+}
+
+
+
+
 async function doc_headerList(self, body) {
+	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
 		searchtext: `doc_id ILIKE '%' || \${searchtext} || '%'`,
@@ -90,10 +111,14 @@ async function doc_headerList(self, body) {
 			}
 		}
 
+		// apabila ada keperluan untuk recompose criteria
+		if (typeof Extender.headerListCriteria === 'function') {
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+		}
 
 		var max_rows = limit==0 ? 10 : limit
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
-		const sql = sqlUtil.createSqlSelect({tablename:headerTableName, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
+		const sql = sqlUtil.createSqlSelect({tablename, columns, whereClause, sort, limit:max_rows+1, offset, queryParams})
 		const rows = await db.any(sql, queryParams);
 
 		
@@ -104,11 +129,9 @@ async function doc_headerList(self, body) {
 			if (i>max_rows) { break }
 
 			
-
-
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(row)
+				await Extender.headerListRow(self, row)
 			}
 
 			data.push(row)
@@ -132,13 +155,15 @@ async function doc_headerList(self, body) {
 }
 
 async function doc_headerOpen(self, body) {
+	const tablename = headerTableName
+
 	try {
 		const { id } = body 
 		const criteria = { doc_id: id }
 		const searchMap = { doc_id: `doc_id = \${doc_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
-			tablename: headerTableName, 
+			tablename: tablename, 
 			columns:[], 
 			whereClause, 
 			sort:{}, 
@@ -148,16 +173,26 @@ async function doc_headerOpen(self, body) {
 		})
 		const data = await db.one(sql, queryParams);
 		if (data==null) { 
-			throw new Error(`[${headerTableName}] data dengan id '${id}' tidak ditemukan`) 
+			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
 		
 
+		// lookup data createby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._createby)
+			data._createby = user_fullname ?? ''
+		}
 
-
+		// lookup data modifyby
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data._modifyby)
+			data._modifyby = user_fullname ?? ''
+		}
+		
 		// pasang extender untuk olah data
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(data)
+			await Extender.headerOpen(self, data)
 		}
 
 		return data
@@ -169,21 +204,43 @@ async function doc_headerOpen(self, body) {
 
 async function doc_headerCreate(self, body) {
 	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint();
+	const tablename = headerTableName
 
 	try {
-		sqlUtil.connect(db)
 
-		data._createby = 1
+		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
 
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
 
-		const cmd = sqlUtil.createInsertCommand(headerTableName, data)
-		const result = await cmd.execute(data)
-		
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'CREATE', id: result.doc_id}
-		await self.log(logdata)
-		
+				
+
+			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
+			if (typeof Extender.headerCreating === 'function') {
+				await Extender.headerCreating(self, tx, data, seqdata)
+			}
+
+
+			const cmd = sqlUtil.createInsertCommand(tablename, data)
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.headerCreated === 'function') {
+				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+			}
+
+			// record log
+			doc_log(self, body, startTime, tablename, ret.doc_id, 'CREATE', logMetadata)
+
+			return ret
+		})
+
 		return result
 	} catch (err) {
 		throw err
@@ -192,19 +249,42 @@ async function doc_headerCreate(self, body) {
 
 async function doc_headerUpdate(self, body) {
 	const { source, data } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = headerTableName
 
 	try {
-		sqlUtil.connect(db)
 
-		data._modifyby = 1
+		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
+
+		const result = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+
+			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
+			if (typeof Extender.headerUpdating === 'function') {
+				await Extender.headerUpdating(self, tx, data)
+			}
+
+			// eksekusi update
+			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['doc_id'])
+			const ret = await cmd.execute(data)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
+			if (typeof Extender.headerUpdated === 'function') {
+				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
+			}			
+
+			// record log
+			doc_log(self, body, startTime, tablename, data.doc_id, 'UPDATE')
+
+			return ret
+		})
 		
-		const cmd =  sqlUtil.createUpdateCommand(headerTableName, data, ['doc_id'])
-		const result = await cmd.execute(data)
-		
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'UPDATE', id: data.doc_id} 
-		await self.log(logdata)
 
 		return result
 	} catch (err) {
@@ -214,20 +294,49 @@ async function doc_headerUpdate(self, body) {
 
 
 async function doc_headerDelete(self, body) {
+	const { source, id } = body
+	const req = self.req
+	const user_id = req.session.user.userId
+	const startTime = process.hrtime.bigint()
+	const tablename = headerTableName
 
 	try {
-		const { source, id } = body 
-		const dataToRemove = {doc_id: id}
 
-		const cmd = sqlUtil.createDeleteCommand(headerTableName, ['doc_id'])
-		const result = await cmd.execute(dataToRemove)
+		const deletedRow = await db.tx(async tx=>{
+			sqlUtil.connect(tx)
+
+			const dataToRemove = {doc_id: id}
+
+			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
+			if (typeof Extender.headerDeleting === 'function') {
+				await Extender.headerDeleting(self, tx, dataToRemove)
+			}
+
+			
+
+			// hapus data header
+			const cmd = sqlUtil.createDeleteCommand(tablename, ['doc_id'])
+			const deletedRow = await cmd.execute(dataToRemove)
+
+			const logMetadata = {}
+
+			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
+			if (typeof Extender.headerDeleted === 'function') {
+				await Extender.headerDeleted(self, tx, ret, logMetadata)
+			}
+
+			// record log
+			doc_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
+
+			return deletedRow
+		})
 	
-		// record log
-		let logdata = {moduleName, source, tablename:headerTableName, section:headerSectionName, action:'DELETE', id}
-		await self.log(logdata)
 
-		return result
+		return deletedRow
 	} catch (err) {
 		throw err
 	}
 }
+
+
+	

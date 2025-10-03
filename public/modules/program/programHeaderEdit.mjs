@@ -1,6 +1,6 @@
 import Context from './program-context.mjs'
 import * as Extender from './program-ext.mjs'
-
+import * as pageHelper from '/public/libs/webmodule/pagehelper.mjs'
 
 const CurrentState = {}
 const Crsl =  Context.Crsl
@@ -23,16 +23,24 @@ const btn_reset = new $fgta5.ActionButton('programHeaderEdit-btn_reset')
 const btn_prev = new $fgta5.ActionButton('programHeaderEdit-btn_prev')
 const btn_next = new $fgta5.ActionButton('programHeaderEdit-btn_next')
 
+const btn_recordstatus = document.getElementById('programHeader-btn_recordstatus')
+const btn_logs = document.getElementById('programHeader-btn_logs')
+const btn_about = document.getElementById('programHeader-btn_about')
+
 const frm = new $fgta5.Form('programHeaderEdit-frm');
 const obj_program_id = frm.Inputs['programHeaderEdit-obj_program_id']
-const obj_program_name = frm.Inputs['programHeaderEdit-obj_program_name']
 const obj_program_title = frm.Inputs['programHeaderEdit-obj_program_title']
 const obj_apps_id = frm.Inputs['programHeaderEdit-obj_apps_id']
+const obj_program_name = frm.Inputs['programHeaderEdit-obj_program_name']
+const obj_program_variance = frm.Inputs['programHeaderEdit-obj_program_variance']
+const obj_programgroup_id = frm.Inputs['programHeaderEdit-obj_programgroup_id']
 const obj_program_descr = frm.Inputs['programHeaderEdit-obj_program_descr']
 const obj_program_icon = frm.Inputs['programHeaderEdit-obj_program_icon']
-const obj_program_parameter = frm.Inputs['programHeaderEdit-obj_program_parameter']
-const obj_program_isdisabled = frm.Inputs['programHeaderEdit-obj_program_isdisabled']
-const obj_directory_id = frm.Inputs['programHeaderEdit-obj_directory_id']	
+const obj_program_isdisabled = frm.Inputs['programHeaderEdit-obj_program_isdisabled']	
+const obj_createby = document.getElementById('fRecord-section-createby')
+const obj_createdate = document.getElementById('fRecord-section-createdate')
+const obj_modifyby = document.getElementById('fRecord-section-modifyby')
+const obj_modifydate = document.getElementById('fRecord-section-modifydate')
 
 
 export const Section = CurrentSection
@@ -58,23 +66,38 @@ export async function init(self, args) {
 	btn_next.addEventListener('click', (evt)=>{ btn_next_click(self, evt)})
 
 
-	// addEventListener
+	btn_recordstatus.addEventListener('click', evt=>{ btn_recordstatus_click(self, evt) })	
+	btn_logs.addEventListener('click', evt=>{ btn_logs_click(self, evt) })	
+	btn_about.addEventListener('click', evt=>{ btn_about_click(self, evt) })
+
+
 	
 	// Combobox: obj_apps_id
 	obj_apps_id.addEventListener('selecting', async (evt)=>{
-		if (typeof Extender.obj_apps_id_selecting === 'function') {
-			Extender.obj_apps_id_selecting(self, evt)
+		const fn_selecting_name = 'obj_apps_id_selecting'
+		const fn_selecting = Extender[fn_selecting_name]
+		if (typeof fn_selecting === 'function') {
+			fn_selecting(self, obj_apps_id, evt)
 		} else {
 			// default selecting
 			const cbo = evt.detail.sender
 			const dialog = evt.detail.dialog
 			const searchtext = evt.detail.searchtext!=null ? evt.detail.searchtext : ''
 			const url = `${Context.appsUrls.core.url}/apps/header-list`
+			const criteria = {
+				searchtext: searchtext,
+			}
+
+			const fn_selecting_criteria_name = 'obj_apps_id_selecting_criteria'
+			const fn_selecting_criteria = Extender[fn_selecting_criteria_name]
+			if (typeof fn_selecting_criteria === 'function') {
+				fn_selecting_criteria(self, obj_apps_id, criteria)
+			}
 
 			cbo.wait()
 			try {
 				const result = await Module.apiCall(url, {
-					searchtext: searchtext,
+					criteria,
 					offset: evt.detail.offset,
 					limit: evt.detail.limit,
 				}) 
@@ -94,27 +117,38 @@ export async function init(self, args) {
 		}		
 	})
 	
-	// Combobox: obj_directory_id
-	obj_directory_id.addEventListener('selecting', async (evt)=>{
-		if (typeof Extender.obj_directory_id_selecting === 'function') {
-			Extender.obj_directory_id_selecting(self, evt)
+	// Combobox: obj_programgroup_id
+	obj_programgroup_id.addEventListener('selecting', async (evt)=>{
+		const fn_selecting_name = 'obj_programgroup_id_selecting'
+		const fn_selecting = Extender[fn_selecting_name]
+		if (typeof fn_selecting === 'function') {
+			fn_selecting(self, obj_programgroup_id, evt)
 		} else {
 			// default selecting
 			const cbo = evt.detail.sender
 			const dialog = evt.detail.dialog
 			const searchtext = evt.detail.searchtext!=null ? evt.detail.searchtext : ''
-			const url = `${Context.appsUrls.core.url}/directory/header-list`
+			const url = `${Context.appsUrls.core.url}/programgroup/header-list`
+			const criteria = {
+				searchtext: searchtext,
+			}
+
+			const fn_selecting_criteria_name = 'obj_programgroup_id_selecting_criteria'
+			const fn_selecting_criteria = Extender[fn_selecting_criteria_name]
+			if (typeof fn_selecting_criteria === 'function') {
+				fn_selecting_criteria(self, obj_programgroup_id, criteria)
+			}
 
 			cbo.wait()
 			try {
 				const result = await Module.apiCall(url, {
-					searchtext: searchtext,
+					criteria,
 					offset: evt.detail.offset,
 					limit: evt.detail.limit,
 				}) 
 
 				for (var row of result.data) {
-					evt.detail.addRow(row.directory_id, row.directory_name, row)
+					evt.detail.addRow(row.programgroup_id, row.programgroup_name, row)
 				}
 
 				dialog.setNext(result.nextoffset, result.limit)
@@ -131,13 +165,6 @@ export async function init(self, args) {
 	
 }
 
-
-
-export async function render(self) {
-	console.log('programHeaderEdit render')
-}
-
-
 export async function openSelectedData(self, params) {
 	console.log('openSelectedData')
 
@@ -146,13 +173,30 @@ export async function openSelectedData(self, params) {
 		const id = params.keyvalue
 		const data = await openData(self, id)
 
+		CurrentState.currentOpenedId = id
+
+		const fn_iseditdisabled_name = 'programHeaderEdit_isEditDisabled'
+		const fn_iseditdisabled = Extender[fn_iseditdisabled_name]
+		if (typeof fn_iseditdisabled === 'function') {
+			const editDisabled = fn_iseditdisabled(self, data)
+			CurrentState.editDisabled = editDisabled
+		}
+
 		// disable primary key
 		setPrimaryKeyState(self, {disabled:true})
 
 		frm.setData(data)
 		frm.acceptChanges()
 		frm.lock()
+
+		const fn_formopened_name = 'programHeaderEdit_formOpened'
+		const fn_formopened = Extender[fn_formopened_name]
+		if (typeof fn_formopened === 'function') {
+			fn_formopened(self, frm, CurrentState)
+		}
+
 	} catch (err) {
+		CurrentState.currentOpenedId = null
 		throw err
 	} finally {
 		mask.close()
@@ -160,6 +204,21 @@ export async function openSelectedData(self, params) {
 	}
 }
 
+export function getHeaderForm() {
+	return frm
+}
+
+export function clearForm(self, text) {
+	frm.clear(text)
+}
+
+export function disableNextButton(self, disabled=true) {
+	btn_next.disabled = disabled
+}
+
+export function disablePrevButton(self, disabled=true) {
+	btn_prev.disabled = disabled
+}
 
 async function newData(self, datainit) {
 	try {
@@ -172,14 +231,11 @@ async function newData(self, datainit) {
 }
 
 async function openData(self, id) {
-	CurrentState.currentOpenedId = id
-
 	const url = `/${Context.moduleName}/header-open`
 	try {
 		const result = await Module.apiCall(url, { id }) 
 		return result 
 	} catch (err) {
-		CurrentState.currentOpenedId = null
 		throw err	
 	} 	
 }
@@ -235,7 +291,9 @@ async function backToList(self, evt) {
 
 	if (goback) {
 		frm.lock()
-		evt.detail.fn_ShowNextSection()
+		const listId =  Context.Sections.programHeaderList
+		const listSection = Crsl.Items[listId]
+		listSection.show({direction: 1})
 	}
 }
 
@@ -253,6 +311,13 @@ async function  frm_locked(self, evt) {
 	btn_reset.disabled = true
 	btn_prev.disabled = false
 	btn_next.disabled = false
+
+	if (CurrentState.editDisabled) {
+		// jika karena suatu kondisi data mengharuskan data tidak boleh diedit
+		btn_edit.disabled = true
+	}
+
+		
 
 }
 
@@ -275,10 +340,9 @@ async function  frm_unlocked(self, evt) {
 	btn_reset.disabled = false
 	btn_prev.disabled = true
 	btn_next.disabled = true
+
+		
 }
-
-
-
 
 async function setPrimaryKeyState(self, opt) {
 	const obj_pk = frm.getPrimaryInput()
@@ -339,11 +403,16 @@ async function btn_new_click(self, evt) {
 
 	try {
 
+		// inisiasi data baru
 		let datainit = {}
+
+
 		// jika perlu modifikasi data initial,
-		// atau dialog untuk opsi data baru, dapat dibuat di Extender.newData
-		if (typeof Extender.newData === 'function') {
-			datainit = await Extender.newData(self)
+		// atau dialog untuk opsi data baru, dapat dibuat di Extender
+		const fn_newdata_name = 'programHeaderEdit_newData'
+		const fn_newdata = Extender[fn_newdata_name]
+		if (typeof fn_newdata === 'function') {
+			await fn_newdata(self, datainit, frm)
 		}
 
 		// buat data baru
@@ -398,6 +467,16 @@ async function btn_save_click(self, evt) {
 		dataToSave = frm.getData()		
 	}
 
+	// Extender Saving
+	const fn_datasaving_name = 'programHeaderEdit_dataSaving'
+	const fn_datasaving = Extender[fn_datasaving_name]
+	if (typeof fn_datasaving === 'function') {
+		await fn_datasaving(self, dataToSave, frm)
+	}
+
+
+
+	let mask = $fgta5.Modal.createMask()
 	try {
 		let result
 
@@ -416,6 +495,8 @@ async function btn_save_click(self, evt) {
 		const data = await openData(self, idValue)
 		console.log('data', data)
 
+		CurrentState.currentOpenedId = idValue
+
 		if (frm.AutoID) {
 			console.log('update field ID di form')
 			obj_pk.value = idValue
@@ -427,6 +508,14 @@ async function btn_save_click(self, evt) {
 
 		// update form
 		frm.setData(data)	
+
+
+		// Extender Saving
+		const fn_datasaved_name = 'programHeaderEdit_dataSaved'
+		const fn_datasaved = Extender[fn_datasaved_name]
+		if (typeof fn_datasaved === 'function') {
+			await fn_datasaved(self, data, frm)
+		}
 
 
 		// persist perubahan di form
@@ -449,7 +538,10 @@ async function btn_save_click(self, evt) {
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
-	} 
+	} finally {
+		mask.close()
+		mask = null
+	}
 }
 
 async function btn_del_click(self, evt) {
@@ -474,6 +566,7 @@ async function btn_del_click(self, evt) {
 	}
 
 	console.log('delete data')
+	let mask = $fgta5.Modal.createMask()
 	try {
 		const result = await deleteData(self, idValue)
 		
@@ -490,6 +583,9 @@ async function btn_del_click(self, evt) {
 	} catch (err) {
 		console.error(err)
 		await $fgta5.MessageBox.error(err.message)
+	} finally {
+		mask.close()
+		mask = null
 	}
 
 }
@@ -532,3 +628,92 @@ async function btn_next_click(self, evt) {
 }
 
 
+
+
+async function btn_recordstatus_click(self, evt) {
+	console.log('btn_recordstatus_click')
+	const params = {
+		Context,
+		sectionReturn: CurrentSection
+	}
+	
+	pageHelper.openSection(self, 'fRecord-section', params, async ()=>{
+
+		let mask = $fgta5.Modal.createMask()
+		try {
+			// ambil data
+			const pk = frm.getPrimaryInput()
+			const id = pk.value
+			const data = await openData(self, id)
+
+			obj_createby.innerHTML = data._createby
+			obj_createdate.innerHTML = data._createdate
+			obj_modifyby.innerHTML = data._modifyby
+			obj_modifydate.innerHTML = data._modifydate
+
+			const fn_addrecordinfo_name = 'programHeaderEdit_addRecordInfo'
+			const fn_addrecordinfo = Extender[fn_addrecordinfo_name]
+			if (typeof fn_addrecordinfo === 'function') {
+				await fn_addrecordinfo(data)
+			}
+
+		} catch (err) {
+			console.error(err)
+			$fgta5.MessageBox.error(err.message)
+		} finally {
+			mask.close()
+			mask = null
+		}
+	})
+
+}
+
+async function btn_logs_click(self, evt) {
+	const params = {
+		Context,
+		sectionReturn: CurrentSection
+	}
+
+	pageHelper.openSection(self, 'fLogs-section', params, async ()=>{
+		// get log data
+		const pk = frm.getPrimaryInput()
+		const id = pk.value
+
+
+		let mask = $fgta5.Modal.createMask()
+		try {
+
+			const url = `${Context.appsUrls.core.url}/logs/list`
+			const criteria = {
+				module: Context.moduleName,
+				table: 'core.program',
+				id: id
+			}
+
+			const result = await Module.apiCall(url, {  
+				criteria
+			}) 
+
+			const sc = document.getElementById('fLogs-section')
+			const tbody = sc.querySelector('tbody')
+			pageHelper.renderLog(tbody, result.data)
+		} catch (err) {
+			console.error(err)
+			$fgta5.MessageBox.error(err.message)
+		} finally {
+			mask.close()
+			mask = null
+		}
+
+	})
+}
+
+async function btn_about_click(self, evt) {
+	const params = {
+		Context,
+		sectionReturn: CurrentSection
+	}
+	pageHelper.openSection(self, 'fAbout-section', params, async ()=>{
+
+	})
+}

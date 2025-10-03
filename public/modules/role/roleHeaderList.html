@@ -1,0 +1,25 @@
+<div class="search-container">
+	<div id="roleHeaderList-pnl_search" class="search-parameters">
+		<input id="roleHeaderList-txt_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext">
+	</div>
+	<button id="roleHeaderList-btn_gridload">Load</button>
+</div>
+
+<table id="roleHeaderList-tbl" fgta5-component="Gridview">
+	<thead>
+		<tr data-header key="role_id">
+			<th data-name="role_name" binding="role_name" >Role</th>
+			<th data-name="role_descr" binding="role_descr" >Descr</th>
+		</tr>
+	</thead>
+</table>
+
+
+
+<div class="footer-buttons-container">
+	<div></div>
+	<div>
+		<button id="roleHeaderList-btn_new" data-action="roleHeader-new" data-sectionsource="roleHeaderList-section">New</button>
+	</div>
+	<div></div>
+</div>

@@ -10,5 +10,7 @@ export default {
 	Sections: { 
 		groupHeaderList: 'groupHeaderList-section', 
 		groupHeaderEdit: 'groupHeaderEdit-section', 
+		groupProgramList: 'groupProgramList-section', 
+		groupProgramEdit: 'groupProgramEdit-section', 
 	}
 }
