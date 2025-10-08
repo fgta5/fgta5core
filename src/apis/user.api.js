@@ -126,7 +126,6 @@ async function user_log(self, body, startTime, tablename, id, action, data={}, r
 
 
 
-
 async function user_headerList(self, body) {
 	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
@@ -241,13 +240,17 @@ async function user_headerOpen(self, body) {
 
 
 async function user_headerCreate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = headerTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -284,6 +287,7 @@ async function user_headerCreate(self, body) {
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
 
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -304,13 +308,17 @@ async function user_headerCreate(self, body) {
 }
 
 async function user_headerUpdate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = headerTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -328,6 +336,7 @@ async function user_headerUpdate(self, body) {
 			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['user_id'])
 			const ret = await cmd.execute(data)
 
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -609,13 +618,17 @@ async function user_loginOpen(self, body) {
 }
 
 async function user_loginCreate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = loginTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -634,8 +647,7 @@ async function user_loginCreate(self, body) {
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
-
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -656,13 +668,17 @@ async function user_loginCreate(self, body) {
 }
 
 async function user_loginUpdate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = loginTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -678,7 +694,7 @@ async function user_loginUpdate(self, body) {
 			
 			const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['userlogin_id'])
 			const ret = await cmd.execute(data)
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -896,13 +912,17 @@ async function user_propOpen(self, body) {
 }
 
 async function user_propCreate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = propTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -921,8 +941,7 @@ async function user_propCreate(self, body) {
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
-
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -943,13 +962,17 @@ async function user_propCreate(self, body) {
 }
 
 async function user_propUpdate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = propTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -965,7 +988,7 @@ async function user_propUpdate(self, body) {
 			
 			const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['userprop_id'])
 			const ret = await cmd.execute(data)
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -1193,13 +1216,17 @@ async function user_groupOpen(self, body) {
 }
 
 async function user_groupCreate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = groupTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -1218,8 +1245,7 @@ async function user_groupCreate(self, body) {
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
-
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -1240,13 +1266,17 @@ async function user_groupCreate(self, body) {
 }
 
 async function user_groupUpdate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = groupTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -1262,7 +1292,7 @@ async function user_groupUpdate(self, body) {
 			
 			const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['usergroup_id'])
 			const ret = await cmd.execute(data)
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -1490,13 +1520,17 @@ async function user_favouriteOpen(self, body) {
 }
 
 async function user_favouriteCreate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = favouriteTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -1515,8 +1549,7 @@ async function user_favouriteCreate(self, body) {
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
-
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -1537,13 +1570,17 @@ async function user_favouriteCreate(self, body) {
 }
 
 async function user_favouriteUpdate(self, body) {
-	const { source, data } = body
+	const { source='user', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = favouriteTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -1559,7 +1596,7 @@ async function user_favouriteUpdate(self, body) {
 			
 			const cmd =  sqlUtil.createUpdateCommand(tablename, data, ['userfavouriteprogram_id'])
 			const ret = await cmd.execute(data)
-
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated

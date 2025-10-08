@@ -124,6 +124,8 @@ export async function openSelectedData(self, params) {
 		const id = params.keyvalue
 		const data = await openData(self, id)
 
+		
+
 		CurrentState.currentOpenedId = id
 		
 		
@@ -165,11 +167,13 @@ export function clearForm(self, text) {
 export function headerLocked(self) {
 	CurrentState.headerFormLocked = true
 	CurrentState.editDisabled = true
+	btn_new.disabled = true
 }
 
 export function headerUnlocked(self) {
 	CurrentState.headerFormLocked = false
 	CurrentState.editDisabled = false
+	btn_new.disabled = false
 }
 
 export function disableNextButton(self, disabled=true) {
@@ -202,20 +206,20 @@ async function openData(self, id) {
 	} 	
 }
 
-async function createData(self, data) {
+async function createData(self, data, formData) {
 	const url = `/${Context.moduleName}/group-create`
 	try {
-		const result = await Module.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }, formData) 
 		return result 
 	} catch (err) {
 		throw err	
 	} 	
 }
 
-async function updateData(self, data) {
+async function updateData(self, data, formData) {
 	const url = `/${Context.moduleName}/group-update`
 	try {
-		const result = await Module.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }, formData) 
 		return result 
 	} catch (err) {
 		throw err	
@@ -318,6 +322,8 @@ async function setPrimaryKeyState(self, opt) {
 	}
 }
 
+
+
 async function btn_edit_click(self, evt) {
 	console.log('btn_edit_click')
 
@@ -332,6 +338,7 @@ async function btn_edit_click(self, evt) {
 		frm.lock(true)
 	}
 }
+
 
 async function btn_new_click(self, evt) {
 	console.log('new')
@@ -441,6 +448,18 @@ async function btn_save_click(self, evt) {
 		dataToSave = frm.getData()		
 	}
 
+	
+	// bila ada file, upload filenya
+	let formData = null
+	const files = frm.getFiles()
+	if (files!=null) {
+		formData = new FormData();
+		for (let name in files) {
+			const file = files[name]
+			formData.append(name, file)
+		}
+	}
+
 
 	// Extender Saving
 	const fn_datasaving_name = 'userGroupEdit_dataSaving'
@@ -456,9 +475,9 @@ async function btn_save_click(self, evt) {
 		let result
 
 		if (isNewData) {
-			result = await createData(self, dataToSave)
+			result = await createData(self, dataToSave, formData)
 		} else {
- 			result = await updateData(self, dataToSave)
+ 			result = await updateData(self, dataToSave, formData)
 		}
 
 		console.log('result', result)
@@ -469,6 +488,8 @@ async function btn_save_click(self, evt) {
 		console.log(`get data id ${idValue}`)
 		const data = await openData(self, idValue)
 		console.log('data', data)
+
+		
 
 		CurrentState.currentOpenedId = idValue
 

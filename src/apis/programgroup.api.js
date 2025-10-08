@@ -88,7 +88,6 @@ async function programgroup_log(self, body, startTime, tablename, id, action, da
 
 
 
-
 async function programgroup_headerList(self, body) {
 	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
@@ -213,13 +212,17 @@ async function programgroup_headerOpen(self, body) {
 
 
 async function programgroup_headerCreate(self, body) {
-	const { source, data } = body
+	const { source='programgroup', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = headerTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -238,6 +241,7 @@ async function programgroup_headerCreate(self, body) {
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
 
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -258,13 +262,17 @@ async function programgroup_headerCreate(self, body) {
 }
 
 async function programgroup_headerUpdate(self, body) {
-	const { source, data } = body
+	const { source='programgroup', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = headerTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -282,6 +290,7 @@ async function programgroup_headerUpdate(self, body) {
 			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['programgroup_id'])
 			const ret = await cmd.execute(data)
 
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated

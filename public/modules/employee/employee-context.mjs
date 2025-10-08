@@ -1,14 +1,14 @@
 const app = new $fgta5.Application('mainapp')
-const urlDir = 'public/modules/directory'
+const urlDir = 'public/modules/employee'
 const Crsl = new $fgta5.SectionCarousell(app.Nodes.Main) 
 
 export default {
-	moduleName: 'directory',
+	moduleName: 'employee',
 	app: app,
 	urlDir: urlDir,
 	Crsl: Crsl,
 	Sections: { 
-		directoryHeaderList: 'directoryHeaderList-section', 
-		directoryHeaderEdit: 'directoryHeaderEdit-section', 
+		employeeHeaderList: 'employeeHeaderList-section', 
+		employeeHeaderEdit: 'employeeHeaderEdit-section', 
 	}
 }

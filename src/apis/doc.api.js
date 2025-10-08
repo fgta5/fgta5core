@@ -88,7 +88,6 @@ async function doc_log(self, body, startTime, tablename, id, action, data={}, re
 
 
 
-
 async function doc_headerList(self, body) {
 	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
@@ -203,13 +202,17 @@ async function doc_headerOpen(self, body) {
 
 
 async function doc_headerCreate(self, body) {
-	const { source, data } = body
+	const { source='doc', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
 	const tablename = headerTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._createby = user_id
 		data._createdate = (new Date()).toISOString()
@@ -228,6 +231,7 @@ async function doc_headerCreate(self, body) {
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
 
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
@@ -248,13 +252,17 @@ async function doc_headerCreate(self, body) {
 }
 
 async function doc_headerUpdate(self, body) {
-	const { source, data } = body
+	const { source='doc', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
 	const tablename = headerTableName
 
 	try {
+
+		// parse uploaded data
+		const files = Api.parseUploadData(data, req.files)
+
 
 		data._modifyby = user_id
 		data._modifydate = (new Date()).toISOString()
@@ -272,6 +280,7 @@ async function doc_headerUpdate(self, body) {
 			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['doc_id'])
 			const ret = await cmd.execute(data)
 
+			
 			const logMetadata = {}
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated

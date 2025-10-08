@@ -10,5 +10,9 @@ export default {
 	Sections: { 
 		appsHeaderList: 'appsHeaderList-section', 
 		appsHeaderEdit: 'appsHeaderEdit-section', 
+	},
+	SectionMap: { 
+		'appsHeaderList-section' : 'appsHeaderList', 
+		'appsHeaderEdit-section' : 'appsHeaderEdit', 
 	}
 }

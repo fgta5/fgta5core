@@ -10,5 +10,9 @@ export default {
 	Sections: { 
 		programHeaderList: 'programHeaderList-section', 
 		programHeaderEdit: 'programHeaderEdit-section', 
+	},
+	SectionMap: { 
+		'programHeaderList-section' : 'programHeaderList', 
+		'programHeaderEdit-section' : 'programHeaderEdit', 
 	}
 }

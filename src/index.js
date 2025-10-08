@@ -5,6 +5,8 @@ import * as path from 'node:path';
 import { createWebApplication, createDefaultAppConfig } from '@agung_dhewe/webapps'
 import { createRouter } from './router.js'
 import db from '@agung_dhewe/webapps/src/db.js'
+import bucket from '@agung_dhewe/webapps/src/bucket.js'
+
 
 dotenv.config();
 
@@ -74,7 +76,11 @@ async function main() {
 		startingMessage,
 		redisUrl,
 		appConfig,
-		router
+		router,
+		allowedOrigins: [
+			'http://localhost:3000',
+			/^https:\/\/.*\.transfashion\.id$/
+		] 
 	})
 }
 

@@ -77,12 +77,14 @@ export async function openSelectedData(self, params) {
 		const id = params.keyvalue
 		const data = await openData(self, id)
 
+		
+
 		CurrentState.currentOpenedId = id
 
-		const fn_name = 'settingHeaderEdit_isEditDisabled'
-		const fn_settingHeaderEdit_isEditDisabled = Extender[fn_name]
-		if (typeof fn_settingHeaderEdit_isEditDisabled === 'function') {
-			const editDisabled = fn_settingHeaderEdit_isEditDisabled(self, data)
+		const fn_iseditdisabled_name = 'settingHeaderEdit_isEditDisabled'
+		const fn_iseditdisabled = Extender[fn_iseditdisabled_name]
+		if (typeof fn_iseditdisabled === 'function') {
+			const editDisabled = fn_iseditdisabled(self, data)
 			CurrentState.editDisabled = editDisabled
 		}
 
@@ -92,6 +94,13 @@ export async function openSelectedData(self, params) {
 		frm.setData(data)
 		frm.acceptChanges()
 		frm.lock()
+
+		const fn_formopened_name = 'settingHeaderEdit_formOpened'
+		const fn_formopened = Extender[fn_formopened_name]
+		if (typeof fn_formopened === 'function') {
+			fn_formopened(self, frm, CurrentState)
+		}
+
 	} catch (err) {
 		CurrentState.currentOpenedId = null
 		throw err
@@ -137,10 +146,10 @@ async function openData(self, id) {
 	} 	
 }
 
-async function createData(self, data) {
+async function createData(self, data, formData) {
 	const url = `/${Context.moduleName}/header-create`
 	try {
-		const result = await Module.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }, formData) 
 		return result 
 	} catch (err) {
 		throw err	
@@ -148,10 +157,10 @@ async function createData(self, data) {
 }
 
 
-async function updateData(self, data) {
+async function updateData(self, data, formData) {
 	const url = `/${Context.moduleName}/header-update`
 	try {
-		const result = await Module.apiCall(url, { data, source: Source }) 
+		const result = await Module.apiCall(url, { data, source: Source }, formData) 
 		return result 
 	} catch (err) {
 		throw err	
@@ -252,6 +261,8 @@ async function setPrimaryKeyState(self, opt) {
 	}
 }
 
+
+
 async function btn_edit_click(self, evt) {
 	console.log('btn_edit_click')
 
@@ -306,10 +317,10 @@ async function btn_new_click(self, evt) {
 
 		// jika perlu modifikasi data initial,
 		// atau dialog untuk opsi data baru, dapat dibuat di Extender
-		const fn_name = 'settingHeaderEdit_newData'
-		const fn_settingHeaderEdit_newData = Extender[fn_name]
-		if (typeof fn_settingHeaderEdit_newData === 'function') {
-			await fn_settingHeaderEdit_newData(self, datainit)
+		const fn_newdata_name = 'settingHeaderEdit_newData'
+		const fn_newdata = Extender[fn_newdata_name]
+		if (typeof fn_newdata === 'function') {
+			await fn_newdata(self, datainit, frm)
 		}
 
 		// buat data baru
@@ -364,14 +375,33 @@ async function btn_save_click(self, evt) {
 		dataToSave = frm.getData()		
 	}
 
+	// Extender Saving
+	const fn_datasaving_name = 'settingHeaderEdit_dataSaving'
+	const fn_datasaving = Extender[fn_datasaving_name]
+	if (typeof fn_datasaving === 'function') {
+		await fn_datasaving(self, dataToSave, frm)
+	}
+
+
+	// bila ada file, upload filenya
+	let formData = null
+	const files = frm.getFiles()
+	if (files!=null) {
+		formData = new FormData();
+		for (let name in files) {
+			const file = files[name]
+			formData.append(name, file)
+		}
+	}	
+
 	let mask = $fgta5.Modal.createMask()
 	try {
 		let result
 
 		if (isNewData) {
-			result = await createData(self, dataToSave)
+			result = await createData(self, dataToSave, formData)
 		} else {
- 			result = await updateData(self, dataToSave)
+ 			result = await updateData(self, dataToSave, formData)
 		}
 
 		console.log('result', result)
@@ -382,6 +412,8 @@ async function btn_save_click(self, evt) {
 		console.log(`get data id ${idValue}`)
 		const data = await openData(self, idValue)
 		console.log('data', data)
+
+		
 
 		CurrentState.currentOpenedId = idValue
 
@@ -396,6 +428,14 @@ async function btn_save_click(self, evt) {
 
 		// update form
 		frm.setData(data)	
+
+
+		// Extender Saving
+		const fn_datasaved_name = 'settingHeaderEdit_dataSaved'
+		const fn_datasaved = Extender[fn_datasaved_name]
+		if (typeof fn_datasaved === 'function') {
+			await fn_datasaved(self, data, frm)
+		}
 
 
 		// persist perubahan di form
@@ -531,8 +571,10 @@ async function btn_recordstatus_click(self, evt) {
 			obj_modifyby.innerHTML = data._modifyby
 			obj_modifydate.innerHTML = data._modifydate
 
-			if (typeof Extender.settingHeaderEdit_addRecordInfo === 'function') {
-				await Extender.settingHeaderEdit_addRecordInfo(data)
+			const fn_addrecordinfo_name = 'settingHeaderEdit_addRecordInfo'
+			const fn_addrecordinfo = Extender[fn_addrecordinfo_name]
+			if (typeof fn_addrecordinfo === 'function') {
+				await fn_addrecordinfo(data)
 			}
 
 		} catch (err) {
@@ -592,6 +634,28 @@ async function btn_about_click(self, evt) {
 		sectionReturn: CurrentSection
 	}
 	pageHelper.openSection(self, 'fAbout-section', params, async ()=>{
+		
+		const AboutSection = Crsl.Items['fAbout-section']
+		AboutSection.Title = 'About Setting'
 
+		const section = document.getElementById('fAbout-section')
+
+		if ( document.getElementById('fAbout-section-fdescr') == null) {
+			const divDescr = document.createElement('div')
+			divDescr.setAttribute('id', 'fAbout-section-fdescr')
+			divDescr.setAttribute('style', 'padding: 0 0 10px 0')
+			divDescr.innerHTML = 'setting'
+			const divTopbar = section.querySelector('div[data-topbar]')
+			divTopbar.parentNode.insertBefore(divDescr, divTopbar.nextSibling);
+		}
+
+		if ( document.getElementById('fAbout-section-footer') == null) {
+			const divFooter = document.createElement('div')
+			divFooter.setAttribute('id', 'fAbout-section-footer')
+			divFooter.setAttribute('style', 'border-top: 1px solid #ccc; padding: 5px 0 0 0; margin-top: 50px')
+			divFooter.innerHTML = 'This module is generated by fgta5 generator at 7 Oct 2025 15:15'
+			section.appendChild(divFooter)
+		}
+		
 	})
 }

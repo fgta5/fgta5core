@@ -24,9 +24,6 @@ export default class extends Api {
 
 
 async function container_init(self, body) {
-	console.log('init container')
-	
-
 	const req = self.req
 	req.session.sid = req.sessionID
 
@@ -90,7 +87,6 @@ function composeMenuProgram(rows, parent=null) {
 				url: row.url
 			})
 		} else {
-			console.log(row)
 			// directory
 			programs.push({
 				title: row.title,
@@ -108,8 +104,6 @@ async function container_addToFavourite(self, body) {
 	const { program_id } = body
 	const req = self.req
 	const user_id = req.session.user.userId
-
-	console.log(program_id)
 
 	try {
 

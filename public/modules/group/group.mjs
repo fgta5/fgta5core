@@ -73,6 +73,10 @@ async function render(self) {
 		const footerButtonsContainer =  document.getElementsByClassName('footer-buttons-container')
 		Module.renderFooterButtons(footerButtonsContainer)
 	
+		// Setup Icon
+		Crsl.setIconUrl('')
+
+
 		// Set listener untuk section carousel
 		Crsl.addEventListener($fgta5.SectionCarousell.EVT_SECTIONSHOWING, (evt)=>{
 			var sectionId = evt.detail.commingSection.Id

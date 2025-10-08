@@ -1,0 +1,92 @@
+<form id="employeeHeaderEdit-frm" class="module-form" locked="true" autoid="false" primarykey="employeeHeaderEdit-obj_employee_id">
+
+	<!-- Textbox: employee_id-->	
+	<div id="employeeHeaderEdit-obj_employee_id-container" class="input-field" field="employeeHeaderEdit-obj_employee_id">
+		<label for="employeeHeaderEdit-obj_employee_id">ID</label>
+		<input id="employeeHeaderEdit-obj_employee_id"  fgta5-component="Textbox" placeholder="employee_id" autocomplete="off" spellcheck="false" 
+			binding="employee_id"
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: employe_name-->	
+	<div id="employeeHeaderEdit-obj_employe_name-container" class="input-field" field="employeeHeaderEdit-obj_employe_name">
+		<label for="employeeHeaderEdit-obj_employe_name">Name</label>
+		<input id="employeeHeaderEdit-obj_employe_name"  fgta5-component="Textbox" placeholder="employe_name" autocomplete="off" spellcheck="false" 
+			binding="employe_name"
+			character-case="uppercase" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Textbox: birth_place-->	
+	<div id="employeeHeaderEdit-obj_birth_place-container" class="input-field" field="employeeHeaderEdit-obj_birth_place">
+		<label for="employeeHeaderEdit-obj_birth_place">Birth Place</label>
+		<input id="employeeHeaderEdit-obj_birth_place"  fgta5-component="Textbox" placeholder="birth_place" autocomplete="off" spellcheck="false" 
+			binding="birth_place"
+			character-case="uppercase" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Datepicker: birth_date-->	
+	<div id="employeeHeaderEdit-obj_birth_date-container" class="input-field" field="employeeHeaderEdit-obj_birth_date">
+		<label for="employeeHeaderEdit-obj_birth_date">Birth Date</label>
+		<input id="employeeHeaderEdit-obj_birth_date"  fgta5-component="Datepicker" placeholder="birth_date" autocomplete="off" spellcheck="false" 
+			binding="birth_date"
+		>
+	</div>
+
+
+	<!-- Datepicker: joint_date-->	
+	<div id="employeeHeaderEdit-obj_joint_date-container" class="input-field" field="employeeHeaderEdit-obj_joint_date">
+		<label for="employeeHeaderEdit-obj_joint_date">Joint Date</label>
+		<input id="employeeHeaderEdit-obj_joint_date"  fgta5-component="Datepicker" placeholder="joint_date" autocomplete="off" spellcheck="false" 
+			binding="joint_date"
+		>
+	</div>
+	
+</form>
+
+
+<div id="panel-detil-selector" class="panel-detil hidden">
+	<div panel-title>
+		Information Detil
+	</div>
+	<div panel-content>
+
+		<div id="panel-detil-additionalinfo">
+			<!-- tambahkan additional info disini -->
+		</div>
+	</div>
+</div>
+ 
+
+<div class="panel-recordbar" data-view="nodetil">
+	<div><a id="employeeHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
+	<div><a id="employeeHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
+	<div><a id="employeeHeader-btn_about" href="javascript:void(0)">About</a></div>
+</div>
+
+
+<div class="footer-buttons-container hidden">
+	<div>
+		<button id="employeeHeaderEdit-btn_prev"><span>&laquo;&laquo;</span></button>
+	</div>
+	<div>
+		<button id="employeeHeaderEdit-btn_save">Save</button>
+		<button id="employeeHeaderEdit-btn_edit">Edit</button>
+		<button id="employeeHeaderEdit-btn_new" data-action="employeeHeader-new">New</button>
+		<button id="employeeHeaderEdit-btn_reset">Reset</button>
+		<button id="employeeHeaderEdit-btn_delete">Delete</button>
+	</div>
+	<div>
+		<button id="employeeHeaderEdit-btn_next"><span>&raquo;&raquo;</span></button>
+	</div>
+</div>
