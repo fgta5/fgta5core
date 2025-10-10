@@ -5,6 +5,7 @@
 		<label for="userGroupEdit-obj_usergroup_id">ID</label>
 		<input id="userGroupEdit-obj_usergroup_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="usergroup_id"
+			data-tabindex="1" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 		>
@@ -16,6 +17,7 @@
 		<label for="userGroupEdit-obj_group_id">Group</label>
 		<input id="userGroupEdit-obj_group_id"  fgta5-component="Combobox" placeholder="group" autocomplete="off" spellcheck="false" 
 			binding="group_id"
+			data-tabindex="2" 
 			required 
 			data-display="group_name" 
 		>
@@ -27,6 +29,7 @@
 		<label for="userGroupEdit-obj_usergroup_isdisabled">Disabled</label>
 		<input id="userGroupEdit-obj_usergroup_isdisabled"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
 			binding="usergroup_isdisabled"
+			data-tabindex="3" 
 			type="checkbox" 
 		>
 	</div>
@@ -37,6 +40,7 @@
 		<label for="userGroupEdit-obj_user_id">ID</label>
 		<input id="userGroupEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
+			data-tabindex="4" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 			disabled 
@@ -46,8 +50,8 @@
 </form>
 
 <div class="panel-recordbar" data-view="nodetil">
-	<div><a id="userGroup-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
-	<div><a id="userGroup-btn_logs" href="javascript:void(0)">Logs</a></div>
+	<div><a id="userGroup-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>
+	<div><a id="userGroup-btn_logs" href="javascript:void(0)" tabindex="-1">Logs</a></div>
 </div>
 
 

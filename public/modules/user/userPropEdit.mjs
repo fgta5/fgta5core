@@ -76,6 +76,7 @@ export async function openSelectedData(self, params) {
 
 	let mask = $fgta5.Modal.createMask()
 	try {
+		
 		const id = params.keyvalue
 		const data = await openData(self, id)
 

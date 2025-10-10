@@ -5,6 +5,7 @@
 		<label for="userHeaderEdit-obj_user_id">ID</label>
 		<input id="userHeaderEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
+			data-tabindex="1" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 		>
@@ -16,6 +17,7 @@
 		<label for="userHeaderEdit-obj_user_name">username</label>
 		<input id="userHeaderEdit-obj_user_name"  fgta5-component="Textbox" placeholder="username" autocomplete="off" spellcheck="false" 
 			binding="user_name"
+			data-tabindex="2" 
 			character-case="lowercase" 
 			required 
 			autocomplete="off" spellcheck="false" 
@@ -29,6 +31,7 @@
 		<label for="userHeaderEdit-obj_user_nickname">Nickname</label>
 		<input id="userHeaderEdit-obj_user_nickname"  fgta5-component="Textbox" placeholder="nickname" autocomplete="off" spellcheck="false" 
 			binding="user_nickname"
+			data-tabindex="3" 
 			character-case="lowercase" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
@@ -41,6 +44,7 @@
 		<label for="userHeaderEdit-obj_user_fullname">Fullname</label>
 		<input id="userHeaderEdit-obj_user_fullname"  fgta5-component="Textbox" placeholder="fullname" autocomplete="off" spellcheck="false" 
 			binding="user_fullname"
+			data-tabindex="4" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 		>
@@ -52,6 +56,7 @@
 		<label for="userHeaderEdit-obj_user_email">Email</label>
 		<input id="userHeaderEdit-obj_user_email"  fgta5-component="Textbox" placeholder="email" autocomplete="off" spellcheck="false" 
 			binding="user_email"
+			data-tabindex="5" 
 			character-case="lowercase" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
@@ -64,6 +69,7 @@
 		<label for="userHeaderEdit-obj_user_password">Password</label>
 		<input id="userHeaderEdit-obj_user_password"  fgta5-component="Textbox" placeholder="password" autocomplete="off" spellcheck="false" 
 			binding="user_password"
+			data-tabindex="6" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="255" 
 			disabled 
@@ -76,6 +82,7 @@
 		<label for="userHeaderEdit-obj_user_isdisabled">Disabled</label>
 		<input id="userHeaderEdit-obj_user_isdisabled"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
 			binding="user_isdisabled"
+			data-tabindex="7" 
 			type="checkbox" 
 		>
 	</div>
@@ -86,6 +93,7 @@
 		<label for="userHeaderEdit-obj_user_isdev">Developer Access</label>
 		<input id="userHeaderEdit-obj_user_isdev"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
 			binding="user_isdev"
+			data-tabindex="8" 
 			type="checkbox" 
 		>
 	</div>
@@ -123,9 +131,9 @@
  
 
 <div class="panel-recordbar" >
-	<div><a id="userHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
-	<div><a id="userHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
-	<div><a id="userHeader-btn_about" href="javascript:void(0)">About</a></div>
+	<div><a id="userHeader-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>
+	<div><a id="userHeader-btn_logs" href="javascript:void(0)" tabindex="-1">Logs</a></div>
+	<div><a id="userHeader-btn_about" href="javascript:void(0)" tabindex="-1">About</a></div>
 </div>
 
 

@@ -208,6 +208,26 @@ function openDetilSection(self, sectionTargetName, sectionCurrentName) {
 
 
 function listenUserKeys(self) {
+
+	// capture tombol
+	const allowedKeys = /^[a-zA-Z0-9 ]$/; // huruf, angka, spasi
+	document.addEventListener('keydown', (evt) => {
+		if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'c') {
+			// bebaskan Ctrl+C
+		} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'v') {
+			// bebaskan Ctrl+V
+		} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'r') {
+			// bebaskan Ctrl+R : reload
+		} else if (allowedKeys.test(evt.key) || evt.key === 'Backspace' || evt.key === 'Delete') {
+			// Tangani huruf, angka, spasi, backspace dan delete
+			const id = Crsl.CurrentSection.Id
+			const moduleId = Context.SectionMap[id]
+			const module = self.Modules[moduleId]
+			keyboardAction(self, module, 'typing', evt)
+		}
+	}, true)
+
+	// handle keyboard event	
 	document.addEventListener('keydown', (evt) => {
 		const id = Crsl.CurrentSection.Id
 		const moduleId = Context.SectionMap[id]

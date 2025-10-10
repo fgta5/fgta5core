@@ -12,5 +12,11 @@ export default {
 		groupHeaderEdit: 'groupHeaderEdit-section', 
 		groupProgramList: 'groupProgramList-section', 
 		groupProgramEdit: 'groupProgramEdit-section', 
+	},
+	SectionMap: { 
+		'groupHeaderList-section' : 'groupHeaderList', 
+		'groupHeaderEdit-section' : 'groupHeaderEdit', 
+		'groupProgramList-section' : 'groupProgramList', 
+		'groupProgramEdit-section' : 'groupProgramEdit', 
 	}
 }

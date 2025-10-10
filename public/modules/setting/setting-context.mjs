@@ -10,5 +10,9 @@ export default {
 	Sections: { 
 		settingHeaderList: 'settingHeaderList-section', 
 		settingHeaderEdit: 'settingHeaderEdit-section', 
+	},
+	SectionMap: { 
+		'settingHeaderList-section' : 'settingHeaderList', 
+		'settingHeaderEdit-section' : 'settingHeaderEdit', 
 	}
 }

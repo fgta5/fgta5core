@@ -54,12 +54,22 @@ export default class extends Module {
 			// render dan setup halaman
 			await render(self)
 
-			// kisten keyboard action
+			// listen keyboard action
 			listenUserKeys(self)
 			
+
 			// kalau user melakukan reload, konfirm dulu
-			const isFormDirty = true  // seharusnya cek dulu apa ada form changed
+			const modNameList = ['appsHeaderEdit']
 			window.onbeforeunload = (evt)=>{ 
+				// cek dulu semua form
+				let isFormDirty = false
+				for (var modname of modNameList) {
+					const module = self.Modules[modname]
+					const frm = module.getForm(self)
+					if (frm.isChanged()) {
+						isFormDirty = isFormDirty || true
+					}
+				}
 				if (isFormDirty) {
 					evt.preventDefault();
 					return  "Changes you made may not be saved."
@@ -174,6 +184,26 @@ function openDetilSection(self, sectionTargetName, sectionCurrentName) {
 
 
 function listenUserKeys(self) {
+
+	// capture tombol
+	const allowedKeys = /^[a-zA-Z0-9 ]$/; // huruf, angka, spasi
+	document.addEventListener('keydown', (evt) => {
+		if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'c') {
+			// bebaskan Ctrl+C
+		} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'v') {
+			// bebaskan Ctrl+V
+		} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'r') {
+			// bebaskan Ctrl+R : reload
+		} else if (allowedKeys.test(evt.key) || evt.key === 'Backspace' || evt.key === 'Delete') {
+			// Tangani huruf, angka, spasi, backspace dan delete
+			const id = Crsl.CurrentSection.Id
+			const moduleId = Context.SectionMap[id]
+			const module = self.Modules[moduleId]
+			keyboardAction(self, module, 'typing', evt)
+		}
+	}, true)
+
+	// handle keyboard event	
 	document.addEventListener('keydown', (evt) => {
 		const id = Crsl.CurrentSection.Id
 		const moduleId = Context.SectionMap[id]
@@ -196,7 +226,7 @@ function listenUserKeys(self) {
 		if ((evt.ctrlKey || evt.metaKey) && key === 's') {
 			evt.preventDefault(); // Mencegah aksi default (save page)
 			keyboardAction(self, module, 'save', evt)
-		} else if ((evt.ctrlKey || evt.metaKey) && key === 'n') {
+		} else if (((evt.ctrlKey || evt.metaKey) && key === 'n') || (evt.ctrlKey && key==='f2')) {
 			evt.preventDefault(); // Mencegah aksi default
 			keyboardAction(self, module, 'new', evt)
 		} else if ( key ==='escape') {

@@ -54,6 +54,28 @@ export default class extends Module {
 			// render dan setup halaman
 			await render(self)
 
+			// listen keyboard action
+			listenUserKeys(self)
+			
+
+			// kalau user melakukan reload, konfirm dulu
+			const modNameList = ['roleHeaderEdit']
+			window.onbeforeunload = (evt)=>{ 
+				// cek dulu semua form
+				let isFormDirty = false
+				for (var modname of modNameList) {
+					const module = self.Modules[modname]
+					const frm = module.getForm(self)
+					if (frm.isChanged()) {
+						isFormDirty = isFormDirty || true
+					}
+				}
+				if (isFormDirty) {
+					evt.preventDefault();
+					return  "Changes you made may not be saved."
+				}
+			};
+
 
 		} catch (err) {
 			throw err
@@ -158,6 +180,84 @@ function openDetilSection(self, sectionTargetName, sectionCurrentName) {
 			moduleHeaderEdit
 		})
 	})
+}
 
+
+function listenUserKeys(self) {
+
+	// capture tombol
+	const allowedKeys = /^[a-zA-Z0-9 ]$/; // huruf, angka, spasi
+	document.addEventListener('keydown', (evt) => {
+		if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'c') {
+			// bebaskan Ctrl+C
+		} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'v') {
+			// bebaskan Ctrl+V
+		} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 'r') {
+			// bebaskan Ctrl+R : reload
+		} else if (allowedKeys.test(evt.key) || evt.key === 'Backspace' || evt.key === 'Delete') {
+			// Tangani huruf, angka, spasi, backspace dan delete
+			const id = Crsl.CurrentSection.Id
+			const moduleId = Context.SectionMap[id]
+			const module = self.Modules[moduleId]
+			keyboardAction(self, module, 'typing', evt)
+		}
+	}, true)
+
+	// handle keyboard event	
+	document.addEventListener('keydown', (evt) => {
+		const id = Crsl.CurrentSection.Id
+		const moduleId = Context.SectionMap[id]
+		const module = self.Modules[moduleId]
+
+		// jika ada dialog yang terbuka, semua event keyboard abaikan dulu, keculai tombol escape
+		const dialog = document.querySelector('dialog[open]');
+		if (dialog) {
+			if (evt.key.toLowerCase()=='escape') {
+				dialog.close();
+				evt.preventDefault();
+			} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 's') {
+				evt.preventDefault(); 
+			}
+			return
+		}
+
+		// Cek apakah tombol Ctrl (atau Cmd di Mac) ditekan bersamaan dengan huruf 'S'
+		const key = evt.key.toLowerCase()
+		if ((evt.ctrlKey || evt.metaKey) && key === 's') {
+			evt.preventDefault(); // Mencegah aksi default (save page)
+			keyboardAction(self, module, 'save', evt)
+		} else if (((evt.ctrlKey || evt.metaKey) && key === 'n') || (evt.ctrlKey && key==='f2')) {
+			evt.preventDefault(); // Mencegah aksi default
+			keyboardAction(self, module, 'new', evt)
+		} else if ( key ==='escape') {
+			evt.preventDefault();
+			keyboardAction(self, module, 'escape', evt)
+		} else if ( key === 'f2' ) {
+			keyboardAction(self, module, 'togleEdit', evt)
+		} else if ( key === 'arrowup' ) {
+			keyboardAction(self, module, 'up', evt)
+		} else if ( key === 'arrowdown' ) {	
+			keyboardAction(self, module, 'down', evt)
+		} else if ( key === 'arrowright' ) {
+			keyboardAction(self, module, 'right', evt)
+		} else if ( key === 'arrowleft' ) {	
+			keyboardAction(self, module, 'left', evt)
+		} else if ( key === 'enter' ) {	
+			keyboardAction(self, module, 'enter', evt)
+		}
+	});
+}
+
+
+function keyboardAction(self, module, actionName, evt) {
+
+	if (module!=null) {
+		module.keyboardAction(self,  actionName, evt)
+	} else {
+		// untuk keperluan log dan about, saat escape: back
+		if (actionName=='escape') {
+			Crsl.CurrentSection.back()
+		}
+	}
 
 }

@@ -10,5 +10,9 @@ export default {
 	Sections: { 
 		docHeaderList: 'docHeaderList-section', 
 		docHeaderEdit: 'docHeaderEdit-section', 
+	},
+	SectionMap: { 
+		'docHeaderList-section' : 'docHeaderList', 
+		'docHeaderEdit-section' : 'docHeaderEdit', 
 	}
 }

@@ -10,5 +10,9 @@ export default {
 	Sections: { 
 		roleHeaderList: 'roleHeaderList-section', 
 		roleHeaderEdit: 'roleHeaderEdit-section', 
+	},
+	SectionMap: { 
+		'roleHeaderList-section' : 'roleHeaderList', 
+		'roleHeaderEdit-section' : 'roleHeaderEdit', 
 	}
 }

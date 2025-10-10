@@ -5,6 +5,7 @@
 		<label for="docHeaderEdit-obj_doc_id">Code</label>
 		<input id="docHeaderEdit-obj_doc_id"  fgta5-component="Textbox" placeholder="id dokumen" autocomplete="off" spellcheck="false" 
 			binding="doc_id"
+			data-tabindex="1" 
 			character-case="uppercase" 
 			required 
 			invalid-message-required="code document harus diisi" 
@@ -20,6 +21,7 @@
 		<label for="docHeaderEdit-obj_doc_name">Doc_name</label>
 		<input id="docHeaderEdit-obj_doc_name"  fgta5-component="Textbox" placeholder="doc_name" autocomplete="off" spellcheck="false" 
 			binding="doc_name"
+			data-tabindex="2" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="90" 
 		>
@@ -31,6 +33,7 @@
 		<label for="docHeaderEdit-obj_doc_descr">Descr</label>
 		<input id="docHeaderEdit-obj_doc_descr"  fgta5-component="Textbox" placeholder="deskripsi" autocomplete="off" spellcheck="false" 
 			binding="doc_descr"
+			data-tabindex="3" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="255" 
 		>
@@ -43,6 +46,7 @@
 		<input id="docHeaderEdit-obj_doc_seqnum"  fgta5-component="Numberbox" placeholder="sequencer number" autocomplete="off" spellcheck="false" 
 			binding="doc_seqnum"
 			value="0" 
+			data-tabindex="4" 
 			maxlength="9" 
 			min="1" 
 			max="99" 
@@ -67,9 +71,9 @@
  
 
 <div class="panel-recordbar" data-view="nodetil">
-	<div><a id="docHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
-	<div><a id="docHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
-	<div><a id="docHeader-btn_about" href="javascript:void(0)">About</a></div>
+	<div><a id="docHeader-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>
+	<div><a id="docHeader-btn_logs" href="javascript:void(0)" tabindex="-1">Logs</a></div>
+	<div><a id="docHeader-btn_about" href="javascript:void(0)" tabindex="-1">About</a></div>
 </div>
 
 

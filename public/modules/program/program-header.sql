@@ -12,33 +12,18 @@ comment on table core."program" is 'daftar program';
 
 
 -- =============================================
--- FIELD: program_title text
+-- FIELD: program_isdisabled boolean
 -- =============================================
--- ADD program_title
-alter table core."program" add program_title text  ;
-comment on column core."program".program_title is '';
+-- ADD program_isdisabled
+alter table core."program" add program_isdisabled boolean not null default false;
+comment on column core."program".program_isdisabled is '';
 
--- MODIFY program_title
+-- MODIFY program_isdisabled
 alter table core."program"
-	alter column program_title type text,
-	ALTER COLUMN program_title DROP DEFAULT,
-	ALTER COLUMN program_title DROP NOT NULL;
-comment on column core."program".program_title is '';
-
-
--- =============================================
--- FIELD: apps_id varchar(30)
--- =============================================
--- ADD apps_id
-alter table core."program" add apps_id varchar(30)  ;
-comment on column core."program".apps_id is '';
-
--- MODIFY apps_id
-alter table core."program"
-	alter column apps_id type varchar(30),
-	ALTER COLUMN apps_id DROP DEFAULT,
-	ALTER COLUMN apps_id DROP NOT NULL;
-comment on column core."program".apps_id is '';
+	alter column program_isdisabled type boolean,
+	ALTER COLUMN program_isdisabled SET DEFAULT false,
+	ALTER COLUMN program_isdisabled SET NOT NULL;
+comment on column core."program".program_isdisabled is '';
 
 
 -- =============================================
@@ -57,18 +42,18 @@ comment on column core."program".program_name is '';
 
 
 -- =============================================
--- FIELD: program_variance text
+-- FIELD: apps_id varchar(30)
 -- =============================================
--- ADD program_variance
-alter table core."program" add program_variance text  ;
-comment on column core."program".program_variance is '';
+-- ADD apps_id
+alter table core."program" add apps_id varchar(30)  ;
+comment on column core."program".apps_id is '';
 
--- MODIFY program_variance
+-- MODIFY apps_id
 alter table core."program"
-	alter column program_variance type text,
-	ALTER COLUMN program_variance DROP DEFAULT,
-	ALTER COLUMN program_variance DROP NOT NULL;
-comment on column core."program".program_variance is '';
+	alter column apps_id type varchar(30),
+	ALTER COLUMN apps_id DROP DEFAULT,
+	ALTER COLUMN apps_id DROP NOT NULL;
+comment on column core."program".apps_id is '';
 
 
 -- =============================================
@@ -84,6 +69,36 @@ alter table core."program"
 	ALTER COLUMN programgroup_id DROP DEFAULT,
 	ALTER COLUMN programgroup_id DROP NOT NULL;
 comment on column core."program".programgroup_id is '';
+
+
+-- =============================================
+-- FIELD: program_title text
+-- =============================================
+-- ADD program_title
+alter table core."program" add program_title text  ;
+comment on column core."program".program_title is '';
+
+-- MODIFY program_title
+alter table core."program"
+	alter column program_title type text,
+	ALTER COLUMN program_title DROP DEFAULT,
+	ALTER COLUMN program_title DROP NOT NULL;
+comment on column core."program".program_title is '';
+
+
+-- =============================================
+-- FIELD: program_variance text
+-- =============================================
+-- ADD program_variance
+alter table core."program" add program_variance text  ;
+comment on column core."program".program_variance is '';
+
+-- MODIFY program_variance
+alter table core."program"
+	alter column program_variance type text,
+	ALTER COLUMN program_variance DROP DEFAULT,
+	ALTER COLUMN program_variance DROP NOT NULL;
+comment on column core."program".program_variance is '';
 
 
 -- =============================================
@@ -114,21 +129,6 @@ alter table core."program"
 	ALTER COLUMN program_icon DROP DEFAULT,
 	ALTER COLUMN program_icon DROP NOT NULL;
 comment on column core."program".program_icon is '';
-
-
--- =============================================
--- FIELD: program_isdisabled boolean
--- =============================================
--- ADD program_isdisabled
-alter table core."program" add program_isdisabled boolean not null default false;
-comment on column core."program".program_isdisabled is '';
-
--- MODIFY program_isdisabled
-alter table core."program"
-	alter column program_isdisabled type boolean,
-	ALTER COLUMN program_isdisabled SET DEFAULT false,
-	ALTER COLUMN program_isdisabled SET NOT NULL;
-comment on column core."program".program_isdisabled is '';
 
 
 -- =============================================

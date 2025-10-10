@@ -5,6 +5,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_id">ID</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="programgroup_id"
+			data-tabindex="1" 
 			required 
 			invalid-message-required="ID harus diisi" 
 			autocomplete="off" spellcheck="false" 
@@ -20,6 +21,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_name">Name</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_name"  fgta5-component="Textbox" placeholder="Nama Group" autocomplete="off" spellcheck="false" 
 			binding="programgroup_name"
+			data-tabindex="2" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="90" 
 		>
@@ -31,6 +33,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_descr">Descr</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_descr"  fgta5-component="Textbox" placeholder="Dekskirpsi Group" autocomplete="off" spellcheck="false" 
 			binding="programgroup_descr"
+			data-tabindex="3" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="255" 
 		>
@@ -42,6 +45,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_isparent">IsParent</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_isparent"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
 			binding="programgroup_isparent"
+			data-tabindex="4" 
 			type="checkbox" 
 		>
 	</div>
@@ -52,6 +56,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_parent">Parent</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_parent"  fgta5-component="Combobox" placeholder="Parent Group" autocomplete="off" spellcheck="false" 
 			binding="programgroup_parent"
+			data-tabindex="5" 
 			data-display="programgroup_parent_name" 
 		>
 	</div>
@@ -62,6 +67,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_pathid">PathID</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_pathid"  fgta5-component="Textbox" placeholder="path id" autocomplete="off" spellcheck="false" 
 			binding="programgroup_pathid"
+			data-tabindex="6" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="4" 
 			disabled 
@@ -74,6 +80,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_path">Path</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_path"  fgta5-component="Textbox" placeholder="path" autocomplete="off" spellcheck="false" 
 			binding="programgroup_path"
+			data-tabindex="7" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="255" 
 			disabled 
@@ -87,6 +94,7 @@
 		<input id="programgroupHeaderEdit-obj_programgroup_level"  fgta5-component="Numberbox" placeholder="level" autocomplete="off" spellcheck="false" 
 			binding="programgroup_level"
 			value="0" 
+			data-tabindex="8" 
 			maxlength="9" 
 			disabled 
 		>
@@ -98,6 +106,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_icon">Icon</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_icon"  fgta5-component="Textbox" placeholder="icon" autocomplete="off" spellcheck="false" 
 			binding="programgroup_icon"
+			data-tabindex="9" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 		>
@@ -120,9 +129,9 @@
  
 
 <div class="panel-recordbar" data-view="nodetil">
-	<div><a id="programgroupHeader-btn_recordstatus" href="javascript:void(0)">Record Status</a></div>
-	<div><a id="programgroupHeader-btn_logs" href="javascript:void(0)">Logs</a></div>
-	<div><a id="programgroupHeader-btn_about" href="javascript:void(0)">About</a></div>
+	<div><a id="programgroupHeader-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>
+	<div><a id="programgroupHeader-btn_logs" href="javascript:void(0)" tabindex="-1">Logs</a></div>
+	<div><a id="programgroupHeader-btn_about" href="javascript:void(0)" tabindex="-1">About</a></div>
 </div>
 
 
