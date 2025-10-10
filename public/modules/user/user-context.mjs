@@ -18,5 +18,17 @@ export default {
 		userGroupEdit: 'userGroupEdit-section', 
 		userFavouriteList: 'userFavouriteList-section', 
 		userFavouriteEdit: 'userFavouriteEdit-section', 
+	},
+	SectionMap: { 
+		'userHeaderList-section' : 'userHeaderList', 
+		'userHeaderEdit-section' : 'userHeaderEdit', 
+		'userLoginList-section' : 'userLoginList', 
+		'userLoginEdit-section' : 'userLoginEdit', 
+		'userPropList-section' : 'userPropList', 
+		'userPropEdit-section' : 'userPropEdit', 
+		'userGroupList-section' : 'userGroupList', 
+		'userGroupEdit-section' : 'userGroupEdit', 
+		'userFavouriteList-section' : 'userFavouriteList', 
+		'userFavouriteEdit-section' : 'userFavouriteEdit', 
 	}
 }

@@ -102,6 +102,21 @@ comment on column core."user".user_isdisabled is '';
 
 
 -- =============================================
+-- FIELD: user_isdev boolean
+-- =============================================
+-- ADD user_isdev
+alter table core."user" add user_isdev boolean not null default false;
+comment on column core."user".user_isdev is '';
+
+-- MODIFY user_isdev
+alter table core."user"
+	alter column user_isdev type boolean,
+	ALTER COLUMN user_isdev SET DEFAULT false,
+	ALTER COLUMN user_isdev SET NOT NULL;
+comment on column core."user".user_isdev is '';
+
+
+-- =============================================
 -- FIELD: _createby bigint
 -- =============================================
 -- ADD _createby

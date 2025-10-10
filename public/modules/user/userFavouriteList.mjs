@@ -91,7 +91,9 @@ export async function openList(self, params) {
 	}
 }
 
-
+export function getGrid(self) {
+	return tbl
+}
 
 export function getCurrentRow(self) {
 	return CurrentState.SelectedRow
@@ -114,12 +116,13 @@ export function updateCurrentRow(self, data) {
 
 export function removeCurrentRow(self) {
 	const tr = CurrentState.SelectedRow
-	tr.remove()
+	tbl.removeRow(tr)
 }
 
 export function selectNextRow(self) {
 	const tr = CurrentState.SelectedRow
 	if (tr.nextElementSibling) {
+		tbl.CurrentRow = tr.nextElementSibling
 		openRow(self, tr.nextElementSibling)
 	}
 }
@@ -127,6 +130,7 @@ export function selectNextRow(self) {
 export function selectPreviousRow(self) {
 	const tr = CurrentState.SelectedRow
 	if (tr.previousElementSibling) {
+		tbl.CurrentRow = tr.previousElementSibling
 		openRow(self, tr.previousElementSibling)
 	}
 }
@@ -156,6 +160,20 @@ export function headerLocked(self) {
 export function headerUnlocked(self) {
 	console.log('header unlocked')
 	CurrentState.headerFormLocked = false
+}
+
+
+export function keyboardAction(self, actionName) {
+	if (actionName=='up') {
+		tbl.previousRecord()
+	} else if (actionName=='down') {
+		tbl.nextRecord()
+	} else if (actionName=='enter') {
+		const userFavouriteEdit = self.Modules.userFavouriteEdit
+		userFavouriteEdit.Section.show({}, (evt)=>{
+			openRow(self, tbl.CurrentRow)
+		})
+	}
 }
 
 

@@ -56,6 +56,18 @@ export async function init(self, args) {
 			SearchParams[binding] =  new $fgta5[componentname](id)
 		}
 
+		// saat user ketik tombol enter di text search, lakukan load data
+		const obj_searchtext = document.getElementById('programHeaderList-txt_searchtext')
+		const btn_load = document.getElementById('programHeaderList-btn_gridload')
+		obj_searchtext.addEventListener('keydown', (evt)=>{
+			if (evt.key.toLowerCase()=='enter') {
+				evt.stopPropagation()
+				btn_load.click()
+				obj_searchtext.blur()
+			}
+		})
+
+
 		// programHeaderList-ext.mjs, export function initSearchParams(self, SearchParams) {} 
 		const fn_initSearchParams_name = 'headerList_initSearchParams'
 		const fn_initSearchParams = Extender[fn_initSearchParams_name]
@@ -82,11 +94,14 @@ export async function loadData(self) {
 	tbl_loadData(self)
 }
 
+
+export function getGrid(self) {
+	return tbl
+}
+
 export function getCurrentRow(self) {
 	return CurrentState.SelectedRow
 }
-
-
 
 export function addNewRow(self, data) {
 	const tr = tbl.addRow(data)
@@ -142,16 +157,30 @@ export function setPagingButton(self,  editModule) {
 
 }
 
-export function keyboardAction(self, actionName) {
+export function keyboardAction(self, actionName, evt) {
 	if (actionName=='up') {
 		tbl.previousRecord()
 	} else if (actionName=='down') {
 		tbl.nextRecord()
 	} else if (actionName=='enter') {
 		const programHeaderEdit = self.Modules.programHeaderEdit
-		programHeaderEdit.Section.show({}, (evt)=>{
+		programHeaderEdit.Section.show({}, ()=>{
 			openRow(self, tbl.CurrentRow)
 		})		
+	} else if (actionName=='typing') {
+		evt.preventDefault();
+		evt.stopPropagation();
+
+		const obj_searchtext = document.getElementById('programHeaderList-txt_searchtext')
+		const key = evt.key
+		obj_searchtext.focus()
+		if (key=='Backspace') {
+			Module.deleteAtCursor(obj_searchtext, 'backspace');
+		} else if (key=='Delete') {
+			Module.deleteAtCursor(obj_searchtext, 'delete');
+		} else {
+			Module.insertAtCursor(obj_searchtext, evt.key);
+		}
 	}
 }
 

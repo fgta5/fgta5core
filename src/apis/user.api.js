@@ -274,15 +274,13 @@ async function user_headerCreate(self, body) {
 			// generate data USR reset pertahun
 			const seqdata = await sequencer.yearly('USR')	
 			data.user_id = seqdata.id
-			
-			
-				
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
 				await Extender.headerCreating(self, tx, data, seqdata)
-			}
-
+			}			
+			
+			
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)

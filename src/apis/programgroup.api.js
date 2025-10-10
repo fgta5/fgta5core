@@ -231,12 +231,10 @@ async function programgroup_headerCreate(self, body) {
 			sqlUtil.connect(tx)
 
 				
-
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data, seqdata)
+				await Extender.headerCreating(self, tx, data)
 			}
-
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)

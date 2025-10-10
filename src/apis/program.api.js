@@ -255,14 +255,12 @@ async function program_headerCreate(self, body) {
 			const id = await sequencer.yearlyshort('CNT')
 			data.program_id = id
 
-			const seqdata = {}
-				
-
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data, seqdata)
+				await Extender.headerCreating(self, tx, data)
 			}
 
+			
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)

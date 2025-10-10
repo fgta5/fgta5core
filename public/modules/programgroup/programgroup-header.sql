@@ -224,5 +224,5 @@ alter table core."programgroup"
 
 -- Add unique index 
 alter table  core."programgroup"
-	add constraint uq$core$programgroup$programgroup_name unique (programgroup_name); 
+	add constraint uq$core$programgroup$programgroup_name unique (programgroup_parent, programgroup_name); 
 

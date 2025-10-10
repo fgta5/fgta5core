@@ -54,7 +54,19 @@ export default class extends Module {
 			// render dan setup halaman
 			await render(self)
 
-			listenUserKeys(self)	
+			// kisten keyboard action
+			listenUserKeys(self)
+			
+			// kalau user melakukan reload, konfirm dulu
+			const isFormDirty = true  // seharusnya cek dulu apa ada form changed
+			window.onbeforeunload = (evt)=>{ 
+				if (isFormDirty) {
+					evt.preventDefault();
+					return  "Changes you made may not be saved."
+				}
+			};
+
+
 		} catch (err) {
 			throw err
 		}

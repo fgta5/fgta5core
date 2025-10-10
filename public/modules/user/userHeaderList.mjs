@@ -82,11 +82,14 @@ export async function loadData(self) {
 	tbl_loadData(self)
 }
 
+
+export function getGrid(self) {
+	return tbl
+}
+
 export function getCurrentRow(self) {
 	return CurrentState.SelectedRow
 }
-
-
 
 export function addNewRow(self, data) {
 	const tr = tbl.addRow(data)
@@ -105,12 +108,13 @@ export function updateCurrentRow(self, data) {
 
 export function removeCurrentRow(self) {
 	const tr = CurrentState.SelectedRow
-	tr.remove()
+	tbl.removeRow(tr)
 }
 
 export function selectNextRow(self) {
 	const tr = CurrentState.SelectedRow
 	if (tr.nextElementSibling) {
+		tbl.CurrentRow = tr.nextElementSibling
 		openRow(self, tr.nextElementSibling)
 	}
 }
@@ -118,6 +122,7 @@ export function selectNextRow(self) {
 export function selectPreviousRow(self) {
 	const tr = CurrentState.SelectedRow
 	if (tr.previousElementSibling) {
+		tbl.CurrentRow = tr.previousElementSibling
 		openRow(self, tr.previousElementSibling)
 	}
 }
@@ -139,6 +144,20 @@ export function setPagingButton(self,  editModule) {
 	}
 
 }
+
+export function keyboardAction(self, actionName) {
+	if (actionName=='up') {
+		tbl.previousRecord()
+	} else if (actionName=='down') {
+		tbl.nextRecord()
+	} else if (actionName=='enter') {
+		const userHeaderEdit = self.Modules.userHeaderEdit
+		userHeaderEdit.Section.show({}, (evt)=>{
+			openRow(self, tbl.CurrentRow)
+		})		
+	}
+}
+
 
 function setCurrentRow(self, tr) {
 	CurrentState.SelectedRow = tr

@@ -72,7 +72,9 @@ export async function init(self, args) {
 		const fn_selecting_name = 'obj_program_id_selecting'
 		const fn_selecting = Extender[fn_selecting_name]
 		if (typeof fn_obj_program_id_selecting === 'function') {
-			fn_obj_program_id_selecting(self, obj_program_id, evt)
+			// create function di Extender (jika perlu):
+			// export async function obj_program_id_selecting(self, obj_program_id, frm, evt)
+			fn_obj_program_id_selecting(self, obj_program_id, frm, evt)
 		} else {
 			// default selecting
 			const cbo = evt.detail.sender
@@ -159,6 +161,10 @@ export async function openSelectedData(self, params) {
 	}
 }
 
+export function getForm(self) {
+	return frm
+}
+
 export function clearForm(self, text) {
 	frm.clear(text)
 }
@@ -181,6 +187,30 @@ export function disableNextButton(self, disabled=true) {
 
 export function disablePrevButton(self, disabled=true) {
 	btn_prev.disabled = disabled
+}
+
+export function keyboardAction(self, actionName) {
+	if (actionName=='save') {
+		frm.acceptInput()
+		btn_save.click()
+	} else if (actionName=='new') {
+		frm.acceptInput()
+		btn_new.click()
+	} else if (actionName=='escape') {
+		frm.acceptInput()
+		if (frm.isLocked() || frm.isNew()) {
+			backToList(self)
+		} else {
+			btn_edit.click() // untuk lock data
+		}
+	} else if (actionName=='togleEdit') {
+		frm.acceptInput()
+		btn_edit.click()
+	} else if (actionName=='right') {
+		btn_next.click()
+	} else if (actionName=='left') {
+		btn_prev.click()
+	}
 }
 
 
@@ -279,6 +309,13 @@ async function  frm_locked(self, evt) {
 	btn_next.disabled = false
 
 
+	// Extender untuk event locked
+	const fn_name = 'userFavouriteEdit_formLocked'
+	const fn = Extender[fn_name]
+	if (typeof fn === 'function') {
+		fn(self, frm, CurrentState)
+	}	
+
 	// jika heder form dalam kondisi lock,
 	// tetap tidak bisa hapus
 	if (CurrentState.editDisabled) {
@@ -308,6 +345,12 @@ async function  frm_unlocked(self, evt) {
 	btn_prev.disabled = true
 	btn_next.disabled = true
 
+	// Extender untuk event Unlocked
+	const fn_name = 'userFavouriteEdit_formUnlocked'
+	const fn = Extender[fn_name]
+	if (typeof fn === 'function') {
+		fn(self, frm)
+	}
 }
 
 async function setPrimaryKeyState(self, opt) {
@@ -416,6 +459,13 @@ async function btn_new_click(self, evt) {
 
 async function btn_save_click(self, evt) {
 	console.log('btn_save_click')
+
+	// Extender Autofill
+	const fn_autofill_name = 'userFavouriteEdit_autofill'
+	const fn_autofill = Extender[fn_autofill_name]
+	if (typeof fn_autofill === 'function') {
+		await fn_autofill(self, frm)
+	}
 
 	// cek apakah data valid
 	const valid = frm.validate()
@@ -650,7 +700,7 @@ async function btn_recordstatus_click(self, evt) {
 			const fn_addrecordinfo_name = 'userFavouriteEdit_addRecordInfo'
 			const fn_addrecordinfo = Extender[fn_addrecordinfo_name]
 			if (typeof fn_addrecordinfo === 'function') {
-				await fn_addrecordinfo(data)
+				await fn_addrecordinfo(self,  data)
 			}
 
 		} catch (err) {

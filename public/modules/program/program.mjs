@@ -54,7 +54,29 @@ export default class extends Module {
 			// render dan setup halaman
 			await render(self)
 
-			listenUserKeys(self)	
+			// listen keyboard action
+			listenUserKeys(self)
+			
+
+			// kalau user melakukan reload, konfirm dulu
+			const modNameList = ['programHeaderEdit']
+			window.onbeforeunload = (evt)=>{ 
+				// cek dulu semua form
+				let isFormDirty = false
+				for (var modname of modNameList) {
+					const module = self.Modules[modname]
+					const frm = module.getForm(self)
+					if (frm.isChanged()) {
+						isFormDirty = isFormDirty || true
+					}
+				}
+				if (isFormDirty) {
+					evt.preventDefault();
+					return  "Changes you made may not be saved."
+				}
+			};
+
+
 		} catch (err) {
 			throw err
 		}
@@ -162,6 +184,20 @@ function openDetilSection(self, sectionTargetName, sectionCurrentName) {
 
 
 function listenUserKeys(self) {
+
+	// capture tombol
+	const allowedKeys = /^[a-zA-Z0-9 ]$/; // huruf, angka, spasi
+	document.addEventListener('keydown', (evt) => {
+		// Tangani huruf, angka, spasi, backspace dan delete
+		if (allowedKeys.test(evt.key) || evt.key === 'Backspace' || evt.key === 'Delete') {
+			const id = Crsl.CurrentSection.Id
+			const moduleId = Context.SectionMap[id]
+			const module = self.Modules[moduleId]
+			keyboardAction(self, module, 'typing', evt)
+		}
+	}, true)
+
+	// handle keyboard event	
 	document.addEventListener('keydown', (evt) => {
 		const id = Crsl.CurrentSection.Id
 		const moduleId = Context.SectionMap[id]
@@ -184,7 +220,7 @@ function listenUserKeys(self) {
 		if ((evt.ctrlKey || evt.metaKey) && key === 's') {
 			evt.preventDefault(); // Mencegah aksi default (save page)
 			keyboardAction(self, module, 'save', evt)
-		} else if ((evt.ctrlKey || evt.metaKey) && key === 'n') {
+		} else if (((evt.ctrlKey || evt.metaKey) && key === 'n') || (evt.ctrlKey && key==='f2')) {
 			evt.preventDefault(); // Mencegah aksi default
 			keyboardAction(self, module, 'new', evt)
 		} else if ( key ==='escape') {
