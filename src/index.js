@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import * as path from 'node:path';
 import { createWebApplication, createDefaultAppConfig } from '@agung_dhewe/webapps'
+import { getApplicationSetting, authorizeRequest } from '@agung_dhewe/webapps/src/startup.js'
 import { createRouter } from './router.js'
 import db from '@agung_dhewe/webapps/src/db.js'
 import bucket from '@agung_dhewe/webapps/src/bucket.js'
@@ -13,7 +14,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const webapp = createWebApplication()
-const appName = 'core'
+const appName = process.env.APPNAME
 
 
 main()
@@ -21,7 +22,7 @@ main()
 
 async function main() {
 	const port = process.env.PORT || webapp.defaultPort;
-	const startingMessage = `Starting ${appName} module on port \x1b[32m${port}\x1b[0m`
+	const startingMessage = `Starting \x1b[1m\x1b[93m${appName}\x1b[0m module on port \x1b[32m${port}\x1b[0m`
 	
 	// Baca Data Dari Konfigurasi
 	const redisUrl = process.env.REDIS_URL
@@ -42,7 +43,7 @@ async function main() {
 	const router = createRouter()
 
 	// ambil setting system
-	const applicationSetting = await getApplicationSetting()
+	const applicationSetting = await getApplicationSetting(db)
 
 
 	// variabel local konfigurasi yang bisa diakses dari api/router
@@ -82,76 +83,7 @@ async function main() {
 			/^https:\/\/.*\.transfashion\.id$/
 		],
 		fnParseModuleRequest: async (req)=>{
-			await parseModuleRequest(req)
+			await authorizeRequest(db, req)
 		} 
 	})
-}
-
-
-async function parseModuleRequest(req) {
-	const moduleName = req.params.modulename;
-	const program_id = req.query.prog; 
-
-
-
-	try {
-
-		// jika belum login
-		if (req.session.user==null) {
-			const err = new Error(`Belum login. Anda harus <a href="login">login</a> dulu untuk mengakses resource ini`)
-			err.status = 401
-			err.code = 401
-			throw err
-		}
-
-
-		const user_id = req.session.user.userId
-		const user_fullname = req.session.user.userFullname
-		const developerAccess = req.session.user.developerAccess
-
-
-		// jika punya akses developer boleh buka semuanya
-		const sqlUser = 'select * from core.user where user_id=${user_id} and user_isdev=true'
-		const rowUser = await db.oneOrNone(sqlUser, {user_id})
-		if (rowUser!=null) {
-			return true  // user adalah developer
-		}
-
-		// jika tidak punya akses developer, cek apakah boleh buka program 
-		const sql = 'select * from core.get_user_programs(${user_id}) where id=${program_id}'
-		const row = await db.oneOrNone(sql, {user_id, program_id});
-		if (row!=null) {
-			return true  // user punya akses program
-		}
-
-		const err = new Error(`user '${user_fullname}' tidak diperbolehkan mengakses program '${moduleName}'`)
-		err.status = 401
-		err.code = 401
-		throw err
-
-	} catch(err) {
-		throw err
-	}
-	// jika prog gak ada, hanya khusus untuk developer
-	
-	// const err = new Error('tidak boleh akses')
-	// err.status = 401
-	// throw err
-}
-
-
-async function getApplicationSetting() {
-	const setting = {}
-	try {
-		const sql = 'select setting_id, setting_value from core.setting'
-		const rows = await db.any(sql);
-		for (var row of rows) {
-			const setting_id = row.setting_id
-			const setting_value = row.setting_value
-			setting[setting_id] = setting_value
-		}
-		return setting
-	} catch (err) {
-		throw err
-	}
 }
