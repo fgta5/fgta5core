@@ -42,21 +42,6 @@ comment on column core."apps".apps_name is '';
 
 
 -- =============================================
--- FIELD: apps_descr text
--- =============================================
--- ADD apps_descr
-alter table core."apps" add apps_descr text  ;
-comment on column core."apps".apps_descr is '';
-
--- MODIFY apps_descr
-alter table core."apps"
-	alter column apps_descr type text,
-	ALTER COLUMN apps_descr DROP DEFAULT,
-	ALTER COLUMN apps_descr DROP NOT NULL;
-comment on column core."apps".apps_descr is '';
-
-
--- =============================================
 -- FIELD: apps_url text
 -- =============================================
 -- ADD apps_url
@@ -69,6 +54,21 @@ alter table core."apps"
 	ALTER COLUMN apps_url DROP DEFAULT,
 	ALTER COLUMN apps_url DROP NOT NULL;
 comment on column core."apps".apps_url is '';
+
+
+-- =============================================
+-- FIELD: apps_descr text
+-- =============================================
+-- ADD apps_descr
+alter table core."apps" add apps_descr text  ;
+comment on column core."apps".apps_descr is '';
+
+-- MODIFY apps_descr
+alter table core."apps"
+	alter column apps_descr type text,
+	ALTER COLUMN apps_descr DROP DEFAULT,
+	ALTER COLUMN apps_descr DROP NOT NULL;
+comment on column core."apps".apps_descr is '';
 
 
 -- =============================================

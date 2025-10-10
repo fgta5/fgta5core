@@ -27,6 +27,36 @@ comment on column core."user".user_name is '';
 
 
 -- =============================================
+-- FIELD: user_isdisabled boolean
+-- =============================================
+-- ADD user_isdisabled
+alter table core."user" add user_isdisabled boolean not null default false;
+comment on column core."user".user_isdisabled is '';
+
+-- MODIFY user_isdisabled
+alter table core."user"
+	alter column user_isdisabled type boolean,
+	ALTER COLUMN user_isdisabled SET DEFAULT false,
+	ALTER COLUMN user_isdisabled SET NOT NULL;
+comment on column core."user".user_isdisabled is '';
+
+
+-- =============================================
+-- FIELD: user_isdev boolean
+-- =============================================
+-- ADD user_isdev
+alter table core."user" add user_isdev boolean not null default false;
+comment on column core."user".user_isdev is '';
+
+-- MODIFY user_isdev
+alter table core."user"
+	alter column user_isdev type boolean,
+	ALTER COLUMN user_isdev SET DEFAULT false,
+	ALTER COLUMN user_isdev SET NOT NULL;
+comment on column core."user".user_isdev is '';
+
+
+-- =============================================
 -- FIELD: user_nickname text
 -- =============================================
 -- ADD user_nickname
@@ -84,36 +114,6 @@ alter table core."user"
 	ALTER COLUMN user_password DROP DEFAULT,
 	ALTER COLUMN user_password DROP NOT NULL;
 comment on column core."user".user_password is '';
-
-
--- =============================================
--- FIELD: user_isdisabled boolean
--- =============================================
--- ADD user_isdisabled
-alter table core."user" add user_isdisabled boolean not null default false;
-comment on column core."user".user_isdisabled is '';
-
--- MODIFY user_isdisabled
-alter table core."user"
-	alter column user_isdisabled type boolean,
-	ALTER COLUMN user_isdisabled SET DEFAULT false,
-	ALTER COLUMN user_isdisabled SET NOT NULL;
-comment on column core."user".user_isdisabled is '';
-
-
--- =============================================
--- FIELD: user_isdev boolean
--- =============================================
--- ADD user_isdev
-alter table core."user" add user_isdev boolean not null default false;
-comment on column core."user".user_isdev is '';
-
--- MODIFY user_isdev
-alter table core."user"
-	alter column user_isdev type boolean,
-	ALTER COLUMN user_isdev SET DEFAULT false,
-	ALTER COLUMN user_isdev SET NOT NULL;
-comment on column core."user".user_isdev is '';
 
 
 -- =============================================

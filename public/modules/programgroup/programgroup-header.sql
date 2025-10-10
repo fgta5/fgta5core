@@ -12,6 +12,21 @@ comment on table core."programgroup" is 'daftar grouping program hierarki';
 
 
 -- =============================================
+-- FIELD: programgroup_isparent boolean
+-- =============================================
+-- ADD programgroup_isparent
+alter table core."programgroup" add programgroup_isparent boolean not null default false;
+comment on column core."programgroup".programgroup_isparent is '';
+
+-- MODIFY programgroup_isparent
+alter table core."programgroup"
+	alter column programgroup_isparent type boolean,
+	ALTER COLUMN programgroup_isparent SET DEFAULT false,
+	ALTER COLUMN programgroup_isparent SET NOT NULL;
+comment on column core."programgroup".programgroup_isparent is '';
+
+
+-- =============================================
 -- FIELD: programgroup_name text
 -- =============================================
 -- ADD programgroup_name
@@ -24,6 +39,21 @@ alter table core."programgroup"
 	ALTER COLUMN programgroup_name DROP DEFAULT,
 	ALTER COLUMN programgroup_name DROP NOT NULL;
 comment on column core."programgroup".programgroup_name is '';
+
+
+-- =============================================
+-- FIELD: programgroup_parent int
+-- =============================================
+-- ADD programgroup_parent
+alter table core."programgroup" add programgroup_parent int  ;
+comment on column core."programgroup".programgroup_parent is '';
+
+-- MODIFY programgroup_parent
+alter table core."programgroup"
+	alter column programgroup_parent type int,
+	ALTER COLUMN programgroup_parent DROP DEFAULT,
+	ALTER COLUMN programgroup_parent DROP NOT NULL;
+comment on column core."programgroup".programgroup_parent is '';
 
 
 -- =============================================
@@ -42,33 +72,33 @@ comment on column core."programgroup".programgroup_descr is '';
 
 
 -- =============================================
--- FIELD: programgroup_isparent boolean
+-- FIELD: programgroup_icon text
 -- =============================================
--- ADD programgroup_isparent
-alter table core."programgroup" add programgroup_isparent boolean not null default false;
-comment on column core."programgroup".programgroup_isparent is '';
+-- ADD programgroup_icon
+alter table core."programgroup" add programgroup_icon text  ;
+comment on column core."programgroup".programgroup_icon is '';
 
--- MODIFY programgroup_isparent
+-- MODIFY programgroup_icon
 alter table core."programgroup"
-	alter column programgroup_isparent type boolean,
-	ALTER COLUMN programgroup_isparent SET DEFAULT false,
-	ALTER COLUMN programgroup_isparent SET NOT NULL;
-comment on column core."programgroup".programgroup_isparent is '';
+	alter column programgroup_icon type text,
+	ALTER COLUMN programgroup_icon DROP DEFAULT,
+	ALTER COLUMN programgroup_icon DROP NOT NULL;
+comment on column core."programgroup".programgroup_icon is '';
 
 
 -- =============================================
--- FIELD: programgroup_parent int
+-- FIELD: programgroup_level int
 -- =============================================
--- ADD programgroup_parent
-alter table core."programgroup" add programgroup_parent int  ;
-comment on column core."programgroup".programgroup_parent is '';
+-- ADD programgroup_level
+alter table core."programgroup" add programgroup_level int not null default 0;
+comment on column core."programgroup".programgroup_level is '';
 
--- MODIFY programgroup_parent
+-- MODIFY programgroup_level
 alter table core."programgroup"
-	alter column programgroup_parent type int,
-	ALTER COLUMN programgroup_parent DROP DEFAULT,
-	ALTER COLUMN programgroup_parent DROP NOT NULL;
-comment on column core."programgroup".programgroup_parent is '';
+	alter column programgroup_level type int,
+	ALTER COLUMN programgroup_level SET DEFAULT 0,
+	ALTER COLUMN programgroup_level SET NOT NULL;
+comment on column core."programgroup".programgroup_level is '';
 
 
 -- =============================================
@@ -99,36 +129,6 @@ alter table core."programgroup"
 	ALTER COLUMN programgroup_path DROP DEFAULT,
 	ALTER COLUMN programgroup_path DROP NOT NULL;
 comment on column core."programgroup".programgroup_path is '';
-
-
--- =============================================
--- FIELD: programgroup_level int
--- =============================================
--- ADD programgroup_level
-alter table core."programgroup" add programgroup_level int not null default 0;
-comment on column core."programgroup".programgroup_level is '';
-
--- MODIFY programgroup_level
-alter table core."programgroup"
-	alter column programgroup_level type int,
-	ALTER COLUMN programgroup_level SET DEFAULT 0,
-	ALTER COLUMN programgroup_level SET NOT NULL;
-comment on column core."programgroup".programgroup_level is '';
-
-
--- =============================================
--- FIELD: programgroup_icon text
--- =============================================
--- ADD programgroup_icon
-alter table core."programgroup" add programgroup_icon text  ;
-comment on column core."programgroup".programgroup_icon is '';
-
--- MODIFY programgroup_icon
-alter table core."programgroup"
-	alter column programgroup_icon type text,
-	ALTER COLUMN programgroup_icon DROP DEFAULT,
-	ALTER COLUMN programgroup_icon DROP NOT NULL;
-comment on column core."programgroup".programgroup_icon is '';
 
 
 -- =============================================

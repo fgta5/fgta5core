@@ -27,21 +27,6 @@ comment on column core."doc".doc_name is '';
 
 
 -- =============================================
--- FIELD: doc_descr text
--- =============================================
--- ADD doc_descr
-alter table core."doc" add doc_descr text  ;
-comment on column core."doc".doc_descr is 'deskripsi dokumen';
-
--- MODIFY doc_descr
-alter table core."doc"
-	alter column doc_descr type text,
-	ALTER COLUMN doc_descr DROP DEFAULT,
-	ALTER COLUMN doc_descr DROP NOT NULL;
-comment on column core."doc".doc_descr is 'deskripsi dokumen';
-
-
--- =============================================
 -- FIELD: doc_seqnum int
 -- =============================================
 -- ADD doc_seqnum
@@ -54,6 +39,21 @@ alter table core."doc"
 	ALTER COLUMN doc_seqnum SET DEFAULT 0,
 	ALTER COLUMN doc_seqnum SET NOT NULL;
 comment on column core."doc".doc_seqnum is 'nilai dalam sequencer';
+
+
+-- =============================================
+-- FIELD: doc_descr text
+-- =============================================
+-- ADD doc_descr
+alter table core."doc" add doc_descr text  ;
+comment on column core."doc".doc_descr is 'deskripsi dokumen';
+
+-- MODIFY doc_descr
+alter table core."doc"
+	alter column doc_descr type text,
+	ALTER COLUMN doc_descr DROP DEFAULT,
+	ALTER COLUMN doc_descr DROP NOT NULL;
+comment on column core."doc".doc_descr is 'deskripsi dokumen';
 
 
 -- =============================================

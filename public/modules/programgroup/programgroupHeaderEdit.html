@@ -16,37 +16,25 @@
 	</div>
 
 
-	<!-- Textbox: programgroup_name-->	
-	<div id="programgroupHeaderEdit-obj_programgroup_name-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_name">
-		<label for="programgroupHeaderEdit-obj_programgroup_name">Name</label>
-		<input id="programgroupHeaderEdit-obj_programgroup_name"  fgta5-component="Textbox" placeholder="Nama Group" autocomplete="off" spellcheck="false" 
-			binding="programgroup_name"
-			data-tabindex="2" 
-			autocomplete="off" spellcheck="false" 
-			maxlength="90" 
-		>
-	</div>
-
-
-	<!-- Textbox: programgroup_descr-->	
-	<div id="programgroupHeaderEdit-obj_programgroup_descr-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_descr">
-		<label for="programgroupHeaderEdit-obj_programgroup_descr">Descr</label>
-		<input id="programgroupHeaderEdit-obj_programgroup_descr"  fgta5-component="Textbox" placeholder="Dekskirpsi Group" autocomplete="off" spellcheck="false" 
-			binding="programgroup_descr"
-			data-tabindex="3" 
-			autocomplete="off" spellcheck="false" 
-			maxlength="255" 
-		>
-	</div>
-
-
 	<!-- Checkbox: programgroup_isparent-->	
 	<div id="programgroupHeaderEdit-obj_programgroup_isparent-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_isparent">
 		<label for="programgroupHeaderEdit-obj_programgroup_isparent">IsParent</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_isparent"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
 			binding="programgroup_isparent"
-			data-tabindex="4" 
+			data-tabindex="2" 
 			type="checkbox" 
+		>
+	</div>
+
+
+	<!-- Textbox: programgroup_name-->	
+	<div id="programgroupHeaderEdit-obj_programgroup_name-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_name">
+		<label for="programgroupHeaderEdit-obj_programgroup_name">Name</label>
+		<input id="programgroupHeaderEdit-obj_programgroup_name"  fgta5-component="Textbox" placeholder="Nama Group" autocomplete="off" spellcheck="false" 
+			binding="programgroup_name"
+			data-tabindex="3" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="90" 
 		>
 	</div>
 
@@ -56,8 +44,45 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_parent">Parent</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_parent"  fgta5-component="Combobox" placeholder="Parent Group" autocomplete="off" spellcheck="false" 
 			binding="programgroup_parent"
-			data-tabindex="5" 
+			data-tabindex="4" 
 			data-display="programgroup_parent_name" 
+		>
+	</div>
+
+
+	<!-- Textbox: programgroup_descr-->	
+	<div id="programgroupHeaderEdit-obj_programgroup_descr-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_descr">
+		<label for="programgroupHeaderEdit-obj_programgroup_descr">Descr</label>
+		<input id="programgroupHeaderEdit-obj_programgroup_descr"  fgta5-component="Textbox" placeholder="Dekskirpsi Group" autocomplete="off" spellcheck="false" 
+			binding="programgroup_descr"
+			data-tabindex="5" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="255" 
+		>
+	</div>
+
+
+	<!-- Textbox: programgroup_icon-->	
+	<div id="programgroupHeaderEdit-obj_programgroup_icon-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_icon">
+		<label for="programgroupHeaderEdit-obj_programgroup_icon">Icon</label>
+		<input id="programgroupHeaderEdit-obj_programgroup_icon"  fgta5-component="Textbox" placeholder="icon" autocomplete="off" spellcheck="false" 
+			binding="programgroup_icon"
+			data-tabindex="6" 
+			autocomplete="off" spellcheck="false" 
+			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Numberbox: programgroup_level-->	
+	<div id="programgroupHeaderEdit-obj_programgroup_level-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_level">
+		<label for="programgroupHeaderEdit-obj_programgroup_level">Level</label>
+		<input id="programgroupHeaderEdit-obj_programgroup_level"  fgta5-component="Numberbox" placeholder="level" autocomplete="off" spellcheck="false" 
+			binding="programgroup_level"
+			value="0" 
+			data-tabindex="7" 
+			maxlength="9" 
+			disabled 
 		>
 	</div>
 
@@ -67,7 +92,7 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_pathid">PathID</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_pathid"  fgta5-component="Textbox" placeholder="path id" autocomplete="off" spellcheck="false" 
 			binding="programgroup_pathid"
-			data-tabindex="6" 
+			data-tabindex="8" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="4" 
 			disabled 
@@ -80,35 +105,10 @@
 		<label for="programgroupHeaderEdit-obj_programgroup_path">Path</label>
 		<input id="programgroupHeaderEdit-obj_programgroup_path"  fgta5-component="Textbox" placeholder="path" autocomplete="off" spellcheck="false" 
 			binding="programgroup_path"
-			data-tabindex="7" 
+			data-tabindex="9" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="255" 
 			disabled 
-		>
-	</div>
-
-
-	<!-- Numberbox: programgroup_level-->	
-	<div id="programgroupHeaderEdit-obj_programgroup_level-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_level">
-		<label for="programgroupHeaderEdit-obj_programgroup_level">Level</label>
-		<input id="programgroupHeaderEdit-obj_programgroup_level"  fgta5-component="Numberbox" placeholder="level" autocomplete="off" spellcheck="false" 
-			binding="programgroup_level"
-			value="0" 
-			data-tabindex="8" 
-			maxlength="9" 
-			disabled 
-		>
-	</div>
-
-
-	<!-- Textbox: programgroup_icon-->	
-	<div id="programgroupHeaderEdit-obj_programgroup_icon-container" class="input-field" field="programgroupHeaderEdit-obj_programgroup_icon">
-		<label for="programgroupHeaderEdit-obj_programgroup_icon">Icon</label>
-		<input id="programgroupHeaderEdit-obj_programgroup_icon"  fgta5-component="Textbox" placeholder="icon" autocomplete="off" spellcheck="false" 
-			binding="programgroup_icon"
-			data-tabindex="9" 
-			autocomplete="off" spellcheck="false" 
-			maxlength="30" 
 		>
 	</div>
 	
