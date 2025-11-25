@@ -64,15 +64,22 @@ async function group_init(self, body) {
 			}
 		}
 
-		return {
+		const initialData = {
 			userId: req.session.user.userId,
 			userName: req.session.user.userName,
 			userFullname: req.session.userFullname,
 			sid: req.session.sid ,
 			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
 			notifierSocket: req.app.locals.appConfig.notifierSocket,
-			appsUrls: appsUrls
+			appsUrls: appsUrls,
+			setting: {}
 		}
+		
+		if (typeof Extender.coa_init === 'function') {
+			await Extender.coa_init(self, initialData)
+		}
+
+		return initialData
 		
 	} catch (err) {
 		throw err
@@ -241,12 +248,12 @@ async function group_headerCreate(self, body) {
 			}
 
 			// generate short id untuk CNT reset pertahun
-			const id = await sequencer.yearlyshort('CNT')
-			data.group_id = id
+			const seqdata = await sequencer.yearlyshort('CNT')
+			data.group_id = seqdata.id
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data)
+				await Extender.headerCreating(self, tx, data, seqdata)
 			}
 
 			
@@ -536,12 +543,12 @@ async function group_programCreate(self, body) {
 			sqlUtil.connect(tx)
 
 			const sequencer = createSequencerLine(tx, {})
-			const id = await sequencer.increment('CNT')
-			data.groupprogram_id = id
+			const seqdata = await sequencer.increment('CNT')
+			data.groupprogram_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.programCreating === 'function') {
-				await Extender.programCreating(self, tx, data)
+				await Extender.programCreating(self, tx, data, seqdata)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)

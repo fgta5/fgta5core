@@ -5,7 +5,6 @@ import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 import context from '@agung_dhewe/webapps/src/context.js'  
 import logger from '@agung_dhewe/webapps/src/logger.js'
-import { createSequencerDocument } from '@agung_dhewe/webapps/src/sequencerdoc.js' 
 import { createSequencerLine } from '@agung_dhewe/webapps/src/sequencerline.js' 
 
 import * as Extender from './extenders/user.apiext.js'
@@ -92,15 +91,22 @@ async function user_init(self, body) {
 			}
 		}
 
-		return {
+		const initialData = {
 			userId: req.session.user.userId,
 			userName: req.session.user.userName,
 			userFullname: req.session.userFullname,
 			sid: req.session.sid ,
 			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
 			notifierSocket: req.app.locals.appConfig.notifierSocket,
-			appsUrls: appsUrls
+			appsUrls: appsUrls,
+			setting: {}
 		}
+		
+		if (typeof Extender.coa_init === 'function') {
+			await Extender.coa_init(self, initialData)
+		}
+
+		return initialData
 		
 	} catch (err) {
 		throw err
@@ -258,12 +264,9 @@ async function user_headerCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
-			// buat sequencer document	
-			const sequencer = createSequencerDocument(tx, { 
-				COMPANY_CODE: req.app.locals.appConfig.COMPANY_CODE,
-				blockLength: 3,
-				numberLength: 6,
-			})
+			
+			// buat short sequencer	
+			const sequencer = createSequencerLine(tx, {})
 
 			if (typeof Extender.sequencerSetup === 'function') {
 				// jika ada keperluan menambahkan code block/cluster di sequencer
@@ -271,15 +274,15 @@ async function user_headerCreate(self, body) {
 				await Extender.sequencerSetup(self, tx, sequencer, data)
 			}
 
-			// generate data USR reset pertahun
-			const seqdata = await sequencer.yearly('USR')	
+			// generate short id untuk USR reset pertahun
+			const seqdata = await sequencer.yearlyshort('USR')
 			data.user_id = seqdata.id
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
 				await Extender.headerCreating(self, tx, data, seqdata)
-			}			
-			
+			}
+
 			
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -635,12 +638,12 @@ async function user_loginCreate(self, body) {
 			sqlUtil.connect(tx)
 
 			const sequencer = createSequencerLine(tx, {})
-			const id = await sequencer.increment('USR')
-			data.userlogin_id = id
+			const seqdata = await sequencer.increment('USR')
+			data.userlogin_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.loginCreating === 'function') {
-				await Extender.loginCreating(self, tx, data)
+				await Extender.loginCreating(self, tx, data, seqdata)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -929,12 +932,12 @@ async function user_propCreate(self, body) {
 			sqlUtil.connect(tx)
 
 			const sequencer = createSequencerLine(tx, {})
-			const id = await sequencer.increment('USR')
-			data.userprop_id = id
+			const seqdata = await sequencer.increment('USR')
+			data.userprop_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.propCreating === 'function') {
-				await Extender.propCreating(self, tx, data)
+				await Extender.propCreating(self, tx, data, seqdata)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -1233,12 +1236,12 @@ async function user_groupCreate(self, body) {
 			sqlUtil.connect(tx)
 
 			const sequencer = createSequencerLine(tx, {})
-			const id = await sequencer.increment('USR')
-			data.usergroup_id = id
+			const seqdata = await sequencer.increment('USR')
+			data.usergroup_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.groupCreating === 'function') {
-				await Extender.groupCreating(self, tx, data)
+				await Extender.groupCreating(self, tx, data, seqdata)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -1537,12 +1540,12 @@ async function user_favouriteCreate(self, body) {
 			sqlUtil.connect(tx)
 
 			const sequencer = createSequencerLine(tx, {})
-			const id = await sequencer.increment('USR')
-			data.userfavouriteprogram_id = id
+			const seqdata = await sequencer.increment('USR')
+			data.userfavouriteprogram_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.favouriteCreating === 'function') {
-				await Extender.favouriteCreating(self, tx, data)
+				await Extender.favouriteCreating(self, tx, data, seqdata)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)

@@ -55,15 +55,22 @@ async function role_init(self, body) {
 			}
 		}
 
-		return {
+		const initialData = {
 			userId: req.session.user.userId,
 			userName: req.session.user.userName,
 			userFullname: req.session.userFullname,
 			sid: req.session.sid ,
 			notifierId: Api.generateNotifierId(moduleName, req.sessionID),
 			notifierSocket: req.app.locals.appConfig.notifierSocket,
-			appsUrls: appsUrls
+			appsUrls: appsUrls,
+			setting: {}
 		}
+		
+		if (typeof Extender.coa_init === 'function') {
+			await Extender.coa_init(self, initialData)
+		}
+
+		return initialData
 		
 	} catch (err) {
 		throw err
@@ -232,12 +239,12 @@ async function role_headerCreate(self, body) {
 			}
 
 			// generate short id untuk CNT reset pertahun
-			const id = await sequencer.yearlyshort('CNT')
-			data.role_id = id
+			const seqdata = await sequencer.yearlyshort('CNT')
+			data.role_id = seqdata.id
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data)
+				await Extender.headerCreating(self, tx, data, seqdata)
 			}
 
 			

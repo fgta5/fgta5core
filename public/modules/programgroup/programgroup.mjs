@@ -15,7 +15,7 @@ export default class extends Module {
 	async main(args={}) {
 		
 		console.log('initializing module...')
-		app.setTitle('Group Program')
+		app.setTitle('Program Group')
 		app.showFooter(true)
 		
 		args.autoLoadGridData = true
@@ -41,6 +41,7 @@ export default class extends Module {
 				Context.userFullname = result.userFullname
 				Context.sid = result.sid
 				Context.appsUrls = result.appsUrls
+				Context.setting = result.setting
 			} catch (err) {
 				throw err
 			} 

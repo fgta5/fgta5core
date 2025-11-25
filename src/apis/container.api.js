@@ -118,7 +118,8 @@ async function container_addToFavourite(self, body) {
 			if (row==null) {
 				// belum ada, tambahkan ke user favourite
 				const sequencer = createSequencerLine(tx, {})
-				const userfavouriteprogram_id = await sequencer.increment('CNT')
+				const seqdata = await sequencer.increment('USR')
+				const userfavouriteprogram_id = seqdata.id
 				const data = {
 					userfavouriteprogram_id,
 					program_id,

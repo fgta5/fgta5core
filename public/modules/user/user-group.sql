@@ -42,30 +42,30 @@ comment on column core."usergroup".usergroup_isdisabled is '';
 
 
 -- =============================================
--- FIELD: user_id bigint
+-- FIELD: user_id int
 -- =============================================
 -- ADD user_id
-alter table core."usergroup" add user_id bigint  ;
+alter table core."usergroup" add user_id int  ;
 comment on column core."usergroup".user_id is '';
 
 -- MODIFY user_id
 alter table core."usergroup"
-	alter column user_id type bigint,
+	alter column user_id type int,
 	ALTER COLUMN user_id DROP DEFAULT,
 	ALTER COLUMN user_id DROP NOT NULL;
 comment on column core."usergroup".user_id is '';
 
 
 -- =============================================
--- FIELD: _createby bigint
+-- FIELD: _createby integer
 -- =============================================
 -- ADD _createby
-alter table core."usergroup" add _createby bigint not null ;
+alter table core."usergroup" add _createby integer not null ;
 comment on column core."usergroup"._createby is 'user yang pertama kali membuat record ini';
 
 -- MODIFY _createby
 alter table core."usergroup"
-	alter column _createby type bigint,
+	alter column _createby type integer,
 	ALTER COLUMN _createby DROP DEFAULT,
 	ALTER COLUMN _createby SET NOT NULL;
 comment on column core."usergroup"._createby is 'user yang pertama kali membuat record ini';
@@ -75,27 +75,27 @@ comment on column core."usergroup"._createby is 'user yang pertama kali membuat 
 -- FIELD: _createdate timestamp with time zone
 -- =============================================
 -- ADD _createdate
-alter table core."usergroup" add _createdate timestamp with time zone not null ;
+alter table core."usergroup" add _createdate timestamp with time zone not null default now();
 comment on column core."usergroup"._createdate is 'waktu record dibuat pertama kali';
 
 -- MODIFY _createdate
 alter table core."usergroup"
 	alter column _createdate type timestamp with time zone,
-	ALTER COLUMN _createdate DROP DEFAULT,
+	ALTER COLUMN _createdate SET DEFAULT now(),
 	ALTER COLUMN _createdate SET NOT NULL;
 comment on column core."usergroup"._createdate is 'waktu record dibuat pertama kali';
 
 
 -- =============================================
--- FIELD: _modifyby bigint
+-- FIELD: _modifyby integer
 -- =============================================
 -- ADD _modifyby
-alter table core."usergroup" add _modifyby bigint  ;
+alter table core."usergroup" add _modifyby integer  ;
 comment on column core."usergroup"._modifyby is 'user yang terakhir modifikasi record ini';
 
 -- MODIFY _modifyby
 alter table core."usergroup"
-	alter column _modifyby type bigint,
+	alter column _modifyby type integer,
 	ALTER COLUMN _modifyby DROP DEFAULT,
 	ALTER COLUMN _modifyby DROP NOT NULL;
 comment on column core."usergroup"._modifyby is 'user yang terakhir modifikasi record ini';
@@ -121,11 +121,6 @@ comment on column core."usergroup"._modifydate is 'waktu terakhir record dimodif
 -- =============================================
 -- FOREIGN KEY CONSTRAINT
 -- =============================================
--- Drop Existing Foreign Key Constraint 
-ALTER TABLE core."usergroup" DROP CONSTRAINT fk$core$usergroup$group_id;
-ALTER TABLE core."usergroup" DROP CONSTRAINT fk$core$usergroup$user_id;
-
-
 -- Add Foreign Key Constraint  
 ALTER TABLE core."usergroup"
 	ADD CONSTRAINT fk$core$usergroup$group_id

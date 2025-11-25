@@ -79,8 +79,7 @@ async function main() {
 		appConfig,
 		router,
 		allowedOrigins: [
-			'http://localhost:3000',
-			/^https:\/\/.*\.transfashion\.id$/
+			/^https:\/\/[a-z0-9.-]+\.transfashion\.id(:\d+)?$/
 		],
 		fnParseModuleRequest: async (req)=>{
 			await authorizeRequest(db, req)

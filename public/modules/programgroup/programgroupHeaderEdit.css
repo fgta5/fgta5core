@@ -39,16 +39,28 @@
 
 	#programgroupHeaderEdit-obj_programgroup_level-container {
 		grid-row: 5;
-		grid-column: 1 / span 2;
+		grid-column: 1 / span 1;
 	}
+
+
 
 	#programgroupHeaderEdit-obj_programgroup_pathid-container {
 		grid-row: 5;
-		grid-column: 3 / span 2;
+		grid-column: 2 / span 1;
+	}
+
+	#programgroupHeaderEdit-obj_programgroup_pathid-container label {
+		width: 50px;
+		min-width: 50px;
 	}
 
 	#programgroupHeaderEdit-obj_programgroup_path-container {
 		grid-row: 5;
-		grid-column: 5 / span 2;
+		grid-column: 3 / span 4;
 	}
+
+	#programgroupHeaderEdit-obj_programgroup_path-container label {
+		width: 50px;
+		min-width: 50px;
+	}	
 }

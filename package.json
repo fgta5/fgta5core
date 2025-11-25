@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/agungdhewe/fgta5core#readme",
   "dependencies": {
-    "@agung_dhewe/webapps": "^1.1.2",
     "@agung_dhewe/pgsqlc": "^1.1.5",
     "@rollup/plugin-terser": "^0.4.4",
     "bcrypt": "^6.0.0",
@@ -47,6 +46,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
+    "@agung_dhewe/webapps": "file:../../agungdhewe/webapps",
     "@rollup/plugin-terser": "0.4.4",
     "rollup": "^4.46.2"
   }
