@@ -1,24 +1,32 @@
 <div id="print-area">
 
 	<div id="judul-laporan">Judul Laporan</div>
-	<table>
-		<thead>
-			<td>
 
-			</td>
+	<table id="tbl-report" width="100%">
+		<thead>
+			<tr>
+				<th data-colname="no">No</td>
+				<th data-colname="nama">Nama</td>
+				<th data-colname="alamat">Alamat</td>
+			</tr>
 		</thead>
 		<tbody>
-
 		</tbody>
+		<tfoot>
+			<tr>
+				<td>
+					<div id="tbl-infoloader" style="position: absolute;"><!-- Report Loader Info --></div>
+				</td>
+			</tr>
+		</tfoot>
 	</table>
 
 
-
-
-	<template>
+	<template name="template-report-row">
 		<tr>
-			<td></td>	
-			<td></td>	
+			<td data-colname="no"></td>	
+			<td data-colname="nama"></td>	
+			<td data-colname="alamat"></td>
 		</tr>
 	</template>	
 </div>

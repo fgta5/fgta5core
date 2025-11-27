@@ -1,8 +1,13 @@
 @media print {
+
 	@page {
-        size: A4 landscape; 
-        margin: 0;
+        size: A4 potrait; 
+        margin: 1cm;
     }
+
+	@page :first {
+		margin-top: 0;
+	}
 
 	#print-media {
 		/* Ukuran A4 standar adalah 21cm x 29.7cm */
@@ -11,27 +16,36 @@
         margin: 0;
         padding: 0;
 		font-size: 12pt;
-		background-color: #ccc;
 		display: flex;
 		flex-direction: column;
 	}
 
 
 	#print-area {
-		margin: 1cm;
-		border: 1px dotted black;
+		margin-top: 1cm;
 		flex-grow: 1;
+	}
+
+	#tbl-infoloader {
+		display: none;
 	}
 
 }
 
 
 @media screen {
-
-
 }
+
 
 #judul-laporan {
 	font-weight: bold;
 	font-size: 1.2em;
+	margin-bottom: 15px;
 }
+
+#tbl-report th { background-color: #ccc; border-bottom: 1px solid #999; }
+#tbl-report tr [ data-colname="no"] { width: 60px; text-align: center;}
+#tbl-report tr [ data-colname="alamat"] { width: 200px; }
+
+
+

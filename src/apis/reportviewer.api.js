@@ -4,6 +4,9 @@ import db from '@agung_dhewe/webapps/src/db.js'
 import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 import context from '@agung_dhewe/webapps/src/context.js'  
+import { Worker } from 'worker_threads';
+import * as path from 'path'
+
 
 import jwt from 'jsonwebtoken';
 
@@ -21,7 +24,7 @@ export default class extends Api {
 	}
 
 	async init(body) { return await reportviewer_init(this, body) }
-
+	async generate(body) { return await reportviewer_generate(this, body) }
 	
 }
 
@@ -60,4 +63,111 @@ async function reportviewer_init(self, body) {
 	} catch (err) {
 		throw err
 	}
+}
+
+
+async function reportviewer_generate(self, body) {
+	const req = self.req;
+	const { param, clientId } = body
+	const user_id = req.session.user.userId
+	const user_name = req.session.user.userFullname
+	const ipaddress = req.ip
+
+	try {
+		const notifierServer = req.app.locals.appConfig.notifierServer
+		runDetachedWorker(notifierServer, clientId, {
+			user_id: user_id,
+			user_name: user_name,
+			ipaddress: ipaddress,
+			param: param
+		})
+
+	} catch (err) {
+		throw err
+	}
+}
+
+async function notifyClient(notifierServer, clientId, status, info) {
+	try {
+
+		const data = {clientId, status, info}
+		const url = `${notifierServer}/notify`
+		const response = await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(data)
+		});
+
+		if (!response.ok) {
+			const httpErrorStatus = response.status
+			const httpErrorStatustext = response.statusText
+			const err = new Error(`${httpErrorStatus} ${httpErrorStatustext}: ${options.method} ${url}`)
+			err.code = httpErrorStatus
+			throw err
+		}
+		
+		return response
+	} catch (err) {
+		throw err
+	}		
+
+}
+
+export const runDetachedWorker = (notifierServer, clientId, options) => {
+	const timeout = 10000  // timeout setelah 10 menit ekskusi
+
+	// cek dulu apakah valid
+	try {
+		if (clientId==null || notifierServer==null) {
+			throw new Error('clientId / notifierServer belum didefinisikan di parameter runDetachedWorker')  
+		}
+	} catch (err) {
+		throw err
+	}
+
+	// siapkan worker untuk memproses report
+	const workerPath = path.join(context.getRootDirectory(), 'src', 'workers', 'reportviewer.worker.js')
+	const worker = new Worker(workerPath, {
+		workerData: options
+	});
+
+
+	// handle timeout, sesuai dengan waktu yang di set
+	const timeoutId = setTimeout(() => {
+		console.warn('Worker timeout, terminating...');
+		notifyClient(notifierServer, clientId, 'timeout')     // nofify ke clent, kalau timeout
+		worker.terminate();
+	}, timeout);
+
+
+	
+	worker.on('message', (info) => {
+		clearTimeout(timeoutId);
+		console.log('Worker message:', 'message', info);
+		if (info.done===true) {
+			notifyClient(notifierServer, clientId, 'done', info)     // nofify message ke clent
+		} else {
+			notifyClient(notifierServer, clientId, 'message', info)     // nofify message ke clent
+		}
+	});
+
+
+	// handle error yang terjadi di worker
+	worker.on('error', (err) => {
+		clearTimeout(timeoutId);
+		console.error('Worker error:', err);
+		notifyClient(notifierServer, clientId, 'error', {message: err.message})     // nofify error ke clent
+		worker.terminate();
+	});
+
+	// worker selesi	
+	worker.on('exit', (code) => {
+		clearTimeout(timeoutId);
+		notifyClient(notifierServer, clientId, 'done', {})  
+		console.log(`Worker exited with code ${code}`);
+	});
+
+
 }
