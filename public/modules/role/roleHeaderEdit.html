@@ -1,11 +1,13 @@
-<form id="roleHeaderEdit-frm" class="module-form" locked="true" autoid="true" primarykey="roleHeaderEdit-obj_role_id">
+<form id="roleHeaderEdit-frm" class="module-form" locked="true" autoid="false" primarykey="roleHeaderEdit-obj_role_id">
 
 	<!-- Textbox: role_id-->	
-	<div id="roleHeaderEdit-obj_role_id-container" class="input-field hidden" field="roleHeaderEdit-obj_role_id">
+	<div id="roleHeaderEdit-obj_role_id-container" class="input-field" field="roleHeaderEdit-obj_role_id">
 		<label for="roleHeaderEdit-obj_role_id">ID</label>
-		<input id="roleHeaderEdit-obj_role_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
+		<input id="roleHeaderEdit-obj_role_id"  fgta5-component="Textbox" placeholder="id" autocomplete="off" spellcheck="false" 
 			binding="role_id"
 			data-tabindex="1" 
+			required 
+			invalid-message-required="id harus diisi" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
 		>
@@ -14,13 +16,28 @@
 
 	<!-- Textbox: role_name-->	
 	<div id="roleHeaderEdit-obj_role_name-container" class="input-field" field="roleHeaderEdit-obj_role_name">
-		<label for="roleHeaderEdit-obj_role_name">Role</label>
-		<input id="roleHeaderEdit-obj_role_name"  fgta5-component="Textbox" placeholder="nama role" autocomplete="off" spellcheck="false" 
+		<label for="roleHeaderEdit-obj_role_name">Name</label>
+		<input id="roleHeaderEdit-obj_role_name"  fgta5-component="Textbox" placeholder="name" autocomplete="off" spellcheck="false" 
 			binding="role_name"
 			data-tabindex="2" 
 			character-case="uppercase" 
+			required 
+			invalid-message-required="nama role harus diisi" 
 			autocomplete="off" spellcheck="false" 
-			maxlength="30" 
+			maxlength="90" 
+		>
+	</div>
+
+
+	<!-- Combobox: user_id-->	
+	<div id="roleHeaderEdit-obj_user_id-container" class="input-field" field="roleHeaderEdit-obj_user_id">
+		<label for="roleHeaderEdit-obj_user_id">User</label>
+		<input id="roleHeaderEdit-obj_user_id"  fgta5-component="Combobox" placeholder="user" autocomplete="off" spellcheck="false" 
+			binding="user_id"
+			data-tabindex="3" 
+			required 
+			invalid-message-required="user harus diisi" 
+			data-display="user_fullname" 
 		>
 	</div>
 
@@ -28,17 +45,34 @@
 	<!-- Textbox: role_descr-->	
 	<div id="roleHeaderEdit-obj_role_descr-container" class="input-field" field="roleHeaderEdit-obj_role_descr">
 		<label for="roleHeaderEdit-obj_role_descr">Descr</label>
-		<input id="roleHeaderEdit-obj_role_descr"  fgta5-component="Textbox" placeholder="deskripsi" autocomplete="off" spellcheck="false" 
+		<input id="roleHeaderEdit-obj_role_descr"  fgta5-component="Textbox" placeholder="descr" autocomplete="off" spellcheck="false" 
 			binding="role_descr"
-			data-tabindex="3" 
+			data-tabindex="4" 
 			autocomplete="off" spellcheck="false" 
-			maxlength="30" 
+			maxlength="255" 
+		>
+	</div>
+
+
+	<!-- Combobox: rolelevel_id-->	
+	<div id="roleHeaderEdit-obj_rolelevel_id-container" class="input-field" field="roleHeaderEdit-obj_rolelevel_id">
+		<label for="roleHeaderEdit-obj_rolelevel_id">Level</label>
+		<input id="roleHeaderEdit-obj_rolelevel_id"  fgta5-component="Combobox" placeholder="level" autocomplete="off" spellcheck="false" 
+			binding="rolelevel_id"
+			data-tabindex="5" 
+			required 
+			invalid-message-required="level role harus diisi" 
+			data-display="rolelevel_name" 
 		>
 	</div>
 	
 </form>
 
 
+<div id="roleHeaderEdit-footer">
+</div>
+
+<div id="roleHeaderEdit-panelaction" class="panel-action"></div>
 
 
 <div id="panel-detil-selector" class="panel-detil hidden">

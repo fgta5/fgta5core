@@ -9,28 +9,31 @@ export async function init(self, args) {
 	/* // contoh menambahkan content dari template extender
 	{
 		const target = secRec.querySelector('#fRecord-section div[name="column"][exteder]')
-		const tpl = document.querySelector('template[name="record-panel"]')
+		const tpl = document.getElementById('tpl-record-panel')
 		if (tpl!=null) {
 			const clone = tpl.content.cloneNode(true); // salin isi template
 			target.prepend(clone)
 		}
 	}
 	*/	
-}
 
 
-export function roleHeaderEdit_formOpened(self, frm, CurrentState) {
-	const obj_role_name = frm.Inputs['roleHeaderEdit-obj_role_name']
-	obj_role_name.disabled = true
+	
+	/* // contoh menambahkan custom validator
+	// pada html, tambahkan validator="cobaFunction:paramValue"
+	const frm = self.Modules.coaHeaderEdit.getHeaderForm()
+	const obj_coa_normal = frm.Inputs['coaHeaderEdit-obj_coa_normal']
+	$validators.addCustomValidator('cobaFunction', (v, param)=>{
+	 	console.log(v)
+	 	setTimeout(()=>{
+	 		obj_coa_normal.setError('ini error')
+	 	}, 500)
+	})	
+
+
+	*/
+
+
 }
 
-export async function roleHeaderEdit_newData(self, datainit, frm) {
-	const obj_role_name = frm.Inputs['roleHeaderEdit-obj_role_name']
-	obj_role_name.disabled = false
-}
-
-export async function roleHeaderEdit_dataSaved(self, data, frm) {
-	const obj_role_name = frm.Inputs['roleHeaderEdit-obj_role_name']
-	obj_role_name.disabled = true
-}
 

@@ -1,0 +1,29 @@
+<div id="rolelevelHeaderList-header">
+</div>
+
+<div class="search-container">
+	<div id="rolelevelHeaderList-pnl_search" class="search-parameters">
+		<input id="rolelevelHeaderList-txt_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext" data-searchinput>
+	</div>
+	<button id="rolelevelHeaderList-btn_gridload">Load</button>
+</div>
+
+<table id="rolelevelHeaderList-tbl" fgta5-component="Gridview">
+	<thead>
+		<tr data-header key="rolelevel_id">
+			<th data-name="rolelevel_id" binding="rolelevel_id" >ID</th>
+			<th data-name="rolelevel_name" binding="rolelevel_name" >Name</th>
+			<th data-name="rolelevel_order" binding="rolelevel_order" formatter="int(v)" style="text-align:right">Order</th>
+		</tr>
+	</thead>
+</table>
+
+
+
+<div class="footer-buttons-container">
+	<div></div>
+	<div>
+		<button id="rolelevelHeaderList-btn_new" data-action="rolelevelHeader-new" data-sectionsource="rolelevelHeaderList-section">New</button>
+	</div>
+	<div></div>
+</div>

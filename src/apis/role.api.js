@@ -5,7 +5,6 @@ import Api from '@agung_dhewe/webapps/src/api.js'
 import sqlUtil from '@agung_dhewe/pgsqlc'
 import context from '@agung_dhewe/webapps/src/context.js'  
 import logger from '@agung_dhewe/webapps/src/logger.js'
-import { createSequencerLine } from '@agung_dhewe/webapps/src/sequencerline.js' 
 
 import * as Extender from './extenders/role.apiext.js'
 
@@ -66,8 +65,9 @@ async function role_init(self, body) {
 			setting: {}
 		}
 		
-		if (typeof Extender.coa_init === 'function') {
-			await Extender.coa_init(self, initialData)
+		if (typeof Extender.role_init === 'function') {
+			// export async function role_init(self, initialData) {}
+			await Extender.role_init(self, initialData)
 		}
 
 		return initialData
@@ -118,9 +118,12 @@ async function role_headerList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
 		if (typeof Extender.headerListCriteria === 'function') {
-			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+			// export async function headerListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -135,10 +138,21 @@ async function role_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
+			// lookup: user_fullname dari field user_fullname pada table core.user dimana (core.user.user_id = core.role.user_id)
+			{
+				const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', row.user_id)
+				row.user_fullname = user_fullname
+			}
+			// lookup: rolelevel_name dari field rolelevel_name pada table core.rolelevel dimana (core.rolelevel.rolelevel_id = core.role.rolelevel_id)
+			{
+				const { rolelevel_name } = await sqlUtil.lookupdb(db, 'core.rolelevel', 'rolelevel_id', row.rolelevel_id)
+				row.rolelevel_name = rolelevel_name
+			}
 			
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(self, row)
+				// export async function headerListRow(self, row, args) {}
+				await Extender.headerListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -183,6 +197,16 @@ async function role_headerOpen(self, body) {
 			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		// lookup: user_fullname dari field user_fullname pada table core.user dimana (core.user.user_id = core.role.user_id)
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data.user_id)
+			data.user_fullname = user_fullname
+		}
+		// lookup: rolelevel_name dari field rolelevel_name pada table core.rolelevel dimana (core.rolelevel.rolelevel_id = core.role.rolelevel_id)
+		{
+			const { rolelevel_name } = await sqlUtil.lookupdb(db, 'core.rolelevel', 'rolelevel_id', data.rolelevel_id)
+			data.rolelevel_name = rolelevel_name
+		}
 		
 
 		// lookup data createby
@@ -198,8 +222,10 @@ async function role_headerOpen(self, body) {
 		}
 		
 		// pasang extender untuk olah data
+		// export async function headerOpen(self, db, data) {}
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(self, data)
+			// export async function headerOpen(self, db, data) {}
+			await Extender.headerOpen(self, db, data)
 		}
 
 		return data
@@ -228,26 +254,15 @@ async function role_headerCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
-			
-			// buat short sequencer	
-			const sequencer = createSequencerLine(tx, {})
 
-			if (typeof Extender.sequencerSetup === 'function') {
-				// jika ada keperluan menambahkan code block/cluster di sequencer
-				// dapat diimplementasikan di exterder sequencerSetup 
-				await Extender.sequencerSetup(self, tx, sequencer, data)
-			}
+			const args = { section: 'header' }
 
-			// generate short id untuk CNT reset pertahun
-			const seqdata = await sequencer.yearlyshort('CNT')
-			data.role_id = seqdata.id
-
+				
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data, seqdata)
+				// export async function headerCreating(self, tx, data, seqdata, args) {}
+				await Extender.headerCreating(self, tx, data, null, args)
 			}
-
-			
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
 			const ret = await cmd.execute(data)
@@ -257,7 +272,8 @@ async function role_headerCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerCreated === 'function') {
-				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+				// export async function headerCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.headerCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -294,6 +310,7 @@ async function role_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerUpdating === 'function') {
+				// export async function headerUpdating(self, tx, data) {}
 				await Extender.headerUpdating(self, tx, data)
 			}
 
@@ -306,6 +323,7 @@ async function role_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerUpdated === 'function') {
+				// export async function headerUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
 			}			
 
@@ -339,6 +357,7 @@ async function role_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
 			if (typeof Extender.headerDeleting === 'function') {
+				// export async function headerDeleting(self, tx, dataToRemove) {}
 				await Extender.headerDeleting(self, tx, dataToRemove)
 			}
 
@@ -352,6 +371,7 @@ async function role_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
 			if (typeof Extender.headerDeleted === 'function') {
+				// export async function headerDeleted(self, tx, ret, logMetadata) {}
 				await Extender.headerDeleted(self, tx, ret, logMetadata)
 			}
 

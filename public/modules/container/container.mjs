@@ -59,6 +59,13 @@ async function main(self, args) {
 			appmgr_openpreference(self, evt)
 		})
 
+
+
+		// const btnTestFetch = document.getElementById('btnTestFetch')
+		// btnTestFetch.addEventListener('click', evt=>{
+		// 	btnTestFetch_click()
+		// })
+
 	} catch (err) {
 		throw err
 	}
@@ -144,3 +151,19 @@ async function appmgr_openpreference(self, evt) {
 		$fgta5.MessageBox.error(err.message)
 	}
 }
+
+
+
+// async function btnTestFetch_click() {
+// 	console.log('fetch')
+
+// 	const url = "https://act-dev.transfashion.id/jurnal"
+
+// 	const result = await fetch(url, {
+// 		method: 'GET',
+// 		credentials: 'include'
+// 	})
+
+// 	console.log(result)
+
+// }

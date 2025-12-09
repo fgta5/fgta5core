@@ -1,0 +1,8 @@
+@import url('./approvaltypeHeaderEdit.css');
+@import url('./approvaltypeRoleEdit.css');
+
+
+
+#approvaltypeRoleList-tbl [data-name="approvaltype_id"] {
+	display: none;
+}

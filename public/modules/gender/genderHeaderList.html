@@ -1,0 +1,29 @@
+<div id="genderHeaderList-header">
+</div>
+
+<div class="search-container">
+	<div id="genderHeaderList-pnl_search" class="search-parameters">
+		<input id="genderHeaderList-txt_searchtext" fgta5-component="Textbox" placeholder="search" autocomplete="off" spellcheck="false" binding="searchtext" data-searchinput>
+	</div>
+	<button id="genderHeaderList-btn_gridload">Load</button>
+</div>
+
+<table id="genderHeaderList-tbl" fgta5-component="Gridview">
+	<thead>
+		<tr data-header key="gender_id">
+			<th data-name="gender_id" binding="gender_id" >ID</th>
+			<th data-name="gender_name" binding="gender_name" >Name</th>
+			<th data-name="gender_isnature" binding="gender_isnature" formatter="checkmark(value)" style="text-align:center">isnature</th>
+		</tr>
+	</thead>
+</table>
+
+
+
+<div class="footer-buttons-container">
+	<div></div>
+	<div>
+		<button id="genderHeaderList-btn_new" data-action="genderHeader-new" data-sectionsource="genderHeaderList-section">New</button>
+	</div>
+	<div></div>
+</div>
