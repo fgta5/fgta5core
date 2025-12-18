@@ -53,6 +53,11 @@
 		grid-column: 1 / span 3;
 	}
 
+	#userHeaderEdit-obj_rolelevel_id-container {
+		grid-row: 5;
+		grid-column: 1 / span 2;
+	}
+
 
 	#btn_resetpassword {
 		flex-basis: 100%;

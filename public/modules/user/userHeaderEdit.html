@@ -97,10 +97,25 @@
 			disabled 
 		>
 	</div>
+
+
+	<!-- Combobox: rolelevel_id-->	
+	<div id="userHeaderEdit-obj_rolelevel_id-container" class="input-field" field="userHeaderEdit-obj_rolelevel_id">
+		<label for="userHeaderEdit-obj_rolelevel_id">Level</label>
+		<input id="userHeaderEdit-obj_rolelevel_id"  fgta5-component="Combobox" placeholder="level" autocomplete="off" spellcheck="false" 
+			binding="rolelevel_id"
+			data-tabindex="9" 
+			data-display="rolelevel_name" 
+		>
+	</div>
 	
 </form>
 
 
+<div id="userHeaderEdit-footer">
+</div>
+
+<div id="userHeaderEdit-panelaction" class="panel-action"></div>
 
 
 <div id="panel-detil-selector" class="panel-detil ">
@@ -108,19 +123,19 @@
 		Information Detil
 	</div>
 	<div panel-content>
-		<div class="panel-detil-row">
+		<div class="panel-detil-row" id="userHeaderEdit-info-login-row">
 			<div data-label><a href="javascript:void(0)" data-target-section="userLoginList" data-current-section="userHeaderEdit">Login</a></div>
 			<div data-info>&nbsp</div>
 		</div>
-		<div class="panel-detil-row">
+		<div class="panel-detil-row" id="userHeaderEdit-info-prop-row">
 			<div data-label><a href="javascript:void(0)" data-target-section="userPropList" data-current-section="userHeaderEdit">Properties</a></div>
 			<div data-info>&nbsp</div>
 		</div>
-		<div class="panel-detil-row">
+		<div class="panel-detil-row" id="userHeaderEdit-info-group-row">
 			<div data-label><a href="javascript:void(0)" data-target-section="userGroupList" data-current-section="userHeaderEdit">Group</a></div>
 			<div data-info>&nbsp</div>
 		</div>
-		<div class="panel-detil-row">
+		<div class="panel-detil-row" id="userHeaderEdit-info-favourite-row">
 			<div data-label><a href="javascript:void(0)" data-target-section="userFavouriteList" data-current-section="userHeaderEdit">Favourite</a></div>
 			<div data-info>&nbsp</div>
 		</div>

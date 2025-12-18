@@ -1,3 +1,8 @@
+<div id="userGroupEdit-head">
+	<div id="userGroupEdit-head-title" class="section-detil-title"></div>
+	<div id="userGroupEdit-head-descr" class="section-detil-descr"></div>
+</div>
+
 <form id="userGroupEdit-frm" class="module-form" locked="true" autoid="true" primarykey="userGroupEdit-obj_usergroup_id">
 
 	<!-- Textbox: usergroup_id-->	
@@ -36,7 +41,7 @@
 
 
 	<!-- Textbox: user_id-->	
-	<div id="userGroupEdit-obj_user_id-container" class="input-field hidden" field="userGroupEdit-obj_user_id">
+	<div id="userGroupEdit-obj_user_id-container" class="input-field hidden hidden" field="userGroupEdit-obj_user_id">
 		<label for="userGroupEdit-obj_user_id">ID</label>
 		<input id="userGroupEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
@@ -47,7 +52,13 @@
 		>
 	</div>
 	
+
+
+	<div id="userGroupEdit-footer"></div>
+
 </form>
+
+
 
 <div class="panel-recordbar" data-view="nodetil">
 	<div><a id="userGroup-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>

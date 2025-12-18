@@ -127,6 +127,14 @@ comment on column core."rolelevel"._modifydate is 'waktu terakhir record dimodif
 -- =============================================
 -- UNIQUE INDEX
 -- =============================================
+-- Drop existing unique index 
+alter table core."rolelevel"
+	drop constraint uq$core$rolelevel$rolelevel_order;
+
+alter table core."rolelevel"
+	drop constraint uq$core$rolelevel$rolelevel_name;
+	
+
 -- Add unique index 
 alter table  core."rolelevel"
 	add constraint uq$core$rolelevel$rolelevel_name unique (rolelevel_name); 

@@ -29,6 +29,7 @@ export default class extends Module {
 		args.autoLoadGridData = true
 
 		const self = this
+		Context.program = self
 
 		// module-module yang di load perlu di pack dulu ke dalam variable
 		// jangan import lagi module-module ini di dalam mjs tersebut
@@ -165,7 +166,16 @@ async function render(self) {
 			const sectionTargetName = link.getAttribute('data-target-section')
 			const sectionCurrentName = link.getAttribute('data-current-section')
 			
+			// Detil bisa dibuka apabila data sudah di save
 			link.addEventListener('click', (evt)=>{
+				const moduleHeaderEdit = self.Modules[sectionCurrentName]
+				const form = moduleHeaderEdit.getForm()
+				if (form.isNew()) {
+					console.warn('tidak bisa buka detil jika data baru')	
+					$fgta5.MessageBox.warning('Detil bisa dibuka setelah data disimpan')
+					return;
+				}
+
 				openDetilSection(self, sectionTargetName, sectionCurrentName)
 			})
 
@@ -231,11 +241,14 @@ function listenUserKeys(self) {
 		const module = self.Modules[moduleId]
 
 		// jika ada dialog yang terbuka, semua event keyboard abaikan dulu, keculai tombol escape
-		const dialog = document.querySelector('dialog[open]');
+		const dialogs = [...document.querySelectorAll('dialog[open]')];
+		const dialog = dialogs.pop() || null;
+		// const dialog = document.querySelector('dialog[open]');
 		if (dialog) {
 			if (evt.key.toLowerCase()=='escape') {
-				dialog.close();
-				evt.preventDefault();
+				dialog.close()
+				evt.preventDefault()
+				evt.stopPropagation()
 			} else if ((evt.ctrlKey || evt.metaKey) && evt.key.toLowerCase() === 's') {
 				evt.preventDefault(); 
 			}

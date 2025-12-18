@@ -1,3 +1,8 @@
+<div id="userLoginEdit-head">
+	<div id="userLoginEdit-head-title" class="section-detil-title"></div>
+	<div id="userLoginEdit-head-descr" class="section-detil-descr"></div>
+</div>
+
 <form id="userLoginEdit-frm" class="module-form" locked="true" autoid="true" primarykey="userLoginEdit-obj_userlogin_id">
 
 	<!-- Textbox: userlogin_id-->	
@@ -25,7 +30,7 @@
 
 
 	<!-- Textbox: user_id-->	
-	<div id="userLoginEdit-obj_user_id-container" class="input-field hidden" field="userLoginEdit-obj_user_id">
+	<div id="userLoginEdit-obj_user_id-container" class="input-field hidden hidden" field="userLoginEdit-obj_user_id">
 		<label for="userLoginEdit-obj_user_id">ID</label>
 		<input id="userLoginEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
@@ -36,7 +41,13 @@
 		>
 	</div>
 	
+
+
+	<div id="userLoginEdit-footer"></div>
+
 </form>
+
+
 
 <div class="panel-recordbar" data-view="nodetil">
 	<div><a id="userLogin-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>

@@ -1,7 +1,7 @@
-import Context from './apps-context.mjs'  
-import * as appsHeaderList from './appsHeaderList.mjs' 
-import * as appsHeaderEdit from './appsHeaderEdit.mjs' 
-import * as Extender from './apps-ext.mjs'
+import Context from './auth-context.mjs'  
+import * as authHeaderList from './authHeaderList.mjs' 
+import * as authHeaderEdit from './authHeaderEdit.mjs' 
+import * as Extender from './auth-ext.mjs'
 
 const app = Context.app
 const Crsl = Context.Crsl
@@ -15,7 +15,7 @@ export default class extends Module {
 	async main(args={}) {
 		
 		console.log('initializing module...')
-		app.setTitle('Application')
+		app.setTitle('Authorization')
 		app.showFooter(true)
 		
 		args.autoLoadGridData = true
@@ -27,8 +27,8 @@ export default class extends Module {
 		// jangan import lagi module-module ini di dalam mjs tersebut
 		// karena akan terjadi cyclic redudancy pada saat di rollup
 		self.Modules = { 
-			appsHeaderList, 
-			appsHeaderEdit, 
+			authHeaderList, 
+			authHeaderEdit, 
 		}
 
 		try {
@@ -48,8 +48,8 @@ export default class extends Module {
 			} 
 
 			await Promise.all([ 
-				appsHeaderList.init(self, args), 
-				appsHeaderEdit.init(self, args), 
+				authHeaderList.init(self, args), 
+				authHeaderEdit.init(self, args), 
 				Extender.init(self, args)
 			])
 
@@ -61,7 +61,7 @@ export default class extends Module {
 			
 
 			// kalau user melakukan reload, konfirm dulu
-			const modNameList = ['appsHeaderEdit']
+			const modNameList = ['authHeaderEdit']
 			window.onbeforeunload = (evt)=>{ 
 				// cek dulu semua form
 				let isFormDirty = false
@@ -92,7 +92,7 @@ async function render(self) {
 		Module.renderFooterButtons(footerButtonsContainer)
 	
 		// Setup Icon
-		Crsl.setIconUrl('public/modules/apps/apps.png')
+		Crsl.setIconUrl('')
 
 
 		// Set listener untuk section carousel
@@ -161,7 +161,7 @@ async function render(self) {
 		});
 
 		
-		// apps-ext.mjs, export function extendPage(self) {} 
+		// auth-ext.mjs, export function extendPage(self) {} 
 		const fn_name = 'extendPage'
 		const fn_extendPage = Extender[fn_name]
 		if (typeof fn_extendPage === 'function') {

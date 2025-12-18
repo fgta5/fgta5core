@@ -6,11 +6,11 @@ import sqlUtil from '@agung_dhewe/pgsqlc'
 import context from '@agung_dhewe/webapps/src/context.js'  
 import logger from '@agung_dhewe/webapps/src/logger.js'
 
-import * as Extender from './extenders/apps.apiext.js'
+import * as Extender from './extenders/authlevel.apiext.js'
 
-const moduleName = 'apps'
+const moduleName = 'authlevel'
 const headerSectionName = 'header'
-const headerTableName = 'core.apps' 	
+const headerTableName = 'core.authlevel' 	
 
 // api: account
 export default class extends Api {
@@ -23,20 +23,20 @@ export default class extends Api {
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
-	async init(body) { return await apps_init(this, body) }
+	async init(body) { return await authlevel_init(this, body) }
 
 	// header
-	async headerList(body) { return await apps_headerList(this, body) }
-	async headerOpen(body) { return await apps_headerOpen(this, body) }
-	async headerUpdate(body) { return await apps_headerUpdate(this, body)}
-	async headerCreate(body) { return await apps_headerCreate(this, body)}
-	async headerDelete(body) { return await apps_headerDelete(this, body) }
+	async headerList(body) { return await authlevel_headerList(this, body) }
+	async headerOpen(body) { return await authlevel_headerOpen(this, body) }
+	async headerUpdate(body) { return await authlevel_headerUpdate(this, body)}
+	async headerCreate(body) { return await authlevel_headerCreate(this, body)}
+	async headerDelete(body) { return await authlevel_headerDelete(this, body) }
 	
 			
 }	
 
 // init module
-async function apps_init(self, body) {
+async function authlevel_init(self, body) {
 	const req = self.req
 
 	// set sid untuk session ini, diperlukan ini agar session aktif
@@ -65,9 +65,9 @@ async function apps_init(self, body) {
 			setting: {}
 		}
 		
-		if (typeof Extender.apps_init === 'function') {
-			// export async function apps_init(self, initialData) {}
-			await Extender.apps_init(self, initialData)
+		if (typeof Extender.authlevel_init === 'function') {
+			// export async function authlevel_init(self, initialData) {}
+			await Extender.authlevel_init(self, initialData)
 		}
 
 		return initialData
@@ -79,7 +79,7 @@ async function apps_init(self, body) {
 
 
 // data logging
-async function apps_log(self, body, startTime, tablename, id, action, data={}, remark='') {
+async function authlevel_log(self, body, startTime, tablename, id, action, data={}, remark='') {
 	const { source } = body
 	const req = self.req
 	const user_id = req.session.user.userId
@@ -96,11 +96,11 @@ async function apps_log(self, body, startTime, tablename, id, action, data={}, r
 
 
 
-async function apps_headerList(self, body) {
+async function authlevel_headerList(self, body) {
 	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		searchtext: `apps_id = \${searchtext} OR apps_name ILIKE '%' || \${searchtext} || '%'`,
+		searchtext: `authlevel_name ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
@@ -165,13 +165,13 @@ async function apps_headerList(self, body) {
 	}
 }
 
-async function apps_headerOpen(self, body) {
+async function authlevel_headerOpen(self, body) {
 	const tablename = headerTableName
 
 	try {
 		const { id } = body 
-		const criteria = { apps_id: id }
-		const searchMap = { apps_id: `apps_id = \${apps_id}`}
+		const criteria = { authlevel_id: id }
+		const searchMap = { authlevel_id: `authlevel_id = \${authlevel_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
 			tablename: tablename, 
@@ -215,8 +215,8 @@ async function apps_headerOpen(self, body) {
 }
 
 
-async function apps_headerCreate(self, body) {
-	const { source='apps', data={} } = body
+async function authlevel_headerCreate(self, body) {
+	const { source='authlevel', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
@@ -257,7 +257,7 @@ async function apps_headerCreate(self, body) {
 			}
 
 			// record log
-			apps_log(self, body, startTime, tablename, ret.apps_id, 'CREATE', logMetadata)
+			authlevel_log(self, body, startTime, tablename, ret.authlevel_id, 'CREATE', logMetadata)
 
 			return ret
 		})
@@ -268,8 +268,8 @@ async function apps_headerCreate(self, body) {
 	}
 }
 
-async function apps_headerUpdate(self, body) {
-	const { source='apps', data={} } = body
+async function authlevel_headerUpdate(self, body) {
+	const { source='authlevel', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
@@ -295,7 +295,7 @@ async function apps_headerUpdate(self, body) {
 			}
 
 			// eksekusi update
-			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['apps_id'])
+			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['authlevel_id'])
 			const ret = await cmd.execute(data)
 
 			
@@ -308,7 +308,7 @@ async function apps_headerUpdate(self, body) {
 			}			
 
 			// record log
-			apps_log(self, body, startTime, tablename, data.apps_id, 'UPDATE')
+			authlevel_log(self, body, startTime, tablename, data.authlevel_id, 'UPDATE')
 
 			return ret
 		})
@@ -321,7 +321,7 @@ async function apps_headerUpdate(self, body) {
 }
 
 
-async function apps_headerDelete(self, body) {
+async function authlevel_headerDelete(self, body) {
 	const { source, id } = body
 	const req = self.req
 	const user_id = req.session.user.userId
@@ -333,7 +333,7 @@ async function apps_headerDelete(self, body) {
 		const deletedRow = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
-			const dataToRemove = {apps_id: id}
+			const dataToRemove = {authlevel_id: id}
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
 			if (typeof Extender.headerDeleting === 'function') {
@@ -344,7 +344,7 @@ async function apps_headerDelete(self, body) {
 			
 
 			// hapus data header
-			const cmd = sqlUtil.createDeleteCommand(tablename, ['apps_id'])
+			const cmd = sqlUtil.createDeleteCommand(tablename, ['authlevel_id'])
 			const deletedRow = await cmd.execute(dataToRemove)
 
 			const logMetadata = {}
@@ -356,7 +356,7 @@ async function apps_headerDelete(self, body) {
 			}
 
 			// record log
-			apps_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
+			authlevel_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
 
 			return deletedRow
 		})

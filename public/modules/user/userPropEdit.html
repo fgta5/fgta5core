@@ -1,3 +1,8 @@
+<div id="userPropEdit-head">
+	<div id="userPropEdit-head-title" class="section-detil-title"></div>
+	<div id="userPropEdit-head-descr" class="section-detil-descr"></div>
+</div>
+
 <form id="userPropEdit-frm" class="module-form" locked="true" autoid="true" primarykey="userPropEdit-obj_userprop_id">
 
 	<!-- Textbox: userprop_id-->	
@@ -37,7 +42,7 @@
 
 
 	<!-- Textbox: user_id-->	
-	<div id="userPropEdit-obj_user_id-container" class="input-field hidden" field="userPropEdit-obj_user_id">
+	<div id="userPropEdit-obj_user_id-container" class="input-field hidden hidden" field="userPropEdit-obj_user_id">
 		<label for="userPropEdit-obj_user_id">ID</label>
 		<input id="userPropEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
@@ -48,7 +53,13 @@
 		>
 	</div>
 	
+
+
+	<div id="userPropEdit-footer"></div>
+
 </form>
+
+
 
 <div class="panel-recordbar" data-view="nodetil">
 	<div><a id="userProp-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>

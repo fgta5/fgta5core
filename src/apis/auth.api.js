@@ -6,11 +6,11 @@ import sqlUtil from '@agung_dhewe/pgsqlc'
 import context from '@agung_dhewe/webapps/src/context.js'  
 import logger from '@agung_dhewe/webapps/src/logger.js'
 
-import * as Extender from './extenders/apps.apiext.js'
+import * as Extender from './extenders/auth.apiext.js'
 
-const moduleName = 'apps'
+const moduleName = 'auth'
 const headerSectionName = 'header'
-const headerTableName = 'core.apps' 	
+const headerTableName = 'core.auth' 	
 
 // api: account
 export default class extends Api {
@@ -23,20 +23,20 @@ export default class extends Api {
 	// dipanggil dengan model snake syntax
 	// contoh: header-list
 	//         header-open-data
-	async init(body) { return await apps_init(this, body) }
+	async init(body) { return await auth_init(this, body) }
 
 	// header
-	async headerList(body) { return await apps_headerList(this, body) }
-	async headerOpen(body) { return await apps_headerOpen(this, body) }
-	async headerUpdate(body) { return await apps_headerUpdate(this, body)}
-	async headerCreate(body) { return await apps_headerCreate(this, body)}
-	async headerDelete(body) { return await apps_headerDelete(this, body) }
+	async headerList(body) { return await auth_headerList(this, body) }
+	async headerOpen(body) { return await auth_headerOpen(this, body) }
+	async headerUpdate(body) { return await auth_headerUpdate(this, body)}
+	async headerCreate(body) { return await auth_headerCreate(this, body)}
+	async headerDelete(body) { return await auth_headerDelete(this, body) }
 	
 			
 }	
 
 // init module
-async function apps_init(self, body) {
+async function auth_init(self, body) {
 	const req = self.req
 
 	// set sid untuk session ini, diperlukan ini agar session aktif
@@ -65,9 +65,9 @@ async function apps_init(self, body) {
 			setting: {}
 		}
 		
-		if (typeof Extender.apps_init === 'function') {
-			// export async function apps_init(self, initialData) {}
-			await Extender.apps_init(self, initialData)
+		if (typeof Extender.auth_init === 'function') {
+			// export async function auth_init(self, initialData) {}
+			await Extender.auth_init(self, initialData)
 		}
 
 		return initialData
@@ -79,7 +79,7 @@ async function apps_init(self, body) {
 
 
 // data logging
-async function apps_log(self, body, startTime, tablename, id, action, data={}, remark='') {
+async function auth_log(self, body, startTime, tablename, id, action, data={}, remark='') {
 	const { source } = body
 	const req = self.req
 	const user_id = req.session.user.userId
@@ -96,11 +96,11 @@ async function apps_log(self, body, startTime, tablename, id, action, data={}, r
 
 
 
-async function apps_headerList(self, body) {
+async function auth_headerList(self, body) {
 	const tablename = headerTableName
 	const { criteria={}, limit=0, offset=0, columns=[], sort={} } = body
 	const searchMap = {
-		searchtext: `apps_id = \${searchtext} OR apps_name ILIKE '%' || \${searchtext} || '%'`,
+		searchtext: `auth_name ILIKE '%' || \${searchtext} || '%' OR auth_label ILIKE '%' || \${searchtext} || '%'`,
 	};
 
 	try {
@@ -138,6 +138,16 @@ async function apps_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
+			// lookup: rolelevel_name dari field rolelevel_name pada table core.rolelevel dimana (core.rolelevel.rolelevel_id = core.auth.rolelevel_id)
+			{
+				const { rolelevel_name } = await sqlUtil.lookupdb(db, 'core.rolelevel', 'rolelevel_id', row.rolelevel_id)
+				row.rolelevel_name = rolelevel_name
+			}
+			// lookup: user_fullname dari field user_fullname pada table core.user dimana (core.user.user_id = core.auth.user_id)
+			{
+				const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', row.user_id)
+				row.user_fullname = user_fullname
+			}
 			
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
@@ -165,13 +175,13 @@ async function apps_headerList(self, body) {
 	}
 }
 
-async function apps_headerOpen(self, body) {
+async function auth_headerOpen(self, body) {
 	const tablename = headerTableName
 
 	try {
 		const { id } = body 
-		const criteria = { apps_id: id }
-		const searchMap = { apps_id: `apps_id = \${apps_id}`}
+		const criteria = { auth_id: id }
+		const searchMap = { auth_id: `auth_id = \${auth_id}`}
 		const {whereClause, queryParams} = sqlUtil.createWhereClause(criteria, searchMap) 
 		const sql = sqlUtil.createSqlSelect({
 			tablename: tablename, 
@@ -187,6 +197,16 @@ async function apps_headerOpen(self, body) {
 			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		// lookup: rolelevel_name dari field rolelevel_name pada table core.rolelevel dimana (core.rolelevel.rolelevel_id = core.auth.rolelevel_id)
+		{
+			const { rolelevel_name } = await sqlUtil.lookupdb(db, 'core.rolelevel', 'rolelevel_id', data.rolelevel_id)
+			data.rolelevel_name = rolelevel_name
+		}
+		// lookup: user_fullname dari field user_fullname pada table core.user dimana (core.user.user_id = core.auth.user_id)
+		{
+			const { user_fullname } = await sqlUtil.lookupdb(db, 'core.user', 'user_id', data.user_id)
+			data.user_fullname = user_fullname
+		}
 		
 
 		// lookup data createby
@@ -215,8 +235,8 @@ async function apps_headerOpen(self, body) {
 }
 
 
-async function apps_headerCreate(self, body) {
-	const { source='apps', data={} } = body
+async function auth_headerCreate(self, body) {
+	const { source='auth', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint();
@@ -257,7 +277,7 @@ async function apps_headerCreate(self, body) {
 			}
 
 			// record log
-			apps_log(self, body, startTime, tablename, ret.apps_id, 'CREATE', logMetadata)
+			auth_log(self, body, startTime, tablename, ret.auth_id, 'CREATE', logMetadata)
 
 			return ret
 		})
@@ -268,8 +288,8 @@ async function apps_headerCreate(self, body) {
 	}
 }
 
-async function apps_headerUpdate(self, body) {
-	const { source='apps', data={} } = body
+async function auth_headerUpdate(self, body) {
+	const { source='auth', data={} } = body
 	const req = self.req
 	const user_id = req.session.user.userId
 	const startTime = process.hrtime.bigint()
@@ -295,7 +315,7 @@ async function apps_headerUpdate(self, body) {
 			}
 
 			// eksekusi update
-			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['apps_id'])
+			const cmd = sqlUtil.createUpdateCommand(tablename, data, ['auth_id'])
 			const ret = await cmd.execute(data)
 
 			
@@ -308,7 +328,7 @@ async function apps_headerUpdate(self, body) {
 			}			
 
 			// record log
-			apps_log(self, body, startTime, tablename, data.apps_id, 'UPDATE')
+			auth_log(self, body, startTime, tablename, data.auth_id, 'UPDATE')
 
 			return ret
 		})
@@ -321,7 +341,7 @@ async function apps_headerUpdate(self, body) {
 }
 
 
-async function apps_headerDelete(self, body) {
+async function auth_headerDelete(self, body) {
 	const { source, id } = body
 	const req = self.req
 	const user_id = req.session.user.userId
@@ -333,7 +353,7 @@ async function apps_headerDelete(self, body) {
 		const deletedRow = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
-			const dataToRemove = {apps_id: id}
+			const dataToRemove = {auth_id: id}
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
 			if (typeof Extender.headerDeleting === 'function') {
@@ -344,7 +364,7 @@ async function apps_headerDelete(self, body) {
 			
 
 			// hapus data header
-			const cmd = sqlUtil.createDeleteCommand(tablename, ['apps_id'])
+			const cmd = sqlUtil.createDeleteCommand(tablename, ['auth_id'])
 			const deletedRow = await cmd.execute(dataToRemove)
 
 			const logMetadata = {}
@@ -356,7 +376,7 @@ async function apps_headerDelete(self, body) {
 			}
 
 			// record log
-			apps_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
+			auth_log(self, body, startTime, tablename, id, 'DELETE', logMetadata)
 
 			return deletedRow
 		})

@@ -1,22 +1,22 @@
-import Context from './apps-context.mjs'
-import * as Ext from './apps-ext.mjs'
+import Context from './auth-context.mjs'
+import * as Ext from './auth-ext.mjs'
 
 const Extender = Ext.extenderHeader ?? Ext
 
 const Crsl =  Context.Crsl
-const CurrentSectionId = Context.Sections.appsHeaderList
+const CurrentSectionId = Context.Sections.authHeaderList
 const CurrentSection = Crsl.Items[CurrentSectionId]
 const CurrentState = {}
 
-const tbl =  new $fgta5.Gridview('appsHeaderList-tbl')
-const pnl_search = document.getElementById('appsHeaderList-pnl_search')
-const btn_gridload = new $fgta5.ActionButton('appsHeaderList-btn_gridload') 
+const tbl =  new $fgta5.Gridview('authHeaderList-tbl')
+const pnl_search = document.getElementById('authHeaderList-pnl_search')
+const btn_gridload = new $fgta5.ActionButton('authHeaderList-btn_gridload') 
 
 export const Section = CurrentSection
 export const SearchParams = {}
 
 export async function init(self, args) {
-	console.log('initializing appsHeaderList ...')
+	console.log('initializing authHeaderList ...')
 
 	// add event listener
 	tbl.addEventListener('nextdata', async evt=>{ tbl_nextdata(self, evt) })
@@ -58,8 +58,8 @@ export async function init(self, args) {
 		}
 
 		// saat user ketik tombol enter di text search, lakukan load data
-		const obj_searchtext = document.getElementById('appsHeaderList-txt_searchtext')
-		const btn_load = document.getElementById('appsHeaderList-btn_gridload')
+		const obj_searchtext = document.getElementById('authHeaderList-txt_searchtext')
+		const btn_load = document.getElementById('authHeaderList-btn_gridload')
 		obj_searchtext.addEventListener('keydown', (evt)=>{
 			if (evt.key.toLowerCase()=='enter') {
 				evt.stopPropagation()
@@ -69,7 +69,7 @@ export async function init(self, args) {
 		})
 
 
-		// appsHeaderList-ext.mjs, export function initSearchParams(self, SearchParams) {} 
+		// authHeaderList-ext.mjs, export function initSearchParams(self, SearchParams) {} 
 		const fn_initSearchParams_name = 'headerList_initSearchParams'
 		const fn_initSearchParams = Extender[fn_initSearchParams_name]
 		if (typeof fn_initSearchParams === 'function') {
@@ -164,9 +164,9 @@ export function keyboardAction(self, actionName, evt) {
 	} else if (actionName=='down') {
 		tbl.nextRecord()
 	} else if (actionName=='enter') {
-		const appsHeaderEdit = self.Modules.appsHeaderEdit
+		const authHeaderEdit = self.Modules.authHeaderEdit
 		if (tbl.CurrentRow!=null) {
-			appsHeaderEdit.Section.show({}, ()=>{
+			authHeaderEdit.Section.show({}, ()=>{
 				openRow(self, tbl.CurrentRow)
 			})
 		}	
@@ -175,7 +175,7 @@ export function keyboardAction(self, actionName, evt) {
 		evt.preventDefault();
 		evt.stopPropagation();
 
-		const obj_searchtext = document.getElementById('appsHeaderList-txt_searchtext')
+		const obj_searchtext = document.getElementById('authHeaderList-txt_searchtext')
 		const key = evt.key
 		obj_searchtext.focus()
 		if (key=='Backspace') {
@@ -202,17 +202,17 @@ async function openRow(self, tr) {
 	const keyvalue = tr.getAttribute('keyvalue')
 	const key = tr.getAttribute('key')
 
-	const appsHeaderEdit = self.Modules.appsHeaderEdit
-	appsHeaderEdit.clearForm(self, 'loading...')
+	const authHeaderEdit = self.Modules.authHeaderEdit
+	authHeaderEdit.clearForm(self, 'loading...')
 
 	try {
 		setCurrentRow(self, tr)
 		CurrentState.SelectedRow.keyValue = keyvalue
 		CurrentState.SelectedRow.key = key
-		await appsHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
+		await authHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
 
 		// matikan atau nyalakan button prev/next sesuai kondisi
-		setPagingButton(self, appsHeaderEdit)
+		setPagingButton(self, authHeaderEdit)
 
 	} catch (err) {
 		setCurrentRow(self, null)
@@ -272,8 +272,8 @@ function tbl_sorting(self, evt) {
 function tbl_cellclick(self, evt) {
 	const tr = evt.detail.tr
 
-	const appsHeaderEdit = self.Modules.appsHeaderEdit
-	appsHeaderEdit.Section.show({}, (evt)=>{
+	const authHeaderEdit = self.Modules.authHeaderEdit
+	authHeaderEdit.Section.show({}, (evt)=>{
 		openRow(self, tr)
 	})
 
@@ -281,7 +281,7 @@ function tbl_cellclick(self, evt) {
 }
 
 async function tbl_loadData(self, params={}) {
-	console.log('loading appsHeader data')
+	console.log('loading authHeader data')
 	console.log(params)
 
 	const { criteria={}, limit=0, offset=0, sort={} } = params

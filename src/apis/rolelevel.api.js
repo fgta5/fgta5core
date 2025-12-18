@@ -235,7 +235,7 @@ async function rolelevel_headerCreate(self, body) {
 			sqlUtil.connect(tx)
 
 
-			const args = { section: 'header' }
+			const args = { section: 'header', prefix:'' }
 
 				
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating

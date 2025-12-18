@@ -117,6 +117,21 @@ comment on column core."user".user_password is '';
 
 
 -- =============================================
+-- FIELD: rolelevel_id smallint
+-- =============================================
+-- ADD rolelevel_id
+alter table core."user" add rolelevel_id smallint  ;
+comment on column core."user".rolelevel_id is '';
+
+-- MODIFY rolelevel_id
+alter table core."user"
+	alter column rolelevel_id type smallint,
+	ALTER COLUMN rolelevel_id DROP DEFAULT,
+	ALTER COLUMN rolelevel_id DROP NOT NULL;
+comment on column core."user".rolelevel_id is '';
+
+
+-- =============================================
 -- FIELD: _createby integer
 -- =============================================
 -- ADD _createby
@@ -181,7 +196,22 @@ comment on column core."user"._modifydate is 'waktu terakhir record dimodifikasi
 -- =============================================
 -- FOREIGN KEY CONSTRAINT
 -- =============================================
--- Add Foreign Key Constraint  	
+-- Drop Existing Foreign Key Constraint 
+ALTER TABLE core."user" DROP CONSTRAINT fk$core$user$rolelevel_id;
+
+
+-- Add Foreign Key Constraint  
+ALTER TABLE core."user"
+	ADD CONSTRAINT fk$core$user$rolelevel_id
+	FOREIGN KEY (rolelevel_id)
+	REFERENCES core."rolelevel"(rolelevel_id);
+
+
+-- Add As Index, drop dulu jika sudah ada
+DROP INDEX IF EXISTS core.idx_fk$core$user$rolelevel_id;
+CREATE INDEX idx_fk$core$user$rolelevel_id ON core."user"(rolelevel_id);	
+
+	
 
 
 -- =============================================

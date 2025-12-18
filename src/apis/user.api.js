@@ -102,8 +102,9 @@ async function user_init(self, body) {
 			setting: {}
 		}
 		
-		if (typeof Extender.coa_init === 'function') {
-			await Extender.coa_init(self, initialData)
+		if (typeof Extender.user_init === 'function') {
+			// export async function user_init(self, initialData) {}
+			await Extender.user_init(self, initialData)
 		}
 
 		return initialData
@@ -154,9 +155,12 @@ async function user_headerList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
 		if (typeof Extender.headerListCriteria === 'function') {
-			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+			// export async function headerListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -171,10 +175,16 @@ async function user_headerList(self, body) {
 			i++
 			if (i>max_rows) { break }
 
+			// lookup: rolelevel_name dari field rolelevel_name pada table core.rolelevel dimana (core.rolelevel.rolelevel_id = core.user.rolelevel_id)
+			{
+				const { rolelevel_name } = await sqlUtil.lookupdb(db, 'core.rolelevel', 'rolelevel_id', row.rolelevel_id)
+				row.rolelevel_name = rolelevel_name
+			}
 			
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(self, row)
+				// export async function headerListRow(self, row, args) {}
+				await Extender.headerListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -219,6 +229,11 @@ async function user_headerOpen(self, body) {
 			throw new Error(`[${tablename}] data dengan id '${id}' tidak ditemukan`) 
 		}	
 
+		// lookup: rolelevel_name dari field rolelevel_name pada table core.rolelevel dimana (core.rolelevel.rolelevel_id = core.user.rolelevel_id)
+		{
+			const { rolelevel_name } = await sqlUtil.lookupdb(db, 'core.rolelevel', 'rolelevel_id', data.rolelevel_id)
+			data.rolelevel_name = rolelevel_name
+		}
 		
 
 		// lookup data createby
@@ -234,8 +249,10 @@ async function user_headerOpen(self, body) {
 		}
 		
 		// pasang extender untuk olah data
+		// export async function headerOpen(self, db, data) {}
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(self, data)
+			// export async function headerOpen(self, db, data) {}
+			await Extender.headerOpen(self, db, data)
 		}
 
 		return data
@@ -264,6 +281,9 @@ async function user_headerCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { section: 'header' }
+
 			
 			// buat short sequencer	
 			const sequencer = createSequencerLine(tx, {})
@@ -271,16 +291,18 @@ async function user_headerCreate(self, body) {
 			if (typeof Extender.sequencerSetup === 'function') {
 				// jika ada keperluan menambahkan code block/cluster di sequencer
 				// dapat diimplementasikan di exterder sequencerSetup 
-				await Extender.sequencerSetup(self, tx, sequencer, data)
+				// export async function sequencerSetup(self, tx, sequencer, data, args) {}
+				await Extender.sequencerSetup(self, tx, sequencer, data, args)
 			}
 
-			// generate short id untuk USR reset pertahun
-			const seqdata = await sequencer.yearlyshort('USR')
+			// generate short id sesuai prefix (default: USR) reset pertahun
+			const seqdata = await sequencer.yearlyshort(args.prefix)
 			data.user_id = seqdata.id
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data, seqdata)
+				// export async function headerCreating(self, tx, data, seqdata, args) {}
+				await Extender.headerCreating(self, tx, data, seqdata, args)
 			}
 
 			
@@ -293,7 +315,8 @@ async function user_headerCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerCreated === 'function') {
-				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+				// export async function headerCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.headerCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -330,6 +353,7 @@ async function user_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerUpdating === 'function') {
+				// export async function headerUpdating(self, tx, data) {}
 				await Extender.headerUpdating(self, tx, data)
 			}
 
@@ -342,6 +366,7 @@ async function user_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerUpdated === 'function') {
+				// export async function headerUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
 			}			
 
@@ -375,6 +400,7 @@ async function user_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
 			if (typeof Extender.headerDeleting === 'function') {
+				// export async function headerDeleting(self, tx, dataToRemove) {}
 				await Extender.headerDeleting(self, tx, dataToRemove)
 			}
 
@@ -386,6 +412,7 @@ async function user_headerDelete(self, body) {
 				for (let rowlogin of rows) {
 					// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 					if (typeof Extender.loginDeleting === 'function') {
+						// export async function loginDeleting(self, tx, rowlogin, logMetadata) {}
 						await Extender.loginDeleting(self, tx, rowlogin, logMetadata)
 					}
 
@@ -395,6 +422,7 @@ async function user_headerDelete(self, body) {
 
 					// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 					if (typeof Extender.loginDeleted === 'function') {
+						// export async function loginDeleted(self, tx, deletedRow, logMetadata) {}
 						await Extender.loginDeleted(self, tx, deletedRow, logMetadata)
 					}					
 
@@ -412,6 +440,7 @@ async function user_headerDelete(self, body) {
 				for (let rowprop of rows) {
 					// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 					if (typeof Extender.propDeleting === 'function') {
+						// export async function propDeleting(self, tx, rowprop, logMetadata) {}
 						await Extender.propDeleting(self, tx, rowprop, logMetadata)
 					}
 
@@ -421,6 +450,7 @@ async function user_headerDelete(self, body) {
 
 					// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 					if (typeof Extender.propDeleted === 'function') {
+						// export async function propDeleted(self, tx, deletedRow, logMetadata) {}
 						await Extender.propDeleted(self, tx, deletedRow, logMetadata)
 					}					
 
@@ -438,6 +468,7 @@ async function user_headerDelete(self, body) {
 				for (let rowgroup of rows) {
 					// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 					if (typeof Extender.groupDeleting === 'function') {
+						// export async function groupDeleting(self, tx, rowgroup, logMetadata) {}
 						await Extender.groupDeleting(self, tx, rowgroup, logMetadata)
 					}
 
@@ -447,6 +478,7 @@ async function user_headerDelete(self, body) {
 
 					// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 					if (typeof Extender.groupDeleted === 'function') {
+						// export async function groupDeleted(self, tx, deletedRow, logMetadata) {}
 						await Extender.groupDeleted(self, tx, deletedRow, logMetadata)
 					}					
 
@@ -464,6 +496,7 @@ async function user_headerDelete(self, body) {
 				for (let rowfavourite of rows) {
 					// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 					if (typeof Extender.favouriteDeleting === 'function') {
+						// export async function favouriteDeleting(self, tx, rowfavourite, logMetadata) {}
 						await Extender.favouriteDeleting(self, tx, rowfavourite, logMetadata)
 					}
 
@@ -473,6 +506,7 @@ async function user_headerDelete(self, body) {
 
 					// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 					if (typeof Extender.favouriteDeleted === 'function') {
+						// export async function favouriteDeleted(self, tx, deletedRow, logMetadata) {}
 						await Extender.favouriteDeleted(self, tx, deletedRow, logMetadata)
 					}					
 
@@ -494,6 +528,7 @@ async function user_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
 			if (typeof Extender.headerDeleted === 'function') {
+				// export async function headerDeleted(self, tx, ret, logMetadata) {}
 				await Extender.headerDeleted(self, tx, ret, logMetadata)
 			}
 
@@ -531,9 +566,12 @@ async function user_loginList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
-		if (typeof Extender.userListCriteria === 'function') {
-			await Extender.userListCriteria(self, db, searchMap, criteria, sort, columns)
+		if (typeof Extender.loginListCriteria === 'function') {
+			// export async function loginListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.loginListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -552,7 +590,8 @@ async function user_loginList(self, body) {
 
 			// pasang extender di sini
 			if (typeof Extender.detilListRow === 'function') {
-				await Extender.detilListRow(row)
+				// export async function detilListRow(self, row, args) {}
+				await Extender.detilListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -612,6 +651,14 @@ async function user_loginOpen(self, body) {
 			data._modifyby = user_fullname ?? ''
 		}	
 
+
+		// pasang extender untuk olah data
+		// export async function loginOpen(self, db, data) {}
+		if (typeof Extender.loginOpen === 'function') {
+			// export async function loginOpen(self, db, data) {}
+			await Extender.loginOpen(self, db, data)
+		}
+
 		return data
 	} catch (err) {
 		throw err
@@ -637,13 +684,30 @@ async function user_loginCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { 
+				section: 'login', 
+				prefix: 'USR'	
+			}
+
 			const sequencer = createSequencerLine(tx, {})
-			const seqdata = await sequencer.increment('USR')
+
+
+			if (typeof Extender.sequencerSetup === 'function') {
+				// jika ada keperluan menambahkan code block/cluster di sequencer
+				// dapat diimplementasikan di exterder sequencerSetup 
+				// export async function sequencerSetup(self, tx, sequencer, data, args) {}
+				await Extender.sequencerSetup(self, tx, sequencer, data, args)
+			}
+
+
+			const seqdata = await sequencer.increment(args.prefix)
 			data.userlogin_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.loginCreating === 'function') {
-				await Extender.loginCreating(self, tx, data, seqdata)
+				// export async function loginCreating(self, tx, data, seqdata, args) {}
+				await Extender.loginCreating(self, tx, data, seqdata, args)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -653,7 +717,8 @@ async function user_loginCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.loginCreated === 'function') {
-				await Extender.loginCreated(self, tx, ret, data, logMetadata)
+				// export async function loginCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.loginCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -690,6 +755,7 @@ async function user_loginUpdate(self, body) {
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.loginUpdating === 'function') {
+				// export async function loginUpdating(self, tx, data) {}
 				await Extender.loginUpdating(self, tx, data)
 			}			
 			
@@ -700,6 +766,7 @@ async function user_loginUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.loginUpdated === 'function') {
+				// export async function loginUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.loginUpdated(self, tx, ret, data, logMetadata)
 			}
 
@@ -734,6 +801,7 @@ async function user_loginDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 			if (typeof Extender.loginDeleting === 'function') {
+				// export async function loginDeleting(self, tx, rowlogin, logMetadata) {}
 				await Extender.loginDeleting(self, tx, rowlogin, logMetadata)
 			}
 
@@ -743,6 +811,7 @@ async function user_loginDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 			if (typeof Extender.loginDeleted === 'function') {
+				// export async function loginDeleted(self, tx, deletedRow, logMetadata) {}
 				await Extender.loginDeleted(self, tx, deletedRow, logMetadata)
 			}					
 
@@ -778,6 +847,7 @@ async function user_loginDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 				if (typeof Extender.loginDeleting === 'function') {
+					// async function loginDeleting(self, tx, rowlogin, logMetadata) {}
 					await Extender.loginDeleting(self, tx, rowlogin, logMetadata)
 				}
 
@@ -787,6 +857,7 @@ async function user_loginDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 				if (typeof Extender.loginDeleted === 'function') {
+					// export async function loginDeleted(self, tx, deletedRow, logMetadata) {}
 					await Extender.loginDeleted(self, tx, deletedRow, logMetadata)
 				}					
 
@@ -825,9 +896,12 @@ async function user_propList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
-		if (typeof Extender.userListCriteria === 'function') {
-			await Extender.userListCriteria(self, db, searchMap, criteria, sort, columns)
+		if (typeof Extender.propListCriteria === 'function') {
+			// export async function propListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.propListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -846,7 +920,8 @@ async function user_propList(self, body) {
 
 			// pasang extender di sini
 			if (typeof Extender.detilListRow === 'function') {
-				await Extender.detilListRow(row)
+				// export async function detilListRow(self, row, args) {}
+				await Extender.detilListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -906,6 +981,14 @@ async function user_propOpen(self, body) {
 			data._modifyby = user_fullname ?? ''
 		}	
 
+
+		// pasang extender untuk olah data
+		// export async function propOpen(self, db, data) {}
+		if (typeof Extender.propOpen === 'function') {
+			// export async function propOpen(self, db, data) {}
+			await Extender.propOpen(self, db, data)
+		}
+
 		return data
 	} catch (err) {
 		throw err
@@ -931,13 +1014,30 @@ async function user_propCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { 
+				section: 'prop', 
+				prefix: 'USR'	
+			}
+
 			const sequencer = createSequencerLine(tx, {})
-			const seqdata = await sequencer.increment('USR')
+
+
+			if (typeof Extender.sequencerSetup === 'function') {
+				// jika ada keperluan menambahkan code block/cluster di sequencer
+				// dapat diimplementasikan di exterder sequencerSetup 
+				// export async function sequencerSetup(self, tx, sequencer, data, args) {}
+				await Extender.sequencerSetup(self, tx, sequencer, data, args)
+			}
+
+
+			const seqdata = await sequencer.increment(args.prefix)
 			data.userprop_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.propCreating === 'function') {
-				await Extender.propCreating(self, tx, data, seqdata)
+				// export async function propCreating(self, tx, data, seqdata, args) {}
+				await Extender.propCreating(self, tx, data, seqdata, args)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -947,7 +1047,8 @@ async function user_propCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.propCreated === 'function') {
-				await Extender.propCreated(self, tx, ret, data, logMetadata)
+				// export async function propCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.propCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -984,6 +1085,7 @@ async function user_propUpdate(self, body) {
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.propUpdating === 'function') {
+				// export async function propUpdating(self, tx, data) {}
 				await Extender.propUpdating(self, tx, data)
 			}			
 			
@@ -994,6 +1096,7 @@ async function user_propUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.propUpdated === 'function') {
+				// export async function propUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.propUpdated(self, tx, ret, data, logMetadata)
 			}
 
@@ -1028,6 +1131,7 @@ async function user_propDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 			if (typeof Extender.propDeleting === 'function') {
+				// export async function propDeleting(self, tx, rowprop, logMetadata) {}
 				await Extender.propDeleting(self, tx, rowprop, logMetadata)
 			}
 
@@ -1037,6 +1141,7 @@ async function user_propDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 			if (typeof Extender.propDeleted === 'function') {
+				// export async function propDeleted(self, tx, deletedRow, logMetadata) {}
 				await Extender.propDeleted(self, tx, deletedRow, logMetadata)
 			}					
 
@@ -1072,6 +1177,7 @@ async function user_propDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 				if (typeof Extender.propDeleting === 'function') {
+					// async function propDeleting(self, tx, rowprop, logMetadata) {}
 					await Extender.propDeleting(self, tx, rowprop, logMetadata)
 				}
 
@@ -1081,6 +1187,7 @@ async function user_propDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 				if (typeof Extender.propDeleted === 'function') {
+					// export async function propDeleted(self, tx, deletedRow, logMetadata) {}
 					await Extender.propDeleted(self, tx, deletedRow, logMetadata)
 				}					
 
@@ -1119,9 +1226,12 @@ async function user_groupList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
-		if (typeof Extender.userListCriteria === 'function') {
-			await Extender.userListCriteria(self, db, searchMap, criteria, sort, columns)
+		if (typeof Extender.groupListCriteria === 'function') {
+			// export async function groupListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.groupListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -1145,7 +1255,8 @@ async function user_groupList(self, body) {
 
 			// pasang extender di sini
 			if (typeof Extender.detilListRow === 'function') {
-				await Extender.detilListRow(row)
+				// export async function detilListRow(self, row, args) {}
+				await Extender.detilListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -1210,6 +1321,14 @@ async function user_groupOpen(self, body) {
 			data._modifyby = user_fullname ?? ''
 		}	
 
+
+		// pasang extender untuk olah data
+		// export async function groupOpen(self, db, data) {}
+		if (typeof Extender.groupOpen === 'function') {
+			// export async function groupOpen(self, db, data) {}
+			await Extender.groupOpen(self, db, data)
+		}
+
 		return data
 	} catch (err) {
 		throw err
@@ -1235,13 +1354,30 @@ async function user_groupCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { 
+				section: 'group', 
+				prefix: 'USR'	
+			}
+
 			const sequencer = createSequencerLine(tx, {})
-			const seqdata = await sequencer.increment('USR')
+
+
+			if (typeof Extender.sequencerSetup === 'function') {
+				// jika ada keperluan menambahkan code block/cluster di sequencer
+				// dapat diimplementasikan di exterder sequencerSetup 
+				// export async function sequencerSetup(self, tx, sequencer, data, args) {}
+				await Extender.sequencerSetup(self, tx, sequencer, data, args)
+			}
+
+
+			const seqdata = await sequencer.increment(args.prefix)
 			data.usergroup_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.groupCreating === 'function') {
-				await Extender.groupCreating(self, tx, data, seqdata)
+				// export async function groupCreating(self, tx, data, seqdata, args) {}
+				await Extender.groupCreating(self, tx, data, seqdata, args)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -1251,7 +1387,8 @@ async function user_groupCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.groupCreated === 'function') {
-				await Extender.groupCreated(self, tx, ret, data, logMetadata)
+				// export async function groupCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.groupCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -1288,6 +1425,7 @@ async function user_groupUpdate(self, body) {
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.groupUpdating === 'function') {
+				// export async function groupUpdating(self, tx, data) {}
 				await Extender.groupUpdating(self, tx, data)
 			}			
 			
@@ -1298,6 +1436,7 @@ async function user_groupUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.groupUpdated === 'function') {
+				// export async function groupUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.groupUpdated(self, tx, ret, data, logMetadata)
 			}
 
@@ -1332,6 +1471,7 @@ async function user_groupDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 			if (typeof Extender.groupDeleting === 'function') {
+				// export async function groupDeleting(self, tx, rowgroup, logMetadata) {}
 				await Extender.groupDeleting(self, tx, rowgroup, logMetadata)
 			}
 
@@ -1341,6 +1481,7 @@ async function user_groupDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 			if (typeof Extender.groupDeleted === 'function') {
+				// export async function groupDeleted(self, tx, deletedRow, logMetadata) {}
 				await Extender.groupDeleted(self, tx, deletedRow, logMetadata)
 			}					
 
@@ -1376,6 +1517,7 @@ async function user_groupDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 				if (typeof Extender.groupDeleting === 'function') {
+					// async function groupDeleting(self, tx, rowgroup, logMetadata) {}
 					await Extender.groupDeleting(self, tx, rowgroup, logMetadata)
 				}
 
@@ -1385,6 +1527,7 @@ async function user_groupDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 				if (typeof Extender.groupDeleted === 'function') {
+					// export async function groupDeleted(self, tx, deletedRow, logMetadata) {}
 					await Extender.groupDeleted(self, tx, deletedRow, logMetadata)
 				}					
 
@@ -1423,9 +1566,12 @@ async function user_favouriteList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
-		if (typeof Extender.userListCriteria === 'function') {
-			await Extender.userListCriteria(self, db, searchMap, criteria, sort, columns)
+		if (typeof Extender.favouriteListCriteria === 'function') {
+			// export async function favouriteListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.favouriteListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -1449,7 +1595,8 @@ async function user_favouriteList(self, body) {
 
 			// pasang extender di sini
 			if (typeof Extender.detilListRow === 'function') {
-				await Extender.detilListRow(row)
+				// export async function detilListRow(self, row, args) {}
+				await Extender.detilListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -1514,6 +1661,14 @@ async function user_favouriteOpen(self, body) {
 			data._modifyby = user_fullname ?? ''
 		}	
 
+
+		// pasang extender untuk olah data
+		// export async function favouriteOpen(self, db, data) {}
+		if (typeof Extender.favouriteOpen === 'function') {
+			// export async function favouriteOpen(self, db, data) {}
+			await Extender.favouriteOpen(self, db, data)
+		}
+
 		return data
 	} catch (err) {
 		throw err
@@ -1539,13 +1694,30 @@ async function user_favouriteCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { 
+				section: 'favourite', 
+				prefix: 'USR'	
+			}
+
 			const sequencer = createSequencerLine(tx, {})
-			const seqdata = await sequencer.increment('USR')
+
+
+			if (typeof Extender.sequencerSetup === 'function') {
+				// jika ada keperluan menambahkan code block/cluster di sequencer
+				// dapat diimplementasikan di exterder sequencerSetup 
+				// export async function sequencerSetup(self, tx, sequencer, data, args) {}
+				await Extender.sequencerSetup(self, tx, sequencer, data, args)
+			}
+
+
+			const seqdata = await sequencer.increment(args.prefix)
 			data.userfavouriteprogram_id = seqdata.id
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.favouriteCreating === 'function') {
-				await Extender.favouriteCreating(self, tx, data, seqdata)
+				// export async function favouriteCreating(self, tx, data, seqdata, args) {}
+				await Extender.favouriteCreating(self, tx, data, seqdata, args)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -1555,7 +1727,8 @@ async function user_favouriteCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.favouriteCreated === 'function') {
-				await Extender.favouriteCreated(self, tx, ret, data, logMetadata)
+				// export async function favouriteCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.favouriteCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -1592,6 +1765,7 @@ async function user_favouriteUpdate(self, body) {
 
 			// apabila ada keperluan pengolahan data SEBELUM disimpan
 			if (typeof Extender.favouriteUpdating === 'function') {
+				// export async function favouriteUpdating(self, tx, data) {}
 				await Extender.favouriteUpdating(self, tx, data)
 			}			
 			
@@ -1602,6 +1776,7 @@ async function user_favouriteUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.favouriteUpdated === 'function') {
+				// export async function favouriteUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.favouriteUpdated(self, tx, ret, data, logMetadata)
 			}
 
@@ -1636,6 +1811,7 @@ async function user_favouriteDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 			if (typeof Extender.favouriteDeleting === 'function') {
+				// export async function favouriteDeleting(self, tx, rowfavourite, logMetadata) {}
 				await Extender.favouriteDeleting(self, tx, rowfavourite, logMetadata)
 			}
 
@@ -1645,6 +1821,7 @@ async function user_favouriteDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 			if (typeof Extender.favouriteDeleted === 'function') {
+				// export async function favouriteDeleted(self, tx, deletedRow, logMetadata) {}
 				await Extender.favouriteDeleted(self, tx, deletedRow, logMetadata)
 			}					
 
@@ -1680,6 +1857,7 @@ async function user_favouriteDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender
 				if (typeof Extender.favouriteDeleting === 'function') {
+					// async function favouriteDeleting(self, tx, rowfavourite, logMetadata) {}
 					await Extender.favouriteDeleting(self, tx, rowfavourite, logMetadata)
 				}
 
@@ -1689,6 +1867,7 @@ async function user_favouriteDeleteRows(self, body) {
 
 				// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender
 				if (typeof Extender.favouriteDeleted === 'function') {
+					// export async function favouriteDeleted(self, tx, deletedRow, logMetadata) {}
 					await Extender.favouriteDeleted(self, tx, deletedRow, logMetadata)
 				}					
 

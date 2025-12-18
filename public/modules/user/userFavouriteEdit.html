@@ -1,3 +1,8 @@
+<div id="userFavouriteEdit-head">
+	<div id="userFavouriteEdit-head-title" class="section-detil-title"></div>
+	<div id="userFavouriteEdit-head-descr" class="section-detil-descr"></div>
+</div>
+
 <form id="userFavouriteEdit-frm" class="module-form" locked="true" autoid="true" primarykey="userFavouriteEdit-obj_userfavouriteprogram_id">
 
 	<!-- Textbox: userfavouriteprogram_id-->	
@@ -24,7 +29,7 @@
 
 
 	<!-- Textbox: user_id-->	
-	<div id="userFavouriteEdit-obj_user_id-container" class="input-field hidden" field="userFavouriteEdit-obj_user_id">
+	<div id="userFavouriteEdit-obj_user_id-container" class="input-field hidden hidden" field="userFavouriteEdit-obj_user_id">
 		<label for="userFavouriteEdit-obj_user_id">ID</label>
 		<input id="userFavouriteEdit-obj_user_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="user_id"
@@ -35,7 +40,13 @@
 		>
 	</div>
 	
+
+
+	<div id="userFavouriteEdit-footer"></div>
+
 </form>
+
+
 
 <div class="panel-recordbar" data-view="nodetil">
 	<div><a id="userFavourite-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>
