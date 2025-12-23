@@ -1,5 +1,7 @@
 import Context from './group-context.mjs'
-import * as Extender from './group-ext.mjs'
+import * as Ext from './group-ext.mjs'
+
+const Extender = Ext.extenderProgram ?? Ext
 
 const Crsl =  Context.Crsl
 const CurrentSectionId = Context.Sections.groupProgramList
@@ -31,6 +33,7 @@ export async function init(self, args) {
 
 	// tambahkan event lain di extender: rowrender, rowremoving
 	// dapatkan parameternya di evt.detail
+	// export function programList_addTableEvents(self, tbl) {}
 	const fn_addTableEvents_name = 'programList_addTableEvents'
 	const fn_addTableEvents = Extender[fn_addTableEvents_name]
 	if (typeof fn_addTableEvents === 'function') {
@@ -47,6 +50,7 @@ export async function init(self, args) {
 	btn_delrow.addEventListener('click', (evt)=>{ btn_delrow_click(self, evt) })
 	
 	// Extend list detil
+	// export function groupProgramList_init(self) {}
 	const fn_name = 'groupProgramList_init'
 	const fn_groupProgramList_init = Extender[fn_name]
 	if (typeof fn_groupProgramList_init === 'function') {
@@ -56,6 +60,14 @@ export async function init(self, args) {
 	CurrentState.headerFormLocked = true 
 }
 
+function setDefaultHeadTitle(self, headerForm) {
+	const data = headerForm.getData()
+
+	
+
+}
+
+
 export async function openList(self, params) {
 	const moduleHeaderEdit = params.moduleHeaderEdit
 	
@@ -63,10 +75,13 @@ export async function openList(self, params) {
 	const pk = headerForm.getPrimaryInput()
 	const id = pk.value 
 
+	// set title halaman ini sesuai data di header
+	setDefaultHeadTitle(self, headerForm)
 
 	// apabila mau menambahkan informasi saat detil list dibuka,
 	// misalnya menambahkan informasi beberapa data dari formHeader
 	// bisa di set pada Extender.groupProgramList_openList :  bisa menggunakan template untuk di embed ke header pada detil list
+	// export function groupProgramList_openList(self, headerForm) {}
 	const fn_name = 'groupProgramList_openList'
 	const fn_groupProgramList_openList = Extender[fn_name]
 	if (typeof fn_groupProgramList_openList === 'function') {
@@ -81,12 +96,15 @@ export async function openList(self, params) {
 	tbl.clear()
 	tbl_loadData(self, {criteria, sort})
 
-
+	const groupProgramEdit = self.Modules.groupProgramEdit
+	const btn_addrow = groupProgramEdit.getCurrentState().Actions.newdata
+	const btn_edit = groupProgramEdit.getCurrentState().Actions.edit
+	
 	if (CurrentState.headerFormLocked) {
- 		btn_addrow.setAttribute('disabled', '')
+ 		btn_addrow.disabled = true
 		btn_delrow.disabled = true
 	} else {
-		btn_addrow.removeAttribute('disabled')
+		btn_addrow.disabled = false
 		btn_delrow.disabled = false
 	}
 }
@@ -216,13 +234,22 @@ async function openRow(self, tr) {
 
 async function listRows(self, criteria, offset, limit, sort) {
 	const url = `/${Context.moduleName}/program-list`
+	const evt = { url, limit }
+
+	// export function programList_dataLoad(self, criteria, sort, evt) {}
+	const fn_dataLoad_name = 'programList_dataLoad'
+	const fn_dataLoad = Extender[fn_dataLoad_name]
+	if (typeof fn_dataLoad === 'function') {
+		fn_dataLoad(self, criteria, sort, evt)
+	}
+
 	try {
 		const columns = []
-		const result = await Module.apiCall(url, {  
+		const result = await Module.apiCall(evt.url, {  
 			columns,
 			criteria,
 			offset,
-			limit,
+			limit: evt.limit,
 			sort
 		}) 
 		return result 
@@ -284,8 +311,21 @@ async function tbl_loadData(self, params={}) {
 		if (offset===0) {
 			tbl.clear()
 		}
+
+
+		tbl.setCriteria(criteria)
 		tbl.addRows(result.data)
 		tbl.setNext(result.nextoffset, result.limit)
+
+
+		// export function programList_tableDataLoaded(self, tbl, result) {}
+		const fn_name = 'programList_tableDataLoaded'
+		const fn = Extender[fn_name]
+		if (typeof fn === 'function') {
+			fn(self, tbl, result)
+		}
+
+
 	} catch (err) {
 		console.error(err)
 		$fgta5.MessageBox.error(err.message)

@@ -132,15 +132,15 @@ comment on column core."programgroup".programgroup_path is '';
 
 
 -- =============================================
--- FIELD: _createby bigint
+-- FIELD: _createby integer
 -- =============================================
 -- ADD _createby
-alter table core."programgroup" add _createby bigint not null ;
+alter table core."programgroup" add _createby integer not null ;
 comment on column core."programgroup"._createby is 'user yang pertama kali membuat record ini';
 
 -- MODIFY _createby
 alter table core."programgroup"
-	alter column _createby type bigint,
+	alter column _createby type integer,
 	ALTER COLUMN _createby DROP DEFAULT,
 	ALTER COLUMN _createby SET NOT NULL;
 comment on column core."programgroup"._createby is 'user yang pertama kali membuat record ini';
@@ -150,27 +150,27 @@ comment on column core."programgroup"._createby is 'user yang pertama kali membu
 -- FIELD: _createdate timestamp with time zone
 -- =============================================
 -- ADD _createdate
-alter table core."programgroup" add _createdate timestamp with time zone not null ;
+alter table core."programgroup" add _createdate timestamp with time zone not null default now();
 comment on column core."programgroup"._createdate is 'waktu record dibuat pertama kali';
 
 -- MODIFY _createdate
 alter table core."programgroup"
 	alter column _createdate type timestamp with time zone,
-	ALTER COLUMN _createdate DROP DEFAULT,
+	ALTER COLUMN _createdate SET DEFAULT now(),
 	ALTER COLUMN _createdate SET NOT NULL;
 comment on column core."programgroup"._createdate is 'waktu record dibuat pertama kali';
 
 
 -- =============================================
--- FIELD: _modifyby bigint
+-- FIELD: _modifyby integer
 -- =============================================
 -- ADD _modifyby
-alter table core."programgroup" add _modifyby bigint  ;
+alter table core."programgroup" add _modifyby integer  ;
 comment on column core."programgroup"._modifyby is 'user yang terakhir modifikasi record ini';
 
 -- MODIFY _modifyby
 alter table core."programgroup"
-	alter column _modifyby type bigint,
+	alter column _modifyby type integer,
 	ALTER COLUMN _modifyby DROP DEFAULT,
 	ALTER COLUMN _modifyby DROP NOT NULL;
 comment on column core."programgroup"._modifyby is 'user yang terakhir modifikasi record ini';

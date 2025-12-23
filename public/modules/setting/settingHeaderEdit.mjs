@@ -1,6 +1,9 @@
 import Context from './setting-context.mjs'
-import * as Extender from './setting-ext.mjs'
+import * as Ext from './setting-ext.mjs'
 import * as pageHelper from '/public/libs/webmodule/pagehelper.mjs'
+
+const Extender = Ext.extenderHeader ?? Ext
+
 
 const CurrentState = {}
 const Crsl =  Context.Crsl
@@ -32,10 +35,11 @@ const frm = new $fgta5.Form('settingHeaderEdit-frm');
 const obj_setting_id = frm.Inputs['settingHeaderEdit-obj_setting_id']
 const obj_setting_value = frm.Inputs['settingHeaderEdit-obj_setting_value']
 const obj_setting_descr = frm.Inputs['settingHeaderEdit-obj_setting_descr']	
-const obj_createby = document.getElementById('fRecord-section-createby')
-const obj_createdate = document.getElementById('fRecord-section-createdate')
-const obj_modifyby = document.getElementById('fRecord-section-modifyby')
-const obj_modifydate = document.getElementById('fRecord-section-modifydate')
+const rec_createby = document.getElementById('fRecord-section-createby')
+const rec_createdate = document.getElementById('fRecord-section-createdate')
+const rec_modifyby = document.getElementById('fRecord-section-modifyby')
+const rec_modifydate = document.getElementById('fRecord-section-modifydate')
+const rec_id = document.getElementById('fRecord-section-id')
 
 
 export const Section = CurrentSection
@@ -67,8 +71,17 @@ export async function init(self, args) {
 
 	// set actions
 	CurrentState.Actions = {
+		newdata: btn_new,
 		edit: btn_edit,	
 	}
+	
+	// export async function settingHeaderEdit_init(self, CurrentState)
+	const fn_init_name = 'settingHeaderEdit_init'
+	const fn_init = Extender[fn_init_name]
+	if (typeof fn_init === 'function') {
+		await fn_init(self, CurrentState)
+	}
+
 
 	
 
@@ -89,6 +102,7 @@ export async function openSelectedData(self, params) {
 
 		CurrentState.currentOpenedId = id
 
+		// export async function settingHeaderEdit_isEditDisabled(self, data)
 		const fn_iseditdisabled_name = 'settingHeaderEdit_isEditDisabled'
 		const fn_iseditdisabled = Extender[fn_iseditdisabled_name]
 		if (typeof fn_iseditdisabled === 'function') {
@@ -99,16 +113,20 @@ export async function openSelectedData(self, params) {
 		// disable primary key
 		setPrimaryKeyState(self, {disabled:true})
 
+		// isi form dengan data
 		frm.setData(data)
-		frm.acceptChanges()
-		frm.lock()
 
+		// jika ada kebutuhan untuk oleh lagi form dan data, bisa lakukan di extender
+		// export async function settingHeaderEdit_formOpened(self, frm, CurrentState)
 		const fn_formopened_name = 'settingHeaderEdit_formOpened'
 		const fn_formopened = Extender[fn_formopened_name]
 		if (typeof fn_formopened === 'function') {
-			// export async function settingHeaderEdit_formOpened(self, frm, CurrentState)
 			await fn_formopened(self, frm, CurrentState)
 		}
+
+		// finally, accept changes dan lock form
+		frm.acceptChanges()
+		frm.lock()
 
 	} catch (err) {
 		CurrentState.currentOpenedId = null
@@ -259,6 +277,7 @@ async function  frm_locked(self, evt) {
 	
 	
 	// Extender untuk event locked
+	// export function settingHeaderEdit_formLocked(self, frm, CurrentState) {}
 	const fn_name = 'settingHeaderEdit_formLocked'
 	const fn = Extender[fn_name]
 	if (typeof fn === 'function') {
@@ -294,6 +313,7 @@ async function  frm_unlocked(self, evt) {
 	
 
 	// Extender untuk event Unlocked
+	// export function settingHeaderEdit_formUnlocked(self, frm, CurrentState) {}
 	const fn_name = 'settingHeaderEdit_formUnlocked'
 	const fn = Extender[fn_name]
 	if (typeof fn === 'function') {
@@ -365,7 +385,8 @@ async function btn_new_click(self, evt) {
 	try {
 
 		// inisiasi data baru
-		let datainit = {}
+		const datainit = {
+		}
 
 
 		// jika perlu modifikasi data initial,
@@ -373,6 +394,7 @@ async function btn_new_click(self, evt) {
 		const fn_newdata_name = 'settingHeaderEdit_newData'
 		const fn_newdata = Extender[fn_newdata_name]
 		if (typeof fn_newdata === 'function') {
+			// export async function settingHeaderEdit_newData(self, datainit, frm) {}
 			await fn_newdata(self, datainit, frm)
 		}
 
@@ -440,12 +462,6 @@ async function btn_save_click(self, evt) {
 		dataToSave = frm.getData()		
 	}
 
-	// Extender Saving
-	const fn_datasaving_name = 'settingHeaderEdit_dataSaving'
-	const fn_datasaving = Extender[fn_datasaving_name]
-	if (typeof fn_datasaving === 'function') {
-		await fn_datasaving(self, dataToSave, frm)
-	}
 
 
 	// bila ada file, upload filenya
@@ -457,7 +473,24 @@ async function btn_save_click(self, evt) {
 			const file = files[name]
 			formData.append(name, file)
 		}
-	}	
+	}
+
+
+	// Extender Saving
+	// export async function settingHeaderEdit_dataSaving(self, dataToSave, frm, args) {}
+	const args = { cancelSave: false }
+	const fn_datasaving_name = 'settingHeaderEdit_dataSaving'
+	const fn_datasaving = Extender[fn_datasaving_name]
+	if (typeof fn_datasaving === 'function') {
+		await fn_datasaving(self, dataToSave, frm, args)
+	}
+
+	// batalkan save, jika ada request cancel
+	if (args.cancelSave) {
+		console.log('save is canceled')
+		return
+	}
+	
 
 	let mask = $fgta5.Modal.createMask()
 	try {
@@ -499,6 +532,7 @@ async function btn_save_click(self, evt) {
 		const fn_datasaved_name = 'settingHeaderEdit_dataSaved'
 		const fn_datasaved = Extender[fn_datasaved_name]
 		if (typeof fn_datasaved === 'function') {
+			// export async function settingHeaderEdit_dataSaved(self, data, frm) {}
 			await fn_datasaved(self, data, frm)
 		}
 
@@ -622,6 +656,12 @@ async function btn_recordstatus_click(self, evt) {
 		sectionReturn: CurrentSection
 	}
 	
+	if (frm.isNew()) {
+		console.warn('tidak bisa buka rescord status jika data baru')	
+		$fgta5.MessageBox.warning('Record Status bisa dibuka setelah data disimpan')
+		return;
+	}
+
 	pageHelper.openSection(self, 'fRecord-section', params, async ()=>{
 
 		let mask = $fgta5.Modal.createMask()
@@ -631,10 +671,11 @@ async function btn_recordstatus_click(self, evt) {
 			const id = pk.value
 			const data = await openData(self, id)
 
-			obj_createby.innerHTML = data._createby
-			obj_createdate.innerHTML = data._createdate
-			obj_modifyby.innerHTML = data._modifyby
-			obj_modifydate.innerHTML = data._modifydate
+			rec_id.innerHTML = id
+			rec_createby.innerHTML = data._createby
+			rec_createdate.innerHTML = data._createdate
+			rec_modifyby.innerHTML = data._modifyby
+			rec_modifydate.innerHTML = data._modifydate
 
 			const fn_addrecordinfo_name = 'settingHeaderEdit_addRecordInfo'
 			const fn_addrecordinfo = Extender[fn_addrecordinfo_name]
@@ -657,6 +698,12 @@ async function btn_logs_click(self, evt) {
 	const params = {
 		Context,
 		sectionReturn: CurrentSection
+	}
+
+	if (frm.isNew()) {
+		console.warn('tidak bisa buka logs jika data baru')	
+		$fgta5.MessageBox.warning('Logs bisa dibuka setelah data disimpan')
+		return;
 	}
 
 	pageHelper.openSection(self, 'fLogs-section', params, async ()=>{
@@ -718,7 +765,7 @@ async function btn_about_click(self, evt) {
 			const divFooter = document.createElement('div')
 			divFooter.setAttribute('id', 'fAbout-section-footer')
 			divFooter.setAttribute('style', 'border-top: 1px solid #ccc; padding: 5px 0 0 0; margin-top: 50px')
-			divFooter.innerHTML = 'This module is generated by fgta5 generator at 2 Nov 2025 08:10'
+			divFooter.innerHTML = 'This module is generated by fgta5 generator at 23 Dec 2025 12:36'
 			section.appendChild(divFooter)
 		}
 		

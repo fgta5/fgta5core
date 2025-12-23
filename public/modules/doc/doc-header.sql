@@ -159,10 +159,10 @@ comment on column core."doc"._modifydate is 'waktu terakhir record dimodifikasi'
 -- =============================================
 -- Drop existing unique index 
 alter table core."doc"
-	drop constraint uq$core$doc$doc_name;
+	drop constraint uq$core$doc$doc_seqnum;
 
 alter table core."doc"
-	drop constraint uq$core$doc$doc_seqnum;
+	drop constraint uq$core$doc$doc_name;
 	
 
 -- Add unique index 

@@ -66,8 +66,9 @@ async function program_init(self, body) {
 			setting: {}
 		}
 		
-		if (typeof Extender.coa_init === 'function') {
-			await Extender.coa_init(self, initialData)
+		if (typeof Extender.program_init === 'function') {
+			// export async function program_init(self, initialData) {}
+			await Extender.program_init(self, initialData)
 		}
 
 		return initialData
@@ -118,9 +119,12 @@ async function program_headerList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
 		if (typeof Extender.headerListCriteria === 'function') {
-			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+			// export async function headerListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -148,7 +152,8 @@ async function program_headerList(self, body) {
 			
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(self, row)
+				// export async function headerListRow(self, row, args) {}
+				await Extender.headerListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -218,8 +223,10 @@ async function program_headerOpen(self, body) {
 		}
 		
 		// pasang extender untuk olah data
+		// export async function headerOpen(self, db, data) {}
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(self, data)
+			// export async function headerOpen(self, db, data) {}
+			await Extender.headerOpen(self, db, data)
 		}
 
 		return data
@@ -248,6 +255,9 @@ async function program_headerCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { section: 'header', prefix:'PROG' }
+
 			
 			// buat short sequencer	
 			const sequencer = createSequencerLine(tx, {})
@@ -255,16 +265,18 @@ async function program_headerCreate(self, body) {
 			if (typeof Extender.sequencerSetup === 'function') {
 				// jika ada keperluan menambahkan code block/cluster di sequencer
 				// dapat diimplementasikan di exterder sequencerSetup 
-				await Extender.sequencerSetup(self, tx, sequencer, data)
+				// export async function sequencerSetup(self, tx, sequencer, data, args) {}
+				await Extender.sequencerSetup(self, tx, sequencer, data, args)
 			}
 
-			// generate short id untuk PROG reset pertahun
-			const seqdata = await sequencer.yearlyshort('PROG')
+			// generate short id sesuai prefix (default: PROG) reset pertahun
+			const seqdata = await sequencer.yearlyshort(args.prefix)
 			data.program_id = seqdata.id
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data, seqdata)
+				// export async function headerCreating(self, tx, data, seqdata, args) {}
+				await Extender.headerCreating(self, tx, data, seqdata, args)
 			}
 
 			
@@ -277,7 +289,8 @@ async function program_headerCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerCreated === 'function') {
-				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+				// export async function headerCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.headerCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -314,6 +327,7 @@ async function program_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerUpdating === 'function') {
+				// export async function headerUpdating(self, tx, data) {}
 				await Extender.headerUpdating(self, tx, data)
 			}
 
@@ -326,6 +340,7 @@ async function program_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerUpdated === 'function') {
+				// export async function headerUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
 			}			
 
@@ -359,6 +374,7 @@ async function program_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
 			if (typeof Extender.headerDeleting === 'function') {
+				// export async function headerDeleting(self, tx, dataToRemove) {}
 				await Extender.headerDeleting(self, tx, dataToRemove)
 			}
 
@@ -372,6 +388,7 @@ async function program_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
 			if (typeof Extender.headerDeleted === 'function') {
+				// export async function headerDeleted(self, tx, ret, logMetadata) {}
 				await Extender.headerDeleted(self, tx, ret, logMetadata)
 			}
 

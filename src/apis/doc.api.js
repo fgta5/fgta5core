@@ -65,8 +65,9 @@ async function doc_init(self, body) {
 			setting: {}
 		}
 		
-		if (typeof Extender.coa_init === 'function') {
-			await Extender.coa_init(self, initialData)
+		if (typeof Extender.doc_init === 'function') {
+			// export async function doc_init(self, initialData) {}
+			await Extender.doc_init(self, initialData)
 		}
 
 		return initialData
@@ -117,9 +118,12 @@ async function doc_headerList(self, body) {
 			}
 		}
 
+		const args = { db, criteria }
+
 		// apabila ada keperluan untuk recompose criteria
 		if (typeof Extender.headerListCriteria === 'function') {
-			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns)
+			// export async function headerListCriteria(self, db, searchMap, criteria, sort, columns, args) {}
+			await Extender.headerListCriteria(self, db, searchMap, criteria, sort, columns, args)
 		}
 
 		var max_rows = limit==0 ? 10 : limit
@@ -137,7 +141,8 @@ async function doc_headerList(self, body) {
 			
 			// pasang extender di sini
 			if (typeof Extender.headerListRow === 'function') {
-				await Extender.headerListRow(self, row)
+				// export async function headerListRow(self, row, args) {}
+				await Extender.headerListRow(self, row, args)
 			}
 
 			data.push(row)
@@ -197,8 +202,10 @@ async function doc_headerOpen(self, body) {
 		}
 		
 		// pasang extender untuk olah data
+		// export async function headerOpen(self, db, data) {}
 		if (typeof Extender.headerOpen === 'function') {
-			await Extender.headerOpen(self, data)
+			// export async function headerOpen(self, db, data) {}
+			await Extender.headerOpen(self, db, data)
 		}
 
 		return data
@@ -227,10 +234,14 @@ async function doc_headerCreate(self, body) {
 		const result = await db.tx(async tx=>{
 			sqlUtil.connect(tx)
 
+
+			const args = { section: 'header', prefix:'' }
+
 				
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerCreating === 'function') {
-				await Extender.headerCreating(self, tx, data)
+				// export async function headerCreating(self, tx, data, seqdata, args) {}
+				await Extender.headerCreating(self, tx, data, null, args)
 			}
 
 			const cmd = sqlUtil.createInsertCommand(tablename, data)
@@ -241,7 +252,8 @@ async function doc_headerCreate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerCreated === 'function') {
-				await Extender.headerCreated(self, tx, ret, data, logMetadata)
+				// export async function headerCreated(self, tx, ret, data, logMetadata, args) {}
+				await Extender.headerCreated(self, tx, ret, data, logMetadata, args)
 			}
 
 			// record log
@@ -278,6 +290,7 @@ async function doc_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum disimpan, lakukan di extender headerCreating
 			if (typeof Extender.headerUpdating === 'function') {
+				// export async function headerUpdating(self, tx, data) {}
 				await Extender.headerUpdating(self, tx, data)
 			}
 
@@ -290,6 +303,7 @@ async function doc_headerUpdate(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah disimpan, lakukan di extender headerCreated
 			if (typeof Extender.headerUpdated === 'function') {
+				// export async function headerUpdated(self, tx, ret, data, logMetadata) {}
 				await Extender.headerUpdated(self, tx, ret, data, logMetadata)
 			}			
 
@@ -323,6 +337,7 @@ async function doc_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data sebelum dihapus, lakukan di extender headerDeleting
 			if (typeof Extender.headerDeleting === 'function') {
+				// export async function headerDeleting(self, tx, dataToRemove) {}
 				await Extender.headerDeleting(self, tx, dataToRemove)
 			}
 
@@ -336,6 +351,7 @@ async function doc_headerDelete(self, body) {
 
 			// apabila ada keperluan pengelohan data setelah dihapus, lakukan di extender headerDeleted
 			if (typeof Extender.headerDeleted === 'function') {
+				// export async function headerDeleted(self, tx, ret, logMetadata) {}
 				await Extender.headerDeleted(self, tx, ret, logMetadata)
 			}
 

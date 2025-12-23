@@ -1,3 +1,8 @@
+<div id="groupProgramEdit-head">
+	<div id="groupProgramEdit-head-title" class="section-detil-title"></div>
+	<div id="groupProgramEdit-head-descr" class="section-detil-descr"></div>
+</div>
+
 <form id="groupProgramEdit-frm" class="module-form" locked="true" autoid="true" primarykey="groupProgramEdit-obj_groupprogram_id">
 
 	<!-- Textbox: groupprogram_id-->	
@@ -36,7 +41,7 @@
 
 
 	<!-- Textbox: group_id-->	
-	<div id="groupProgramEdit-obj_group_id-container" class="input-field hidden" field="groupProgramEdit-obj_group_id">
+	<div id="groupProgramEdit-obj_group_id-container" class="input-field hidden hidden" field="groupProgramEdit-obj_group_id">
 		<label for="groupProgramEdit-obj_group_id">ID</label>
 		<input id="groupProgramEdit-obj_group_id"  fgta5-component="Textbox" placeholder="ID" autocomplete="off" spellcheck="false" 
 			binding="group_id"
@@ -47,7 +52,13 @@
 		>
 	</div>
 	
+
+
+	<div id="groupProgramEdit-footer"></div>
+
 </form>
+
+
 
 <div class="panel-recordbar" data-view="nodetil">
 	<div><a id="groupProgram-btn_recordstatus" href="javascript:void(0)" tabindex="-1">Record Status</a></div>

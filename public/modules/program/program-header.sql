@@ -212,9 +212,9 @@ comment on column core."program"._modifydate is 'waktu terakhir record dimodifik
 -- FOREIGN KEY CONSTRAINT
 -- =============================================
 -- Drop Existing Foreign Key Constraint 
-ALTER TABLE core."program" DROP CONSTRAINT fk$core$program$apps_id;
-ALTER TABLE core."program" DROP CONSTRAINT fk$core$program$programgroup_id;
 ALTER TABLE core."program" DROP CONSTRAINT fk$core$program$generator_id;
+ALTER TABLE core."program" DROP CONSTRAINT fk$core$program$programgroup_id;
+ALTER TABLE core."program" DROP CONSTRAINT fk$core$program$apps_id;
 
 
 -- Add Foreign Key Constraint  

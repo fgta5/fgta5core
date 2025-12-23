@@ -1,6 +1,7 @@
 import Context from './group-context.mjs'
-import * as Extender from './group-ext.mjs'
+import * as Ext from './group-ext.mjs'
 
+const Extender = Ext.extenderHeader ?? Ext
 
 const Crsl =  Context.Crsl
 const CurrentSectionId = Context.Sections.groupHeaderList
@@ -41,7 +42,7 @@ export async function init(self, args) {
 
 	try {
 		// extract custom search panel from template
-		const tplSearchPanel = document.querySelector('template[name="custom-search-panel"]')
+		const tplSearchPanel = document.getElementById('tpl-custom-search-panel')
 		if (tplSearchPanel!=null) {
 			const clone = tplSearchPanel.content.cloneNode(true); // salin isi template
 			pnl_search.prepend(clone)
@@ -209,28 +210,40 @@ async function openRow(self, tr) {
 		CurrentState.SelectedRow.keyValue = keyvalue
 		CurrentState.SelectedRow.key = key
 		await groupHeaderEdit.openSelectedData(self, {key:key, keyvalue:keyvalue})
-	} catch (err) {
-		console.error(err)
-		await $fgta5.MessageBox.error(err.message)
 
+		// matikan atau nyalakan button prev/next sesuai kondisi
+		setPagingButton(self, groupHeaderEdit)
+
+	} catch (err) {
 		setCurrentRow(self, null)
 		CurrentSection.show() // kembalikan ke list kalau error saat buka data
+
+		console.error(err)
+		await $fgta5.MessageBox.error(err.message)
 	}
-
-
-	// matikan atau nyalakan button prev/next sesuai kondisi
-	setPagingButton(self, groupHeaderEdit)
+	
 }
 
-async function listRows(self, criteria, offset,limit, sort) {
+async function listRows(self, criteria, offset, limit, sort) {
+
 	const url = `/${Context.moduleName}/header-list`
+	const evt = { url, limit }
+
+	// export function headerList_dataLoad(self, criteria, sort, evt) {}
+	const fn_dataLoad_name = 'headerList_dataLoad'
+	const fn_dataLoad = Extender[fn_dataLoad_name]
+	if (typeof fn_dataLoad === 'function') {
+		fn_dataLoad(self, criteria, sort, evt)
+	}
+
+	
 	try {
 		const columns = []
-		const result = await Module.apiCall(url, {  
+		const result = await Module.apiCall(evt.url, {  
 			columns,
 			criteria,
 			offset,
-			limit,
+			limit: evt.limit,
 			sort
 		}) 
 		return result 
@@ -300,6 +313,14 @@ async function tbl_loadData(self, params={}) {
 		}
 		tbl.addRows(result.data)
 		tbl.setNext(result.nextoffset, result.limit)
+
+		// export function headerList_tableDataLoaded(self, tbl, result) {}
+		const fn_name = 'headerList_tableDataLoaded'
+		const fn = Extender[fn_name]
+		if (typeof fn === 'function') {
+			fn(self, tbl, result)
+		}
+
 	} catch (err) {
 		console.error(err)
 		$fgta5.MessageBox.error(err.message)

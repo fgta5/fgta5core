@@ -137,6 +137,10 @@ export async function openSelectedData(self, params) {
 	}
 }
 
+export function getCurrentState(self) {
+	return CurrentState
+}
+
 export function getForm(self) {
 	return frm
 }

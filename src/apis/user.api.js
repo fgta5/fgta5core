@@ -282,7 +282,7 @@ async function user_headerCreate(self, body) {
 			sqlUtil.connect(tx)
 
 
-			const args = { section: 'header' }
+			const args = { section: 'header', prefix:'USR' }
 
 			
 			// buat short sequencer	
@@ -555,6 +555,11 @@ async function user_loginList(self, body) {
 	const searchMap = {
 		user_id: `user_id=try_cast_bigint(\${user_id}, 0)`,
 	};
+
+
+	if (Object.keys(sort).length === 0) {
+		sort.userlogin_id = 'asc'
+	}
 
 
 	try {
@@ -887,6 +892,11 @@ async function user_propList(self, body) {
 	};
 
 
+	if (Object.keys(sort).length === 0) {
+		sort.userprop_id = 'asc'
+	}
+
+
 	try {
 	
 		// hilangkan criteria '' atau null
@@ -1215,6 +1225,11 @@ async function user_groupList(self, body) {
 	const searchMap = {
 		user_id: `user_id=try_cast_bigint(\${user_id}, 0)`,
 	};
+
+
+	if (Object.keys(sort).length === 0) {
+		sort.usergroup_id = 'asc'
+	}
 
 
 	try {
@@ -1555,6 +1570,11 @@ async function user_favouriteList(self, body) {
 	const searchMap = {
 		user_id: `user_id=try_cast_bigint(\${user_id}, 0)`,
 	};
+
+
+	if (Object.keys(sort).length === 0) {
+		sort.userfavouriteprogram_id = 'asc'
+	}
 
 
 	try {

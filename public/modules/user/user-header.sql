@@ -8,7 +8,7 @@ create table core."user" (
 	user_id int not null,
 	constraint user_pk primary key (user_id)
 );
-comment on table core."user" is '';	
+comment on table core."user" is 'daftar user untuk kerperluan login';	
 
 
 -- =============================================
@@ -42,21 +42,6 @@ comment on column core."user".user_isdisabled is '';
 
 
 -- =============================================
--- FIELD: user_isdev boolean
--- =============================================
--- ADD user_isdev
-alter table core."user" add user_isdev boolean not null default false;
-comment on column core."user".user_isdev is '';
-
--- MODIFY user_isdev
-alter table core."user"
-	alter column user_isdev type boolean,
-	ALTER COLUMN user_isdev SET DEFAULT false,
-	ALTER COLUMN user_isdev SET NOT NULL;
-comment on column core."user".user_isdev is '';
-
-
--- =============================================
 -- FIELD: user_nickname text
 -- =============================================
 -- ADD user_nickname
@@ -84,6 +69,21 @@ alter table core."user"
 	ALTER COLUMN user_fullname DROP DEFAULT,
 	ALTER COLUMN user_fullname DROP NOT NULL;
 comment on column core."user".user_fullname is '';
+
+
+-- =============================================
+-- FIELD: rolelevel_id smallint
+-- =============================================
+-- ADD rolelevel_id
+alter table core."user" add rolelevel_id smallint  ;
+comment on column core."user".rolelevel_id is '';
+
+-- MODIFY rolelevel_id
+alter table core."user"
+	alter column rolelevel_id type smallint,
+	ALTER COLUMN rolelevel_id DROP DEFAULT,
+	ALTER COLUMN rolelevel_id DROP NOT NULL;
+comment on column core."user".rolelevel_id is '';
 
 
 -- =============================================
@@ -117,18 +117,33 @@ comment on column core."user".user_password is '';
 
 
 -- =============================================
--- FIELD: rolelevel_id smallint
+-- FIELD: user_isdev boolean
 -- =============================================
--- ADD rolelevel_id
-alter table core."user" add rolelevel_id smallint  ;
-comment on column core."user".rolelevel_id is '';
+-- ADD user_isdev
+alter table core."user" add user_isdev boolean not null default false;
+comment on column core."user".user_isdev is '';
 
--- MODIFY rolelevel_id
+-- MODIFY user_isdev
 alter table core."user"
-	alter column rolelevel_id type smallint,
-	ALTER COLUMN rolelevel_id DROP DEFAULT,
-	ALTER COLUMN rolelevel_id DROP NOT NULL;
-comment on column core."user".rolelevel_id is '';
+	alter column user_isdev type boolean,
+	ALTER COLUMN user_isdev SET DEFAULT false,
+	ALTER COLUMN user_isdev SET NOT NULL;
+comment on column core."user".user_isdev is '';
+
+
+-- =============================================
+-- FIELD: user_isshowallprogram boolean
+-- =============================================
+-- ADD user_isshowallprogram
+alter table core."user" add user_isshowallprogram boolean not null default false;
+comment on column core."user".user_isshowallprogram is '';
+
+-- MODIFY user_isshowallprogram
+alter table core."user"
+	alter column user_isshowallprogram type boolean,
+	ALTER COLUMN user_isshowallprogram SET DEFAULT false,
+	ALTER COLUMN user_isshowallprogram SET NOT NULL;
+comment on column core."user".user_isshowallprogram is '';
 
 
 -- =============================================

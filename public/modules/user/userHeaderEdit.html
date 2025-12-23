@@ -37,23 +37,12 @@
 	</div>
 
 
-	<!-- Checkbox: user_isdev-->	
-	<div id="userHeaderEdit-obj_user_isdev-container" class="input-field" field="userHeaderEdit-obj_user_isdev">
-		<label for="userHeaderEdit-obj_user_isdev">Developer Access</label>
-		<input id="userHeaderEdit-obj_user_isdev"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
-			binding="user_isdev"
-			data-tabindex="4" 
-			type="checkbox" 
-		>
-	</div>
-
-
 	<!-- Textbox: user_nickname-->	
 	<div id="userHeaderEdit-obj_user_nickname-container" class="input-field" field="userHeaderEdit-obj_user_nickname">
 		<label for="userHeaderEdit-obj_user_nickname">Nickname</label>
 		<input id="userHeaderEdit-obj_user_nickname"  fgta5-component="Textbox" placeholder="nickname" autocomplete="off" spellcheck="false" 
 			binding="user_nickname"
-			data-tabindex="5" 
+			data-tabindex="4" 
 			character-case="lowercase" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
@@ -66,9 +55,20 @@
 		<label for="userHeaderEdit-obj_user_fullname">Fullname</label>
 		<input id="userHeaderEdit-obj_user_fullname"  fgta5-component="Textbox" placeholder="fullname" autocomplete="off" spellcheck="false" 
 			binding="user_fullname"
-			data-tabindex="6" 
+			data-tabindex="5" 
 			autocomplete="off" spellcheck="false" 
 			maxlength="30" 
+		>
+	</div>
+
+
+	<!-- Combobox: rolelevel_id-->	
+	<div id="userHeaderEdit-obj_rolelevel_id-container" class="input-field" field="userHeaderEdit-obj_rolelevel_id">
+		<label for="userHeaderEdit-obj_rolelevel_id">Level</label>
+		<input id="userHeaderEdit-obj_rolelevel_id"  fgta5-component="Combobox" placeholder="level" autocomplete="off" spellcheck="false" 
+			binding="rolelevel_id"
+			data-tabindex="6" 
+			data-display="rolelevel_name" 
 		>
 	</div>
 
@@ -99,13 +99,24 @@
 	</div>
 
 
-	<!-- Combobox: rolelevel_id-->	
-	<div id="userHeaderEdit-obj_rolelevel_id-container" class="input-field" field="userHeaderEdit-obj_rolelevel_id">
-		<label for="userHeaderEdit-obj_rolelevel_id">Level</label>
-		<input id="userHeaderEdit-obj_rolelevel_id"  fgta5-component="Combobox" placeholder="level" autocomplete="off" spellcheck="false" 
-			binding="rolelevel_id"
+	<!-- Checkbox: user_isdev-->	
+	<div id="userHeaderEdit-obj_user_isdev-container" class="input-field" field="userHeaderEdit-obj_user_isdev">
+		<label for="userHeaderEdit-obj_user_isdev">Developer Access</label>
+		<input id="userHeaderEdit-obj_user_isdev"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
+			binding="user_isdev"
 			data-tabindex="9" 
-			data-display="rolelevel_name" 
+			type="checkbox" 
+		>
+	</div>
+
+
+	<!-- Checkbox: user_isshowallprogram-->	
+	<div id="userHeaderEdit-obj_user_isshowallprogram-container" class="input-field" field="userHeaderEdit-obj_user_isshowallprogram">
+		<label for="userHeaderEdit-obj_user_isshowallprogram">Show All Program</label>
+		<input id="userHeaderEdit-obj_user_isshowallprogram"  fgta5-component="Checkbox" placeholder="" autocomplete="off" spellcheck="false" 
+			binding="user_isshowallprogram"
+			data-tabindex="10" 
+			type="checkbox" 
 		>
 	</div>
 	

@@ -60,6 +60,19 @@ export async function init(self, args) {
 	CurrentState.headerFormLocked = true 
 }
 
+function setDefaultHeadTitle(self, headerForm) {
+	const data = headerForm.getData()
+
+	const detilTitleElements = document.getElementsByClassName('section-detil-title')
+	for (let el of detilTitleElements) {
+		el.innerHTML = data.user_fullname
+	}
+	
+	
+
+}
+
+
 export async function openList(self, params) {
 	const moduleHeaderEdit = params.moduleHeaderEdit
 	
@@ -67,6 +80,8 @@ export async function openList(self, params) {
 	const pk = headerForm.getPrimaryInput()
 	const id = pk.value 
 
+	// set title halaman ini sesuai data di header
+	setDefaultHeadTitle(self, headerForm)
 
 	// apabila mau menambahkan informasi saat detil list dibuka,
 	// misalnya menambahkan informasi beberapa data dari formHeader
@@ -86,12 +101,15 @@ export async function openList(self, params) {
 	tbl.clear()
 	tbl_loadData(self, {criteria, sort})
 
-
+	const userLoginEdit = self.Modules.userLoginEdit
+	const btn_addrow = userLoginEdit.getCurrentState().Actions.newdata
+	const btn_edit = userLoginEdit.getCurrentState().Actions.edit
+	
 	if (CurrentState.headerFormLocked) {
- 		btn_addrow.setAttribute('disabled', '')
+ 		btn_addrow.disabled = true
 		btn_delrow.disabled = true
 	} else {
-		btn_addrow.removeAttribute('disabled')
+		btn_addrow.disabled = false
 		btn_delrow.disabled = false
 	}
 }
@@ -298,6 +316,9 @@ async function tbl_loadData(self, params={}) {
 		if (offset===0) {
 			tbl.clear()
 		}
+
+
+		tbl.setCriteria(criteria)
 		tbl.addRows(result.data)
 		tbl.setNext(result.nextoffset, result.limit)
 
